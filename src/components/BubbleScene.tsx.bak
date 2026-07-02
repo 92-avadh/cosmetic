@@ -1,0 +1,186 @@
+"use client";
+
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { MeshTransmissionMaterial, Environment, useTexture } from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import * as THREE from "three";
+import { useEffect, useRef, useState, Suspense } from "react";
+import { useCartStore } from "@/store/useCartStore";
+
+// Check if WebGL is supported by the client browser
+function hasWebGL() {
+  if (typeof window === "undefined") return false;
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+// Fallback CSS/SVG Glass bubble for browsers without WebGL or low-spec devices
+function CSSBubbleFallback() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-10 overflow-hidden">
+      <div
+        className="w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] rounded-full relative animate-pulse duration-[6000ms]"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(237, 229, 223, 0.1) 40%, rgba(201, 122, 94, 0.15) 80%, rgba(18, 18, 18, 0.05) 100%)",
+          boxShadow:
+            "inset 0 16px 24px rgba(255, 255, 255, 0.35), inset 8px 0 16px rgba(201, 122, 94, 0.2), inset -8px 0 16px rgba(18, 18, 18, 0.15), 0 20px 40px rgba(18, 18, 18, 0.12)",
+          backdropFilter: "blur(5px)",
+          border: "1px solid rgba(255, 255, 255, 0.15)",
+        }}
+      >
+        {/* High specular reflection glare dot */}
+        <div className="absolute top-[15%] left-[20%] w-[10%] h-[10%] bg-white rounded-full opacity-60 filter blur-[1px]" />
+      </div>
+    </div>
+  );
+}
+
+// Renders the background texture inside WebGL so that the transmissive material has pixels to refract
+function BackgroundPlane({ refractImage }: { refractImage: boolean }) {
+  const { viewport } = useThree();
+  const texture = useTexture("/hero-bg.png");
+
+  return (
+    <mesh position={[0, 0, -2.5]} scale={[viewport.width * 1.5, viewport.height * 1.5, 1]}>
+      <planeGeometry />
+      {refractImage ? (
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      ) : (
+        <meshBasicMaterial color="#F6F4EE" toneMapped={false} />
+      )}
+    </mesh>
+  );
+}
+
+// Custom interactive bubble mesh drawing R3F elements
+function BubbleMesh() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const materialRef = useRef<any>(null);
+  const targetPos = useRef(new THREE.Vector3());
+  const mouseVel = useRef(0);
+  const lastMousePos = useRef({ x: 0, y: 0 });
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+
+    // 1. Lerping Position toward cursor
+    const { x, y } = state.pointer; // normalized [-1, 1] cursor position
+    const viewport = state.viewport;
+
+    // Scale movement range to viewport dimensions
+    targetPos.current.set(
+      x * (viewport.width * 0.15),
+      y * (viewport.height * 0.15),
+      0
+    );
+    meshRef.current.position.lerp(targetPos.current, 0.055);
+
+    // 2. Proximity speed/velocity calculation for elastic reaction
+    const dx = x - lastMousePos.current.x;
+    const dy = y - lastMousePos.current.y;
+    const velocity = Math.sqrt(dx * dx + dy * dy);
+    mouseVel.current += (velocity - mouseVel.current) * 0.085;
+
+    lastMousePos.current.x = x;
+    lastMousePos.current.y = y;
+
+    // 3. Ambient oscillation & scale deformation
+    const time = state.clock.getElapsedTime();
+
+    // Soft rotation to cycle specular spots
+    meshRef.current.rotation.y = time * 0.15;
+    meshRef.current.rotation.x = time * 0.07;
+
+    // Wobbling scaling to mimic fluid surface tension
+    const baseWobble = Math.sin(time * 1.8) * 0.03;
+    const dynamicScale = 1.02 + baseWobble + mouseVel.current * 0.55;
+    meshRef.current.scale.set(
+      dynamicScale,
+      dynamicScale + Math.cos(time * 1.4) * 0.015,
+      dynamicScale
+    );
+
+    // Adjust shader material values directly in uniform layers
+    if (materialRef.current) {
+      materialRef.current.distortionScale = 0.45 + mouseVel.current * 2.8;
+      materialRef.current.distortion = 0.25 + mouseVel.current * 1.4;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[1.65, 64, 64]} />
+      <MeshTransmissionMaterial
+        ref={materialRef}
+        transmission={1.0}
+        thickness={0.15} // Low thickness makes it a thin soap film/bubble wall instead of solid heavy glass
+        roughness={0.02} // Highly polished for bright reflections
+        ior={1.33} // Soap film IOR (~1.33)
+        chromaticAberration={0.08} // Color dispersion at grazing angles
+        anisotropicBlur={0.05}
+        distortion={0.25}
+        distortionScale={0.45}
+        temporalDistortion={0.15}
+        color="#ffffff"
+        resolution={512}
+        samples={5}
+        iridescence={1.0} // Enables rainbow thin-film iridescence
+        iridescenceIOR={1.4}
+        iridescenceThicknessRange={[100, 800]} // Wide range for realistic rainbow variations
+      />
+    </mesh>
+  );
+}
+
+export default function BubbleScene({ refractImage = true }: { refractImage?: boolean }) {
+  const [hasWebGLSupport, setHasWebGLSupport] = useState<boolean | null>(null);
+  const currency = useCartStore((state) => state.currency); // Trigger updates if state changes
+
+  useEffect(() => {
+    setHasWebGLSupport(hasWebGL());
+  }, []);
+
+  if (hasWebGLSupport === null) return null;
+  if (!hasWebGLSupport) return <CSSBubbleFallback />;
+
+  return (
+    <div className="absolute inset-0 w-full h-full pointer-events-none select-none z-10">
+      <Canvas
+        dpr={[1, 1.5]}
+        camera={{ position: [0, 0, 5], fov: 42 }}
+        gl={{ alpha: true, antialias: true }}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.8} />
+          
+          {/* Specular highlight spots */}
+          <pointLight position={[-5, 5, 4]} intensity={25} color="#ffffff" />
+          <pointLight position={[5, -5, 2.5]} intensity={12} color="#ffffff" />
+
+          {/* Background plane providing pixels to refract */}
+          <BackgroundPlane refractImage={refractImage} />
+
+          <BubbleMesh />
+
+          <Environment preset="studio" />
+        </Suspense>
+
+        <EffectComposer>
+          <Bloom
+            intensity={0.5}
+            luminanceThreshold={0.8}
+            luminanceSmoothing={0.05}
+          />
+        </EffectComposer>
+      </Canvas>
+    </div>
+  );
+}
