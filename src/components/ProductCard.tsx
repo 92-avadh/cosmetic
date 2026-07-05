@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import CurtainButton from "./CurtainButton";
 
 interface ProductCardProps {
   id: string;
@@ -46,17 +48,23 @@ export default function ProductCard({
   };
 
   return (
-    <div
-      className="interactive-card flex flex-col group relative"
+    <Link
+      href={`/products/${id}`}
+      className="interactive-card flex flex-col group relative cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Images container */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-card-bg border border-line/50 transition-all duration-500">
+        {/* Brand Overlay Badge */}
+        <div className="absolute top-3 left-3 bg-bg/90 backdrop-blur-sm px-2 py-0.5 border border-line/40 text-[7px] tracking-[0.22em] font-bold text-ink uppercase z-10 select-none rounded-[2px]">
+          BODYBARREL
+        </div>
+
         {/* Base Image */}
         <img
           src={image}
-          alt={name}
+          alt={`BODYBARREL - ${name}`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
           }`}
@@ -65,7 +73,7 @@ export default function ProductCard({
         {/* Hover Alt Image */}
         <img
           src={hoverImage}
-          alt={`${name} Texture`}
+          alt={`BODYBARREL - ${name} Texture`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}
@@ -77,13 +85,13 @@ export default function ProductCard({
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
-          <button
+          <CurtainButton
             onClick={handleQuickAdd}
-            className="w-full bg-ink text-bg text-[10px] md:text-xs font-semibold py-3 px-4 tracking-[0.15em] uppercase hover:bg-accent hover:text-bg transition-colors duration-300 flex items-center justify-center space-x-2"
+            className="w-full text-ink border-ink bg-transparent text-[10px] md:text-xs font-semibold py-3 px-4 tracking-[0.15em] uppercase flex items-center justify-center space-x-2"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add to Bag</span>
-          </button>
+          </CurtainButton>
         </div>
       </div>
 
@@ -99,6 +107,7 @@ export default function ProductCard({
           <span className="text-sm font-semibold text-ink/80">{priceString}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
+

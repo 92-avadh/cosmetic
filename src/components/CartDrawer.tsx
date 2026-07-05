@@ -5,6 +5,9 @@ import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartS
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PRODUCTS_CATALOG } from "./ProductRow";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/useUserStore";
+import CurtainButton from "./CurtainButton";
 
 export default function CartDrawer() {
   const {
@@ -15,7 +18,20 @@ export default function CartDrawer() {
     updateQuantity,
     currency,
     addItem,
+    products,
   } = useCartStore();
+
+  const router = useRouter();
+  const { isLoggedIn } = useUserStore();
+
+  const handleCheckoutRedirect = () => {
+    setCartOpen(false);
+    if (isLoggedIn) {
+      router.push("/checkout");
+    } else {
+      router.push("/login?redirect=/checkout");
+    }
+  };
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +66,8 @@ export default function CartDrawer() {
 
   // Find upsell candidates (products in catalog but NOT currently in cart)
   const cartIds = cart.map((i) => i.id);
-  const upsellProducts = PRODUCTS_CATALOG.filter((p) => !cartIds.includes(p.id)).slice(0, 2);
+  const displayProducts = products.length > 0 ? products : PRODUCTS_CATALOG;
+  const upsellProducts = displayProducts.filter((p) => !cartIds.includes(p.id)).slice(0, 2);
 
   return (
     <AnimatePresence>
@@ -125,11 +142,16 @@ export default function CartDrawer() {
                         key={item.id}
                         className="flex space-x-4 border-b border-line/30 pb-6 last:border-b-0"
                       >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-20 h-24 object-cover bg-card-bg border border-line/45 flex-none"
-                        />
+                        <div className="relative w-20 h-24 bg-card-bg border border-line/50 overflow-hidden select-none shrink-0">
+                          <div className="absolute top-1 left-1 bg-bg/95 backdrop-blur-sm px-1 py-0.2 text-[5px] tracking-[0.2em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
+                            BODYBARREL
+                          </div>
+                          <img
+                            src={item.image}
+                            alt={`BODYBARREL - ${item.name}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                         <div className="flex-1 flex flex-col justify-between">
                           <div>
                             <div className="flex justify-between items-start">
@@ -199,13 +221,18 @@ export default function CartDrawer() {
                       return (
                         <div
                           key={product.id}
-                          className="flex items-center space-x-3 p-2 bg-card-bg/60 border border-line/30 rounded"
+                          className="flex items-center space-x-3 p-2 bg-card-bg/60 border border-line/30 rounded relative"
                         >
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-12 h-14 object-cover bg-card-bg"
-                          />
+                          <div className="relative w-12 h-14 shrink-0 overflow-hidden border border-line/20 rounded-[2px]">
+                            <div className="absolute top-0.5 left-0.5 bg-bg/95 px-0.5 py-0.1 text-[4px] tracking-[0.18em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
+                              BODYBARREL
+                            </div>
+                            <img
+                              src={product.image}
+                              alt={`BODYBARREL - ${product.name}`}
+                              className="w-full h-full object-cover bg-card-bg"
+                            />
+                          </div>
                           <div className="flex-1 min-w-0">
                             <h5 className="font-display font-semibold text-[9px] uppercase tracking-wide truncate text-ink">
                               {product.name}
@@ -248,13 +275,13 @@ export default function CartDrawer() {
                 <p className="text-[10px] text-muted leading-relaxed uppercase tracking-wider">
                   Shipping and taxes calculated at checkout. Free shipping on orders over $150.
                 </p>
-                <button
-                  onClick={() => alert("Proceeding to checkout simulation...")}
-                  className="w-full bg-ink text-bg text-xs font-semibold py-4 tracking-[0.2em] uppercase hover:bg-accent hover:text-bg transition-colors duration-300 flex items-center justify-center space-x-2"
+                <CurtainButton
+                  onClick={handleCheckoutRedirect}
+                  className="w-full text-ink border-ink bg-transparent text-[11px] font-semibold py-4 tracking-[0.2em] uppercase flex items-center justify-center space-x-2 cursor-pointer border"
                 >
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </CurtainButton>
               </div>
             )}
           </motion.div>

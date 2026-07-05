@@ -15,7 +15,7 @@ export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   USD: "$",
   EUR: "€",
   KRW: "₩",
-  INR: "₹",
+  INR: "RS. ",
 };
 
 export const CURRENCY_RATES: Record<Currency, number> = {
@@ -30,6 +30,7 @@ interface CartState {
   isCartOpen: boolean;
   currency: Currency;
   isCurrencyModalOpen: boolean;
+  products: any[];
   setCartOpen: (open: boolean) => void;
   setCurrencyModalOpen: (open: boolean) => void;
   setCurrency: (currency: Currency) => void;
@@ -38,6 +39,7 @@ interface CartState {
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   getCartTotal: () => number;
+  fetchProducts: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -45,6 +47,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   isCartOpen: false,
   currency: "USD",
   isCurrencyModalOpen: false,
+  products: [],
   
   setCartOpen: (open) => set({ isCartOpen: open }),
   
@@ -78,4 +81,19 @@ export const useCartStore = create<CartState>((set, get) => ({
     const sumUSD = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     return sumUSD * CURRENCY_RATES[currency];
   },
+
+  fetchProducts: async () => {
+    try {
+      const res = await fetch("/api/all-products");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          set({ products: data });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching products in store:", error);
+    }
+  },
 }));
+

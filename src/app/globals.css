@@ -108,3 +108,58 @@ html.lenis {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
+/* Custom Button Hover Transition Effect */
+.button {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* establish z-index context */
+  transition: color 0.4s cubic-bezier(.11, .82, .39, .92), border-color 0.4s ease, background-color 0.4s ease !important;
+}
+
+.button:before,
+.button:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* place behind text */
+  transform: translateY(-110%); /* resting: pushed above the button, hidden */
+}
+
+.button:before {
+  background: #e8c5c1; /* dusty pink */
+  transition: transform .2s cubic-bezier(.11, .82, .39, .92);
+}
+
+.button:after {
+  background: #2d1c14; /* near-black brown */
+  transition: transform .5s cubic-bezier(.11, .82, .39, .92) .15s;
+}
+
+.button:hover:before,
+.button:hover:after {
+  transform: translateY(0); /* both slide down to fully cover the button */
+}
+
+/* Ensure the text turns off-white on hover to be visible over the near-black brown background */
+.button:hover {
+  background-color: transparent !important;
+  color: #F6F4EE !important;
+  border-color: #2d1c14 !important;
+}
+
+/* Make sure child elements (text spans, icons) remain above the pseudo elements */
+.button > * {
+  position: relative;
+  z-index: 10;
+  pointer-events: none; /* prevent children from capturing pointer events and disrupting transition */
+}
+
+/* Match Lucide icons inside button to turn off-white on hover */
+.button:hover svg {
+  stroke: #F6F4EE !important;
+}
+

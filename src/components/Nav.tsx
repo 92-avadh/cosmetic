@@ -114,9 +114,11 @@ export default function Nav() {
               href="/"
               className="hover:opacity-85 transition-opacity"
             >
-              <span className="font-display font-bold text-2xl md:text-3xl tracking-[0.05em] uppercase text-ink select-none">
-                BODYBARREL
-              </span>
+              <img
+                src="/logo.png"
+                alt="BODYBARREL Logo"
+                className="h-7 md:h-9 w-auto object-contain"
+              />
             </Link>
           </div>
 
@@ -190,9 +192,11 @@ export default function Nav() {
             {/* Mobile Menu Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <span className="font-display font-bold text-xl tracking-[0.05em] uppercase text-ink">
-                  BODYBARREL
-                </span>
+                <img
+                  src="/logo.png"
+                  alt="BODYBARREL Logo"
+                  className="h-6 w-auto object-contain"
+                />
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

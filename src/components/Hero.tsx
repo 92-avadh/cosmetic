@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import CurtainButton from "./CurtainButton";
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,6 +80,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-ink/35 via-transparent to-ink/40" />
       </div>
 
+
       {/* Hero Content Box */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 text-center text-bg flex flex-col items-center">
         <span
@@ -101,12 +103,15 @@ export default function Hero() {
         </h1>
 
         <div ref={ctaRef} className="opacity-0">
-          <a
-            href="#shop"
-            className="inline-block bg-bg text-ink px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase hover:bg-accent hover:text-bg transition-colors duration-300 border border-line"
+          <CurtainButton
+            onClick={() => {
+              const el = document.getElementById("shop");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="bg-transparent text-bg px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase border border-bg/40 rounded-full"
           >
             DISCOVER THE SYSTEM
-          </a>
+          </CurtainButton>
         </div>
       </div>
     </section>

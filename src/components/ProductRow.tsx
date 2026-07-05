@@ -3,42 +3,70 @@
 import useEmblaCarousel from "embla-carousel-react";
 import ProductCard from "./ProductCard";
 
+import { useEffect } from "react";
+import { useCartStore } from "@/store/useCartStore";
+
 export const PRODUCTS_CATALOG = [
   {
-    id: "eye-serum",
-    name: "Eye Fitness Serum",
-    subtitle: "Cellular Recovery 15ml",
-    priceUSD: 85,
-    image: "/products/eye-serum.png",
+    id: "hydra-foam-cleanser",
+    name: "HYDRA-FOAM CLEANSER",
+    subtitle: "Age-Defying, Gentle Hydration Support, + 0.5% PDRN & Hyaluronic Acid",
+    priceUSD: 40.71856,
+    image: "/model.png",
+    hoverImage: "/products/texture-gel.png",
+  },
+  {
+    id: "hydra-nutrition-essence",
+    name: "HYDRA-NUTRITION ESSENCE",
+    subtitle: "Moisture, Nourish + PDRN (Salmon DNA) & Multi-Peptide",
+    priceUSD: 75.4491,
+    image: "/serum.png",
     hoverImage: "/products/cream-texture.png",
   },
   {
-    id: "recovery-cream",
-    name: "Active Recovery Cream",
-    subtitle: "Cell-Fit Hydration 50ml",
-    priceUSD: 110,
-    image: "/products/recovery-cream.png",
-    hoverImage: "/products/cream-texture.png",
+    id: "men-body-wash",
+    name: "Derm-Restore Men's Body Wash",
+    subtitle: "Deep Cleanse & Lipid Barrier Repair 400ml",
+    priceUSD: 38,
+    image: "/products/men-wash.png",
+    hoverImage: "/products/texture-gel.png",
   },
   {
-    id: "glow-mist",
-    name: "Phyto-Stem Glow Mist",
-    subtitle: "Cellular Hydrating Spray 100ml",
-    priceUSD: 65,
-    image: "/products/glow-mist.png",
-    hoverImage: "/products/cream-texture.png",
+    id: "women-body-wash",
+    name: "Aura-Glow Women's Body Wash",
+    subtitle: "Cellular Recovery & Intense Hydration 400ml",
+    priceUSD: 42,
+    image: "/products/women-wash.png",
+    hoverImage: "/products/texture-gel.png",
   },
   {
-    id: "cleansing-gel",
-    name: "Barrier Cleansing Gel",
-    subtitle: "Gentle Amino Wash 150ml",
-    priceUSD: 45,
-    image: "/products/cleansing-gel.png",
-    hoverImage: "/products/cream-texture.png",
+    id: "unisex-body-wash",
+    name: "Bio-Fit Unisex Body Wash",
+    subtitle: "Universal Amino Acid Cleanse 400ml",
+    priceUSD: 36,
+    image: "/products/unisex-wash.png",
+    hoverImage: "/products/texture-gel.png",
+  },
+  {
+    id: "exfoliating-body-wash",
+    name: "Dermal-Micro Exfoliating Wash",
+    subtitle: "Cellular Resurfacing Body Gel 300ml",
+    priceUSD: 40,
+    image: "/products/exfoliating-wash.png",
+    hoverImage: "/products/texture-gel.png",
   },
 ];
 
 export default function ProductRow() {
+  const { products, fetchProducts } = useCartStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Use DB products if loaded, otherwise fallback
+  const displayProducts = products.length > 0 ? products : PRODUCTS_CATALOG;
+
   // Initialize Embla Carousel for mobile snap scrolling, disabled on tablet/desktop (>= 768px)
   const [emblaRef] = useEmblaCarousel({
     align: "start",
@@ -70,7 +98,7 @@ export default function ProductRow() {
         {/* Embla Carousel Wrap for Mobile */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex md:grid md:grid-cols-4 md:gap-8 gap-6">
-            {PRODUCTS_CATALOG.map((product) => (
+            {displayProducts.map((product) => (
               <div
                 key={product.id}
                 className="flex-none w-[78vw] sm:w-[50vw] md:w-auto"

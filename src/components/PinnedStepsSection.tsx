@@ -80,9 +80,13 @@ export default function PinnedStepsSection() {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center h-full w-full">
                 {/* Left Side: Product Image Display */}
                 <div className="md:col-span-5 flex items-center justify-center bg-bg/60 border border-line/35 aspect-square rounded-2xl p-6 relative overflow-hidden select-none">
+                  {/* Brand Overlay Badge */}
+                  <div className="absolute top-4 left-4 bg-bg/90 backdrop-blur-sm px-2.5 py-1 border border-line/45 text-[7px] md:text-[8px] tracking-[0.25em] font-bold text-ink uppercase z-10 rounded-[2px]">
+                    BODYBARREL
+                  </div>
                   <img
                     src={step.image}
-                    alt={step.title}
+                    alt={`BODYBARREL - ${step.title}`}
                     className="w-[80%] h-[80%] object-contain transform hover:scale-105 transition-transform duration-700 ease-out"
                   />
                 </div>

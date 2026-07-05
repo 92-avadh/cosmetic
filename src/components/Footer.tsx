@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore, Currency } from "@/store/useCartStore";
+import CurtainButton from "./CurtainButton";
 
 export default function Footer() {
   const { currency, setCurrency } = useCartStore();
@@ -23,9 +24,11 @@ export default function Footer() {
           
           {/* Gigantic Brand Logo on Left */}
           <div className="col-span-1 lg:col-span-7 flex items-center">
-            <span className="font-display font-bold text-6xl md:text-[100px] tracking-tight uppercase text-ink select-none leading-none">
-              BODYBARREL
-            </span>
+            <img
+              src="/logo.png"
+              alt="BODYBARREL Logo"
+              className="max-h-16 md:max-h-24 w-auto object-contain"
+            />
           </div>
 
           {/* Subscribe to Newsletters & Country/Region Selector on Right */}
@@ -46,12 +49,12 @@ export default function Footer() {
                     required
                   />
                 </div>
-                <button
+                <CurtainButton
                   type="submit"
-                  className="border border-ink/80 hover:bg-ink hover:text-bg transition-colors py-2 px-8 text-xs uppercase tracking-widest font-semibold cursor-pointer shrink-0 w-full sm:w-auto font-sans"
+                  className="border border-ink/80 py-2.5 px-8 text-xs uppercase tracking-widest font-semibold cursor-pointer shrink-0 w-full sm:w-auto font-sans"
                 >
                   SUBMIT
-                </button>
+                </CurtainButton>
               </form>
               
               {isSubscribed && (

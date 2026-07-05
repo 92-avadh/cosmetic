@@ -7,9 +7,22 @@ import { Trash2, Plus, Minus, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { PRODUCTS_CATALOG } from "@/components/ProductRow";
 import ProductCard from "@/components/ProductCard";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/useUserStore";
+import CurtainButton from "@/components/CurtainButton";
 
 export default function CartPage() {
+  const router = useRouter();
+  const { isLoggedIn } = useUserStore();
   const { cart, updateQuantity, removeItem, getCartTotal, currency } = useCartStore();
+
+  const handleCheckoutRedirect = () => {
+    if (isLoggedIn) {
+      router.push("/checkout");
+    } else {
+      router.push("/login?redirect=/checkout");
+    }
+  };
 
   const symbol = CURRENCY_SYMBOLS[currency];
   const rate = CURRENCY_RATES[currency];
@@ -127,10 +140,13 @@ export default function CartPage() {
                 </div>
 
                 <div className="pt-2">
-                  <button className="w-full bg-ink text-bg text-[11px] font-semibold py-4 uppercase tracking-[0.2em] hover:bg-accent hover:text-bg transition-colors flex items-center justify-center space-x-2">
+                  <CurtainButton
+                    onClick={handleCheckoutRedirect}
+                    className="w-full text-ink border border-ink bg-transparent text-[11px] font-semibold py-4 uppercase tracking-[0.2em] cursor-pointer"
+                  >
                     <span>Proceed to Checkout</span>
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </CurtainButton>
                 </div>
 
                 <div className="flex items-center gap-3 justify-center text-[10px] text-muted tracking-widest uppercase">
@@ -146,12 +162,12 @@ export default function CartPage() {
                 <span className="text-sm text-muted uppercase tracking-[0.2em] block">
                   Your shopping bag is empty
                 </span>
-                <Link
-                  href="/shop"
-                  className="inline-block px-10 py-4 bg-ink text-bg text-xs font-semibold tracking-widest uppercase hover:bg-accent hover:text-bg transition-colors duration-300 border border-line"
+                <CurtainButton
+                  onClick={() => router.push("/shop")}
+                  className="inline-block px-10 py-4 text-ink border border-ink bg-transparent text-xs font-semibold tracking-widest uppercase"
                 >
                   Discover The System
-                </Link>
+                </CurtainButton>
               </div>
 
               {/* Recommended items carousel list */}

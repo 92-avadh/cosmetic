@@ -7,16 +7,16 @@ import { motion } from "framer-motion";
 export default function UsPage() {
   const brandPillars = [
     {
-      title: "Biocompatible Research",
-      desc: "Our labs develop cellular ingredients that map precisely to human biological structures, maximizing absorption speed and structural efficacy."
+      title: "Biocompatible Cleansing",
+      desc: "Our labs develop cellular-level body wash formulas that cleanse impurities without damaging or dissolving the body's natural lipid barrier."
     },
     {
-      title: "Seoul Clinical Labs",
-      desc: "Every formulation is designed, synthesized, and clinically evaluated in collaboration with leading skin research scientists in Seoul, Korea."
+      title: "Advanced Body Regimens",
+      desc: "Every product is tailored for specific skin needs—engineered with targeted bio-actives for Men's thicker dermis, Women's delicate barriers, and Unisex applications."
     },
     {
-      title: "Purity & Integrity",
-      desc: "We isolate high-potency raw active ingredients while avoiding synthetic fillers, silicones, micro-plastics, and structural parabens."
+      title: "Clean Bio-Actives",
+      desc: "We isolate high-potency marine biotics and botanicals while strictly avoiding harsh sulfates, silicones, micro-plastics, and synthetic colorants."
     }
   ];
 
@@ -32,10 +32,10 @@ export default function UsPage() {
             </span>
             <h1 className="font-display font-semibold text-4xl sm:text-6xl uppercase tracking-tight text-ink leading-tight">
               BODYBARREL: <br />
-              <span className="text-accent">CELLULAR STRENGTH</span>
+              <span className="text-accent">BODY STRENGTH</span>
             </h1>
             <p className="text-sm md:text-base text-muted leading-relaxed">
-              Founded in collaboration with prominent clinical skin biochemists, BODYBARREL is dedicated to building structural skin fitness from within. We believe the skin is an active organ that can be trained, repaired, and structurally optimized through advanced molecular biology.
+              Founded in collaboration with prominent skin biochemists, BODYBARREL is dedicated to building structural skin fitness for the entire body. We believe that body skin requires specialized care, utilizing advanced molecular science to maintain and protect its critical lipid barrier.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ export default function UsPage() {
             {/* Main Narrative Image */}
             <div className="relative aspect-[16/10] bg-card-bg border border-line rounded-2xl overflow-hidden shadow-sm">
               <img
-                src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1000&auto=format&fit=crop"
+                src="/products/us-narrative.png"
                 alt="Research Laboratory Extraction"
                 className="w-full h-full object-cover filter brightness-95 saturate-[0.85]"
               />
@@ -52,14 +52,119 @@ export default function UsPage() {
             {/* Narrative text block */}
             <div className="space-y-6 max-w-xl">
               <h2 className="font-display font-semibold text-xl md:text-2xl uppercase tracking-wide text-ink">
-                THE KOREAN CLINICAL ENGINE
+                THE CLINICAL ENGINE
               </h2>
               <p className="text-sm sm:text-base text-muted leading-relaxed">
-                By sourcing wild-derived marine cellular fragments and utilizing advanced enzymatic micro-filtration, we create active formulas that stimulate deep dermal density. We bridge the gap between active molecular genetics and daily skin routines.
+                By sourcing wild-derived marine cellular fragments and utilizing advanced enzymatic micro-filtration, we create active body washes that stimulate deep hydration. We bridge the gap between clinical molecular biology and daily shower routines.
               </p>
               <p className="text-sm sm:text-base text-muted leading-relaxed">
-                Each product is formulated inside our partnering clinical laboratory in Seoul. Through hundreds of skin tests, we ensure the stability and safety of our low-molecular weight polynucleotides, establishing a new global benchmark for skin longevity and health.
+                Each product is formulated inside our partnering clinical laboratory. Through hundreds of skin trials, we ensure the stability and safety of our formulas, establishing a new global benchmark for whole-body skin longevity and health.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Founders & Clinical Advisory Board */}
+        <section className="max-w-7xl mx-auto px-6 md:px-12 py-24 border-t border-line/50">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 space-y-4 md:space-y-0">
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] font-semibold text-accent block mb-3">
+                Expertise & Chemistry
+              </span>
+              <h2 className="font-display font-semibold text-3xl md:text-5xl uppercase tracking-tight text-ink">
+                THE CLINICAL BOARD
+              </h2>
+            </div>
+            <p className="text-sm md:text-base text-muted max-w-md">
+              Led by veteran cosmetic biochemists and researchers dedicated to cell volume kinetics and skin barrier longevity.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-4">
+              <div className="aspect-[4/3] bg-card-bg border border-line rounded-xl overflow-hidden relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=500&auto=format&fit=crop" 
+                  alt="Dr. Jun-Ho Park" 
+                  className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-accent">Chief Formulation Scientist</span>
+                <h3 className="font-display font-semibold text-lg text-ink uppercase mt-1">Dr. Jun-Ho Park</h3>
+                <p className="text-xs text-muted mt-2 leading-relaxed">
+                  Over 18 years in dermal reconstruction. Former research director at Seoul National Dermal Sciences Center.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="aspect-[4/3] bg-card-bg border border-line rounded-xl overflow-hidden relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=500&auto=format&fit=crop" 
+                  alt="Dr. Elena Rostova" 
+                  className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-accent">Director of Barrier Longevity</span>
+                <h3 className="font-display font-semibold text-lg text-ink uppercase mt-1">Dr. Elena Rostova</h3>
+                <p className="text-xs text-muted mt-2 leading-relaxed">
+                  Specializes in intercellular lipid matrix synthesis. Author of multiple peer-reviewed studies on TEWL suppression.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="aspect-[4/3] bg-card-bg border border-line rounded-xl overflow-hidden relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=500&auto=format&fit=crop" 
+                  alt="Min-Sik Cho" 
+                  className="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-accent">Head of Clinical Evaluation</span>
+                <h3 className="font-display font-semibold text-lg text-ink uppercase mt-1">Min-Sik Cho</h3>
+                <p className="text-xs text-muted mt-2 leading-relaxed">
+                  Oversees all skin trial protocols and bio-absorption testing. Ensures zero allergen indices across all formulas.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Eco & Sustainability Green-Tech Sourcing */}
+        <section className="max-w-7xl mx-auto px-6 md:px-12 py-24 border-t border-line/50">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-5 space-y-6">
+              <span className="text-xs uppercase tracking-[0.2em] font-semibold text-accent block">
+                Responsible Science
+              </span>
+              <h2 className="font-display font-semibold text-3xl md:text-4xl uppercase tracking-tight text-ink">
+                GREEN-TECH & COLD EXTRACTION
+              </h2>
+              <p className="text-xs md:text-sm text-muted leading-relaxed">
+                We utilize standard low-heat enzymatic digestion and microfiltration to isolate plant and marine actives without high-temperature carbon emissions. This ensures the molecules retain their biological structure and efficacy.
+              </p>
+              <div className="grid grid-cols-2 gap-6 pt-4 border-t border-line/30">
+                <div>
+                  <span className="text-lg font-bold text-accent block">100%</span>
+                  <span className="text-[9px] uppercase tracking-wider text-muted font-bold block mt-1">Recycled Aluminum Bottles</span>
+                </div>
+                <div>
+                  <span className="text-lg font-bold text-accent block">Zero</span>
+                  <span className="text-[9px] uppercase tracking-wider text-muted font-bold block mt-1">Microplastics Or Sulfates</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 aspect-[16/9] bg-card-bg border border-line rounded-2xl overflow-hidden relative">
+              <img 
+                src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop" 
+                alt="Eco Conscious Laboratory Forestry" 
+                className="w-full h-full object-cover filter saturate-[0.7] brightness-95"
+              />
             </div>
           </div>
         </section>
