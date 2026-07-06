@@ -9,14 +9,8 @@ function getPrisma(): PrismaClient {
 
   if (typeof window === "undefined") {
     if (process.env.NODE_ENV === "production") {
-      // Indirect require to bypass Next.js static analysis and compilation warnings in Edge runtime
-      const req = typeof require !== "undefined" ? require : undefined;
-      if (!req) {
-        throw new Error("require is not defined. Cannot load database drivers.");
-      }
-      const { Pool } = req("pg");
-      const { PrismaPg } = req("@prisma/adapter-pg");
-      
+      const { Pool } = eval('require("pg")');
+      const { PrismaPg } = eval('require("@prisma/adapter-pg")');
       const connectionString = process.env.DATABASE_URL;
       const pool = new Pool({ connectionString });
       const adapter = new PrismaPg(pool);
