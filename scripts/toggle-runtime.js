@@ -19,7 +19,19 @@ function processDirectory(dir) {
       const targetStr = `export const runtime = "${targetRuntime}";`;
       const sourceStr = `export const runtime = "${sourceRuntime}";`;
       
-      if (content.includes(sourceStr)) {
+      // Skip files that use pg/Prisma (db.ts) — these are Node.js-only and
+      // cannot run in Edge Runtime. They must stay on the "nodejs" runtime.
+      const usesNodeDb =
+        content.includes('from "@/lib/db"') ||
+        content.includes("from '@/lib/db'") ||
+        content.includes('require("@/lib/db")') ||
+        content.includes("require('@/lib/db')");
+
+      if (usesNodeDb && targetRuntime === "edge") {
+        console.log(
+          `Skipping (Node.js DB dependency): ${path.relative(path.join(__dirname, ".."), fullPath)}`
+        );
+      } else if (content.includes(sourceStr)) {
         content = content.replace(sourceStr, targetStr);
         fs.writeFileSync(fullPath, content, "utf8");
         console.log(`Updated runtime in: ${path.relative(path.join(__dirname, ".."), fullPath)} -> ${targetRuntime}`);
