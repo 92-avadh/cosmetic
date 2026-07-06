@@ -31,7 +31,15 @@ export async function sendEmail({
       return { success: true, mocked: true };
     }
 
-    const nodemailer = eval('require("nodemailer")');
+    // Indirect require to bypass Next.js compilation warnings in Edge runtime
+    const dynamicRequire = typeof require !== "undefined" ? require : undefined;
+    const nodemailer = dynamicRequire ? dynamicRequire("nodemailer") : null;
+
+    if (!nodemailer) {
+      console.warn("Nodemailer is not available in this environment. Email was mocked.");
+      return { success: true, mocked: true };
+    }
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
