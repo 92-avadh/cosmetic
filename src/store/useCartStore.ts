@@ -31,6 +31,7 @@ interface CartState {
   currency: Currency;
   isCurrencyModalOpen: boolean;
   products: any[];
+  hasFetchedCart: boolean;
   setCartOpen: (open: boolean) => void;
   setCurrencyModalOpen: (open: boolean) => void;
   setCurrency: (currency: Currency) => void;
@@ -40,6 +41,8 @@ interface CartState {
   clearCart: () => void;
   getCartTotal: () => number;
   fetchProducts: () => Promise<void>;
+  setCart: (cart: CartItem[]) => void;
+  setHasFetchedCart: (hasFetchedCart: boolean) => void;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -48,6 +51,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   currency: "USD",
   isCurrencyModalOpen: false,
   products: [],
+  hasFetchedCart: false,
   
   setCartOpen: (open) => set({ isCartOpen: open }),
   
@@ -74,7 +78,11 @@ export const useCartStore = create<CartState>((set, get) => ({
       .map((item) => (item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item)),
   })),
   
-  clearCart: () => set({ cart: [] }),
+  clearCart: () => set({ cart: [], hasFetchedCart: false }),
+
+  setCart: (cart) => set({ cart }),
+  
+  setHasFetchedCart: (hasFetchedCart) => set({ hasFetchedCart }),
   
   getCartTotal: () => {
     const { cart, currency } = get();

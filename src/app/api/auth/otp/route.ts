@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -34,16 +37,23 @@ export async function POST(request: Request) {
       },
     });
 
-    // Print to terminal console with high-visibility formatting
-    console.log("\n");
-    console.log("┌────────────────────────────────────────────────────────┐");
-    console.log("│             BODYBARREL SECURITY VERIFICATION           │");
-    console.log("├────────────────────────────────────────────────────────┤");
-    console.log(`│ Email:    ${emailKey.padEnd(45)} │`);
-    console.log(`│ OTP Code: \x1b[36m\x1b[1m${otp}\x1b[0m (Use to confirm identity)             │`);
-    console.log("│ Expires:  In 5 minutes                                 │");
-    console.log("└────────────────────────────────────────────────────────┘");
-    console.log("\n");
+    const emailHtml = `
+      <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+        <h2 style="font-size: 18px; font-weight: 600; color: #111111; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 20px; border-bottom: 1px solid #eaeaea; padding-bottom: 12px;">BODYBARREL Verification</h2>
+        <p style="font-size: 13px; color: #666666; line-height: 1.6; margin-bottom: 25px;">Please use the security code below to complete your sign-in. This code is valid for 5 minutes.</p>
+        <div style="font-size: 28px; font-weight: 700; letter-spacing: 0.2em; text-align: center; color: #111111; margin: 30px 0; background-color: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea; font-family: monospace;">
+          ${otp}
+        </div>
+        <p style="font-size: 11px; color: #999999; margin-top: 35px; border-t: 1px solid #eaeaea; padding-top: 12px; line-height: 1.5;">If you did not request this login code, you can safely ignore this message.</p>
+      </div>
+    `;
+
+    // Dispatch the verification email
+    await sendEmail({
+      to: emailKey,
+      subject: `Your BODYBARREL Verification Code: ${otp}`,
+      html: emailHtml,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

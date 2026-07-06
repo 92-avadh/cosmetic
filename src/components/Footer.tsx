@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { useCartStore, Currency } from "@/store/useCartStore";
 import CurtainButton from "./CurtainButton";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./animate-ui/components/radix/dropdown-menu";
 
 export default function Footer() {
   const { currency, setCurrency } = useCartStore();
@@ -27,7 +34,7 @@ export default function Footer() {
             <img
               src="/logo.png"
               alt="BODYBARREL Logo"
-              className="max-h-16 md:max-h-24 w-auto object-contain"
+              className="max-h-24 md:max-h-36 w-auto object-contain"
             />
           </div>
 
@@ -67,16 +74,22 @@ export default function Footer() {
             {/* Region / Shop Selector */}
             <div className="flex items-center space-x-2 text-[11px] tracking-[0.2em] font-semibold text-ink font-sans pt-2">
               <span className="text-ink/65 uppercase">SHOP IN:</span>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="bg-transparent border-b border-ink/40 outline-none text-[11px] font-bold tracking-widest text-ink uppercase py-0.5 pr-4 cursor-pointer font-sans"
-              >
-                <option value="INR" className="bg-bg text-ink">India (INR)</option>
-                <option value="USD" className="bg-bg text-ink">United States (USD)</option>
-                <option value="EUR" className="bg-bg text-ink">Europe (EUR)</option>
-                <option value="KRW" className="bg-bg text-ink">South Korea (KRW)</option>
-              </select>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="border-0 border-b border-ink/45 rounded-none px-0 py-0.5 h-auto text-[11px] font-bold text-ink uppercase tracking-widest bg-transparent hover:bg-transparent shadow-none hover:text-accent select-none cursor-pointer">
+                    {currency === "INR" ? "India (INR)" :
+                     currency === "USD" ? "United States (USD)" :
+                     currency === "EUR" ? "Europe (EUR)" :
+                     "South Korea (KRW)"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => setCurrency("INR")}>India (INR)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCurrency("USD")}>United States (USD)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCurrency("EUR")}>Europe (EUR)</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCurrency("KRW")}>South Korea (KRW)</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

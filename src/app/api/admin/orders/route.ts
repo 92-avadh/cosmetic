@@ -1,0 +1,87 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { prisma } from "@/lib/db";
+import { verifySession } from "@/lib/session";
+
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
+
+// Authentication helper
+async function checkAdminAuth() {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) return false;
+  const payload = await verifySession(sessionCookie);
+  return payload?.role === "ADMIN";
+}
+
+// GET: Fetch all orders
+export async function GET(request: Request) {
+  try {
+    if (!(await checkAdminAuth())) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(orders);
+  } catch (error: any) {
+    console.error("GET Admin Orders Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to fetch orders" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST: Update order status
+export async function POST(request: Request) {
+  try {
+    if (!(await checkAdminAuth())) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
+    const { orderId, status } = await request.json();
+
+    if (!orderId || !status) {
+      return NextResponse.json({ error: "orderId and status are required" }, { status: 400 });
+    }
+
+    // Validate status value
+    const allowedStatuses = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
+    if (!allowedStatuses.includes(status)) {
+      return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { status },
+      include: {
+        user: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true, order: updatedOrder });
+  } catch (error: any) {
+    console.error("POST Admin Orders Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to update order status" },
+      { status: 500 }
+    );
+  }
+}

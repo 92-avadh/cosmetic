@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
+import { verifySession } from "@/lib/session";
+
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { action, email, firstName, lastName, addressDetails } = body;
-
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
+    if (!sessionCookie) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const emailKey = email.toLowerCase().trim();
+    const payload = await verifySession(sessionCookie);
+    if (!payload || !payload.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { action, firstName, lastName, addressDetails } = body;
+    const emailKey = payload.email.toLowerCase().trim();
 
     // Action 1: Get/Fetch user details
     if (action === "get") {
@@ -44,6 +54,7 @@ export async function POST(request: Request) {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
           addresses: user.addresses,
           orders: user.orders,
         },

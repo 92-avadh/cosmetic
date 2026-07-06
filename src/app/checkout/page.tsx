@@ -27,6 +27,12 @@ export default function CheckoutPage() {
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
 
+  // Promo Code States
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+
   // Guard against hydration mismatches and check login status
   useEffect(() => {
     setMounted(true);
@@ -50,9 +56,11 @@ export default function CheckoutPage() {
   const symbol = CURRENCY_SYMBOLS[currency];
   const rate = CURRENCY_RATES[currency];
   const subtotal = getCartTotal();
-  const shipping = subtotal > 150 * rate ? 0 : 15 * rate;
-  const tax = subtotal * 0.088; // mock 8.8% tax
-  const total = subtotal + shipping + tax;
+  const discountAmount = appliedPromo ? subtotal * appliedPromo.discount : 0;
+  const discountedSubtotal = subtotal - discountAmount;
+  const shipping = discountedSubtotal > 150 * rate ? 0 : 15 * rate;
+  const tax = discountedSubtotal * 0.088; // mock 8.8% tax
+  const total = discountedSubtotal + shipping + tax;
 
   const formatPrice = (priceUSD: number) => {
     const converted = priceUSD * rate;
@@ -60,6 +68,38 @@ export default function CheckoutPage() {
       minimumFractionDigits: currency === "KRW" ? 0 : 2,
       maximumFractionDigits: currency === "KRW" ? 0 : 2,
     })}`;
+  };
+
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode) return;
+    
+    setPromoError("");
+    setIsValidatingPromo(true);
+    
+    try {
+      const res = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoCode }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to validate code");
+      }
+      
+      setAppliedPromo({
+        code: data.code,
+        discount: data.discount,
+      });
+      setPromoCode("");
+    } catch (err: any) {
+      setPromoError(err.message || "Invalid promo code.");
+      setAppliedPromo(null);
+    } finally {
+      setIsValidatingPromo(false);
+    }
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -71,14 +111,14 @@ export default function CheckoutPage() {
     
     setFormError("");
     setIsOrdering(true);
-
+    
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: user?.email,
-          totalUSD: total,
+          totalUSD: total / rate, // Send total in USD to the database
           items: cart.map((item) => ({
             id: item.id,
             name: item.name,
@@ -296,7 +336,7 @@ export default function CheckoutPage() {
                 </h3>
 
                 {/* Cart Items List */}
-                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                <div className="space-y-4 max-h-[220px] overflow-y-auto pr-2">
                   {cart.map((item) => (
                     <div key={item.id} className="flex gap-4 border-b border-line/30 pb-4 last:border-b-0 last:pb-0 items-center justify-between">
                       <div className="flex gap-3 items-center min-w-0">
@@ -315,12 +355,55 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Promo Code Input Form */}
+                <form onSubmit={handleApplyPromo} className="space-y-2.5 pt-4 border-t border-line/30">
+                  <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Promo / Discount Code</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. WELCOME10"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      disabled={isValidatingPromo}
+                      className="flex-1 bg-bg border border-line rounded-xl px-4 py-2.5 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isValidatingPromo || !promoCode}
+                      className="px-5 py-2.5 border border-ink text-[10px] font-semibold uppercase tracking-wider hover:bg-accent hover:text-bg hover:border-accent transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      {isValidatingPromo ? "..." : "Apply"}
+                    </button>
+                  </div>
+                  {promoError && (
+                    <p className="text-[10px] text-accent font-medium mt-1">{promoError}</p>
+                  )}
+                  {appliedPromo && (
+                    <div className="flex items-center justify-between text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg p-2.5 font-medium mt-1">
+                      <span>Code "{appliedPromo.code}" applied ({appliedPromo.discount * 100}% off)</span>
+                      <button
+                        type="button"
+                        onClick={() => setAppliedPromo(null)}
+                        className="text-[10px] font-bold hover:text-emerald-800 ml-2 uppercase tracking-wider"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </form>
+
                 {/* Calculations summary */}
                 <div className="space-y-4 text-xs font-medium uppercase tracking-wider text-ink/80 border-t border-line/60 pt-6">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span className="font-semibold text-ink">{symbol}{subtotal.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                   </div>
+                  {appliedPromo && (
+                    <div className="flex justify-between text-emerald-600 font-semibold">
+                      <span>Discount ({appliedPromo.code})</span>
+                      <span>-{symbol}{discountAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span>Estimated Shipping</span>
                     <span className="font-semibold text-ink">

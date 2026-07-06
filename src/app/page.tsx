@@ -28,8 +28,17 @@ export default function Home() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Trigger loading fadeout once progress hits 100%
   useEffect(() => {
-    let progress = 0;
+    if (loadingProgress >= 100) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingProgress]);
+
+  useEffect(() => {
     let isLoaded = false;
     let interval: NodeJS.Timeout;
 
@@ -52,23 +61,25 @@ export default function Home() {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 600); // smooth fade out transition
           return 100;
         }
 
+        let next = prev;
         // If page has loaded, speed up to 100%
         if (isLoaded) {
-          return Math.min(100, prev + 6);
+          next = Math.min(100, prev + 6);
+        } else if (prev < 90) {
+          // Otherwise, crawl slowly up to 90%, then even slower to 98%
+          const diff = 90 - prev;
+          next = prev + Math.max(0.2, diff * 0.05); // slowing increment
+        } else if (prev < 98) {
+          next = prev + 0.05; // tiny crawl near the end
         }
 
-        // Otherwise, crawl slowly up to 90%, then even slower to 98%
-        if (prev < 90) {
-          const diff = 90 - prev;
-          return prev + Math.max(0.2, diff * 0.05); // slowing increment
-        } else if (prev < 98) {
-          return prev + 0.05; // tiny crawl near the end
+        if (next >= 100) {
+          clearInterval(interval);
         }
-        return prev;
+        return next;
       });
     }, 30);
 

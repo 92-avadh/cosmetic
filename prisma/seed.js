@@ -106,6 +106,25 @@ async function main() {
     console.log(`✓ Product upserted: ${upserted.name} (${upserted.id})`);
   }
 
+  // 4. Seed default promo codes
+  const defaultPromoCodes = [
+    { code: "WELCOME10", discount: 0.10 },
+    { code: "FIT20", discount: 0.20 },
+    { code: "BODYBARREL30", discount: 0.30 },
+  ];
+
+  for (const promo of defaultPromoCodes) {
+    const upsertedPromo = await prisma.promoCode.upsert({
+      where: { code: promo.code },
+      update: {
+        discount: promo.discount,
+        isActive: true,
+      },
+      create: promo,
+    });
+    console.log(`✓ Promo code upserted: ${upsertedPromo.code} (${Math.round(upsertedPromo.discount * 100)}% off)`);
+  }
+
   console.log("✨ Database seeding completed successfully.");
 }
 

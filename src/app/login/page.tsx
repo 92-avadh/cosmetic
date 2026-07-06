@@ -88,7 +88,7 @@ function LoginForm() {
       }
 
       // Successful login
-      login(email);
+      login(email, data.user?.role);
       router.push(redirect);
     } catch (err: any) {
       setError(err.message || "Failed to verify security code.");

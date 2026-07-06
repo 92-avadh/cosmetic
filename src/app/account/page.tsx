@@ -107,7 +107,12 @@ export default function AccountPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("Logout API failed:", err);
+    }
     logout();
     router.push("/");
   };
@@ -211,6 +216,16 @@ export default function AccountPage() {
                 );
               })}
               
+              {user?.role === "ADMIN" && (
+                <Link
+                  href="/admin"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold tracking-wider uppercase rounded-xl text-accent bg-accent/5 hover:bg-accent/15 border border-accent/25 transition-all mt-2"
+                >
+                  <ShieldCheck className="w-4.5 h-4.5 shrink-0" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              )}
+              
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-3 text-xs font-semibold tracking-wider uppercase rounded-xl text-accent hover:bg-accent/10 border border-transparent transition-all mt-4"
@@ -281,6 +296,81 @@ export default function AccountPage() {
                           </div>
                           <span className="text-sm font-semibold text-ink ml-4 shrink-0">${order.totalUSD.toFixed(2)}</span>
                         </div>
+
+                        {/* Visual Tracking Stepper */}
+                        {order.status !== "CANCELLED" ? (
+                          <div className="mt-6 pt-5 border-t border-line/35 flex items-center justify-between max-w-lg text-[9px] uppercase tracking-wider font-semibold text-muted/75 relative">
+                            {/* Connector Line Background */}
+                            <div className="absolute top-[27px] left-[12%] right-[12%] h-[1.5px] bg-line/35 z-0" />
+                            
+                            {/* Connector Line Progress */}
+                            <div 
+                              className="absolute top-[27px] left-[12%] h-[1.5px] bg-accent z-0 transition-all duration-500" 
+                              style={{
+                                width: 
+                                  order.status === "PAID" 
+                                    ? "25.3%" 
+                                    : order.status === "SHIPPED" 
+                                    ? "50.6%" 
+                                    : order.status === "DELIVERED" 
+                                    ? "76%" 
+                                    : "0%"
+                              }}
+                            />
+
+                            {/* Step 1: Ordered */}
+                            <div className="flex flex-col items-center gap-2 flex-1 relative z-10">
+                              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold font-mono text-[9px] transition-colors duration-300 ${
+                                ["PENDING", "PAID", "SHIPPED", "DELIVERED"].includes(order.status)
+                                  ? "bg-accent border-accent text-bg"
+                                  : "bg-bg border-line"
+                              }`}>
+                                1
+                              </span>
+                              <span className={["PENDING", "PAID", "SHIPPED", "DELIVERED"].includes(order.status) ? "text-ink" : ""}>Ordered</span>
+                            </div>
+
+                            {/* Step 2: Paid */}
+                            <div className="flex flex-col items-center gap-2 flex-1 relative z-10">
+                              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold font-mono text-[9px] transition-colors duration-300 ${
+                                ["PAID", "SHIPPED", "DELIVERED"].includes(order.status)
+                                  ? "bg-accent border-accent text-bg"
+                                  : "bg-bg border-line"
+                              }`}>
+                                2
+                              </span>
+                              <span className={["PAID", "SHIPPED", "DELIVERED"].includes(order.status) ? "text-ink" : ""}>Paid</span>
+                            </div>
+
+                            {/* Step 3: Shipped */}
+                            <div className="flex flex-col items-center gap-2 flex-1 relative z-10">
+                              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold font-mono text-[9px] transition-colors duration-300 ${
+                                ["SHIPPED", "DELIVERED"].includes(order.status)
+                                  ? "bg-accent border-accent text-bg"
+                                  : "bg-bg border-line"
+                              }`}>
+                                3
+                              </span>
+                              <span className={["SHIPPED", "DELIVERED"].includes(order.status) ? "text-ink" : ""}>Shipped</span>
+                            </div>
+
+                            {/* Step 4: Delivered */}
+                            <div className="flex flex-col items-center gap-2 flex-1 relative z-10">
+                              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold font-mono text-[9px] transition-colors duration-300 ${
+                                order.status === "DELIVERED"
+                                  ? "bg-accent border-accent text-bg"
+                                  : "bg-bg border-line"
+                              }`}>
+                                4
+                              </span>
+                              <span className={order.status === "DELIVERED" ? "text-ink" : ""}>Delivered</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-4 pt-3 border-t border-line/30 text-[10px] text-accent font-semibold uppercase tracking-wider">
+                            Order Cancelled & Voided
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -18,6 +18,11 @@ export default function SmoothScrollProvider({
     // Register GSAP ScrollTrigger inside useEffect to prevent SSR reference errors
     gsap.registerPlugin(ScrollTrigger);
 
+    // Skip Lenis on admin dashboard (uses its own nested scroll container)
+    if (pathname.startsWith("/admin")) {
+      return;
+    }
+
     // Check for user reduced motion preference
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -57,7 +62,7 @@ export default function SmoothScrollProvider({
       gsap.ticker.remove(updateTicker);
       ScrollTrigger.killAll();
     };
-  }, []);
+  }, [pathname]);
 
   // Set up global text scroll-reveal trigger on page changes
   useEffect(() => {

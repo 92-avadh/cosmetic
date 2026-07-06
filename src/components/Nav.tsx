@@ -13,6 +13,8 @@ export default function Nav() {
   const { cart, setCartOpen, setCurrencyModalOpen, currency } = useCartStore();
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
 
+
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 40);
@@ -106,6 +108,7 @@ export default function Nav() {
               </span>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
             </Link>
+
           </nav>
 
           {/* Center Brand Logo */}
@@ -117,7 +120,7 @@ export default function Nav() {
               <img
                 src="/logo.png"
                 alt="BODYBARREL Logo"
-                className="h-7 md:h-9 w-auto object-contain"
+                className="h-10 md:h-14 w-auto object-contain"
               />
             </Link>
           </div>
@@ -195,7 +198,7 @@ export default function Nav() {
                 <img
                   src="/logo.png"
                   alt="BODYBARREL Logo"
-                  className="h-6 w-auto object-contain"
+                  className="h-9 w-auto object-contain"
                 />
               </div>
               <button

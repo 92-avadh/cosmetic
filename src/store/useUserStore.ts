@@ -3,12 +3,13 @@ import { persist } from "zustand/middleware";
 
 export interface User {
   email: string;
+  role?: string;
 }
 
 interface UserState {
   user: User | null;
   isLoggedIn: boolean;
-  login: (email: string) => void;
+  login: (email: string, role?: string) => void;
   logout: () => void;
 }
 
@@ -17,7 +18,7 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       isLoggedIn: false,
-      login: (email) => set({ user: { email }, isLoggedIn: true }),
+      login: (email, role) => set({ user: { email, role }, isLoggedIn: true }),
       logout: () => set({ user: null, isLoggedIn: false }),
     }),
     {

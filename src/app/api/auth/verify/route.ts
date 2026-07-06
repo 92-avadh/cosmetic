@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
+import { signSession } from "@/lib/session";
+
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -53,12 +57,30 @@ export async function POST(request: Request) {
     });
 
     // Create the User in the DB if they don't already exist (Auto-registration)
+    const isAdmin = emailKey === "dhameliyaavadh592@gmail.com";
     const user = await prisma.user.upsert({
       where: { email: emailKey },
-      update: {}, // keep existing user info
+      update: isAdmin ? { role: "ADMIN" } : {},
       create: {
         email: emailKey,
+        role: isAdmin ? "ADMIN" : "USER",
       },
+    });
+
+    // Set HTTP-only secure cookie
+    const token = await signSession({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    const cookieStore = await cookies();
+    cookieStore.set("session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
     return NextResponse.json({
@@ -68,6 +90,7 @@ export async function POST(request: Request) {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     });
   } catch (error: any) {

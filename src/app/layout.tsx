@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScroll";
+import CartSync from "@/components/CartSync";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
     >
       <body className="bg-bg text-ink font-body min-h-screen flex flex-col">
         <SmoothScrollProvider>
+          <CartSync />
           {children}
         </SmoothScrollProvider>
       </body>

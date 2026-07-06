@@ -2,14 +2,8 @@ import { prisma } from "@/lib/db";
 import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
-
-export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    select: { id: true },
-  });
-  return products.map((p) => ({ id: p.id }));
-}
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 export default async function ProductDetailPage({
   params,

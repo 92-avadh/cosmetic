@@ -1,0 +1,5 @@
+name = "cosmetic-web"
+main = ".vercel/output/static/_worker.js"
+assets = { directory = ".vercel/output/static" }
+compatibility_date = "2024-05-02"
+compatibility_flags = [ "nodejs_compat" ]
