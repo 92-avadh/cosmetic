@@ -22,6 +22,15 @@ if (isCI) {
           NEXT_ON_PAGES: "1"
         }
       });
+
+      // 2.5 Create .assetsignore to prevent wrangler from uploading _worker.js as an asset
+      const fs = require("fs");
+      const path = require("path");
+      const assetsDir = path.join(__dirname, "../.vercel/output/static");
+      if (fs.existsSync(assetsDir)) {
+        fs.writeFileSync(path.join(assetsDir, ".assetsignore"), "_worker.js\n", "utf8");
+        console.log("Created .assetsignore in .vercel/output/static to ignore _worker.js");
+      }
     } finally {
       // 3. Restore runtimes to nodejs
       execSync("node scripts/toggle-runtime.js nodejs", { stdio: "inherit" });
