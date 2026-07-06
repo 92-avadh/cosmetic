@@ -12,8 +12,8 @@ export default function CartSync() {
   // 1. Fetch & Merge Cart on Login
   useEffect(() => {
     if (!isLoggedIn || !user?.email) {
-      setHasFetchedCart(false);
-      clearCart();
+      if (hasFetchedCart) setHasFetchedCart(false);
+      if (cart.length > 0) clearCart();
       return;
     }
 

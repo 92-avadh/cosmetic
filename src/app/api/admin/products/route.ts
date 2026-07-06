@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 // Authentication helper
 async function checkAdminAuth() {

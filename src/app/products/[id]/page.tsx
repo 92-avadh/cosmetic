@@ -3,7 +3,7 @@ import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export default async function ProductDetailPage({
   params,

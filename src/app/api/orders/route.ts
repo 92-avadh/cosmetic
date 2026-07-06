@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifySession } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {

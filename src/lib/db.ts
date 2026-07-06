@@ -7,8 +7,8 @@ let prismaClient: PrismaClient;
 if (typeof window === "undefined") {
   if (process.env.NODE_ENV === "production") {
     // Only load database drivers dynamically in production to avoid compile-time crashes in local dev
-    const { Pool } = require("pg");
-    const { PrismaPg } = require("@prisma/adapter-pg");
+    const { Pool } = eval('require("pg")');
+    const { PrismaPg } = eval('require("@prisma/adapter-pg")');
     
     const connectionString = process.env.DATABASE_URL;
     const pool = new Pool({ connectionString });

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 // GET: Retrieve user's cart from database
 export async function GET(request: Request) {

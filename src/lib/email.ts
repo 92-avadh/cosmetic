@@ -1,5 +1,3 @@
-import nodemailer from "nodemailer";
-
 export async function sendEmail({
   to,
   subject,
@@ -28,6 +26,12 @@ export async function sendEmail({
   }
 
   try {
+    if (process.env.NEXT_RUNTIME === "edge") {
+      console.warn("SMTP email sending is not supported in Edge runtime. Email was mocked.");
+      return { success: true, mocked: true };
+    }
+
+    const nodemailer = eval('require("nodemailer")');
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "worker:build": "npx @cloudflare/next-on-pages",
+    "worker:build": "node scripts/toggle-runtime.js edge && npx @cloudflare/next-on-pages && node scripts/toggle-runtime.js nodejs",
     "worker:preview": "wrangler dev",
     "worker:deploy": "wrangler deploy"
   },
