@@ -5,10 +5,6 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
-// Pre-generate all known product pages at build time
-export function generateStaticParams() {
-  return PRODUCTS_CATALOG.map((p) => ({ id: p.id }));
-}
 
 export default async function ProductDetailPage({
   params,
