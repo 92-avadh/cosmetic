@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
+import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -12,37 +13,76 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
 
-  const { data: product, error } = await supabase
-    .from("Product")
-    .select("*")
-    .eq("id", id)
-    .single();
+  let product: any = null;
+  let recommendations: any[] = [];
 
-  if (error || !product) {
-    notFound();
+  // Try Supabase first
+  try {
+    const { data, error } = await supabase
+      .from("Product")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (!error && data) {
+      product = data;
+
+      // Fetch recommendations from DB
+      const { data: recs } = await supabase
+        .from("Product")
+        .select("*")
+        .neq("id", id)
+        .limit(4);
+
+      recommendations = (recs || []).map((r: any) => ({
+        ...r,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+      }));
+    }
+  } catch (_) {
+    // Supabase unavailable — fall through to static catalog
   }
 
-  // Fetch recommendations (other products)
-  const { data: recommendations } = await supabase
-    .from("Product")
-    .select("*")
-    .neq("id", id)
-    .limit(4);
+  // Fallback: use static catalog if DB returned nothing
+  if (!product) {
+    const staticProduct = PRODUCTS_CATALOG.find((p) => p.id === id);
+    if (!staticProduct) {
+      notFound();
+    }
+    product = {
+      id: staticProduct.id,
+      name: staticProduct.name,
+      subtitle: staticProduct.subtitle,
+      priceUSD: staticProduct.priceUSD,
+      image: staticProduct.image,
+      hoverImage: staticProduct.hoverImage,
+      description: null,
+      inventory: 99,
+    };
 
-  // Serialize date types to string format for next.js client boundary safety
+    // Static recommendations = all other products
+    recommendations = PRODUCTS_CATALOG.filter((p) => p.id !== id)
+      .slice(0, 4)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        subtitle: p.subtitle,
+        priceUSD: p.priceUSD,
+        image: p.image,
+        hoverImage: p.hoverImage,
+        description: null,
+        inventory: 99,
+      }));
+  }
+
   const serializedProduct = {
     ...product,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+    createdAt: product.createdAt ?? null,
+    updatedAt: product.updatedAt ?? null,
   };
 
-  const serializedRecs = (recommendations || []).map((r: any) => ({
-    ...r,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-  }));
-
   return (
-    <ProductDetailClient product={serializedProduct} recommendations={serializedRecs} />
+    <ProductDetailClient product={serializedProduct} recommendations={recommendations} />
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { PRODUCTS_CATALOG } from "@/components/ProductRow";
+import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 import { useCartStore } from "@/store/useCartStore";
 import { Sparkles, HelpCircle, Layers, Droplet } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
