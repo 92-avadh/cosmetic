@@ -4,12 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build.js",
+    "build": "node -e \"if (process.env.NEXT_ON_PAGES === '1') { require('child_process').execSync('next build', { stdio: 'inherit' }); } else { require('child_process').execSync('npx @cloudflare/next-on-pages', { stdio: 'inherit', env: { ...process.env, NEXT_ON_PAGES: '1' } }); }\"",
     "start": "next start",
     "lint": "eslint",
-    "worker:build": "node scripts/toggle-runtime.js edge && npx @cloudflare/next-on-pages && node scripts/toggle-runtime.js nodejs",
-    "worker:preview": "wrangler dev",
-    "worker:deploy": "wrangler deploy"
+    "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
@@ -50,5 +48,13 @@
   },
   "overrides": {
     "next": "$next"
+  },
+  "allowScripts": {
+    "esbuild@0.14.47": true,
+    "esbuild@0.15.18": true,
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "workerd@1.20250718.0": true,
+    "workerd@1.20260701.1": true
   }
 }
