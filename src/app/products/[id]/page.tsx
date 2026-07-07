@@ -1,10 +1,14 @@
-import { supabase } from "@/lib/supabase";
+import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
-import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
+
+// Pre-generate all known product pages at build time
+export function generateStaticParams() {
+  return PRODUCTS_CATALOG.map((p) => ({ id: p.id }));
+}
 
 export default async function ProductDetailPage({
   params,
@@ -13,76 +17,38 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
 
-  let product: any = null;
-  let recommendations: any[] = [];
+  // Look up from static catalog — no Supabase, no network call, no env vars needed
+  const staticProduct = PRODUCTS_CATALOG.find((p) => p.id === id);
 
-  // Try Supabase first
-  try {
-    const { data, error } = await supabase
-      .from("Product")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (!error && data) {
-      product = data;
-
-      // Fetch recommendations from DB
-      const { data: recs } = await supabase
-        .from("Product")
-        .select("*")
-        .neq("id", id)
-        .limit(4);
-
-      recommendations = (recs || []).map((r: any) => ({
-        ...r,
-        createdAt: r.createdAt,
-        updatedAt: r.updatedAt,
-      }));
-    }
-  } catch (_) {
-    // Supabase unavailable — fall through to static catalog
+  if (!staticProduct) {
+    notFound();
   }
 
-  // Fallback: use static catalog if DB returned nothing
-  if (!product) {
-    const staticProduct = PRODUCTS_CATALOG.find((p) => p.id === id);
-    if (!staticProduct) {
-      notFound();
-    }
-    product = {
-      id: staticProduct.id,
-      name: staticProduct.name,
-      subtitle: staticProduct.subtitle,
-      priceUSD: staticProduct.priceUSD,
-      image: staticProduct.image,
-      hoverImage: staticProduct.hoverImage,
-      description: null,
-      inventory: 99,
-    };
-
-    // Static recommendations = all other products
-    recommendations = PRODUCTS_CATALOG.filter((p) => p.id !== id)
-      .slice(0, 4)
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        subtitle: p.subtitle,
-        priceUSD: p.priceUSD,
-        image: p.image,
-        hoverImage: p.hoverImage,
-        description: null,
-        inventory: 99,
-      }));
-  }
-
-  const serializedProduct = {
-    ...product,
-    createdAt: product.createdAt ?? null,
-    updatedAt: product.updatedAt ?? null,
+  const product = {
+    id: staticProduct.id,
+    name: staticProduct.name,
+    subtitle: staticProduct.subtitle,
+    priceUSD: staticProduct.priceUSD,
+    image: staticProduct.image,
+    hoverImage: staticProduct.hoverImage ?? null,
+    description: null as string | null,
+    inventory: 99,
   };
 
+  const recommendations = PRODUCTS_CATALOG.filter((p) => p.id !== id)
+    .slice(0, 4)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      subtitle: p.subtitle,
+      priceUSD: p.priceUSD,
+      image: p.image,
+      hoverImage: p.hoverImage ?? null,
+      description: null as string | null,
+      inventory: 99,
+    }));
+
   return (
-    <ProductDetailClient product={serializedProduct} recommendations={recommendations} />
+    <ProductDetailClient product={product} recommendations={recommendations} />
   );
 }
