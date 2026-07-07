@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
-      orderBy: { createdAt: "asc" },
-    });
+    const { data: products, error } = await supabase
+      .from("Product")
+      .select("*")
+      .order("createdAt", { ascending: true });
+
+    if (error) throw new Error(error.message);
+
     return NextResponse.json(products);
   } catch (error: any) {
     console.error("GET Products API Error:", error);

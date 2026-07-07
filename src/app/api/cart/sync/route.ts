@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 // GET: Retrieve user's cart from database
 export async function GET(request: Request) {
@@ -22,31 +22,38 @@ export async function GET(request: Request) {
 
     const emailKey = payload.email.toLowerCase().trim();
 
-    const user = await prisma.user.findUnique({
-      where: { email: emailKey },
-      include: {
-        carts: {
-          include: {
-            items: {
-              include: {
-                product: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const { data: user } = await supabase
+      .from("User")
+      .select("id")
+      .eq("email", emailKey)
+      .single();
 
-    if (!user || !user.carts) {
+    if (!user) {
       return NextResponse.json([]);
     }
 
-    const formattedItems = user.carts.items.map((item) => ({
-      id: item.productId,
-      name: item.product.name,
-      price: item.product.priceUSD,
-      image: item.product.image,
-      subtitle: item.product.subtitle,
+    const { data: cart } = await supabase
+      .from("Cart")
+      .select(`
+        id,
+        CartItem (
+          id, quantity,
+          Product ( id, name, priceUSD, image, subtitle )
+        )
+      `)
+      .eq("userId", user.id)
+      .single();
+
+    if (!cart || !cart.CartItem) {
+      return NextResponse.json([]);
+    }
+
+    const formattedItems = cart.CartItem.map((item: any) => ({
+      id: item.Product.id,
+      name: item.Product.name,
+      price: item.Product.priceUSD,
+      image: item.Product.image,
+      subtitle: item.Product.subtitle,
       quantity: item.quantity,
     }));
 
@@ -77,68 +84,84 @@ export async function POST(request: Request) {
     const emailKey = payload.email.toLowerCase().trim();
 
     // 1. Get or create user
-    let user = await prisma.user.findUnique({
-      where: { email: emailKey },
-    });
+    let { data: user } = await supabase
+      .from("User")
+      .select("id")
+      .eq("email", emailKey)
+      .single();
 
     if (!user) {
-      user = await prisma.user.create({
-        data: { email: emailKey },
-      });
+      const { data: newUser, error: createError } = await supabase
+        .from("User")
+        .insert({ email: emailKey, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+        .select("id")
+        .single();
+      if (createError) throw new Error(createError.message);
+      user = newUser;
     }
 
     // 2. Find or create the user's cart
-    let cart = await prisma.cart.findUnique({
-      where: { userId: user.id },
-    });
+    let { data: cart } = await supabase
+      .from("Cart")
+      .select("id")
+      .eq("userId", user.id)
+      .single();
 
     if (!cart) {
-      cart = await prisma.cart.create({
-        data: { userId: user.id },
-      });
+      const { data: newCart, error: cartError } = await supabase
+        .from("Cart")
+        .insert({ userId: user.id, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+        .select("id")
+        .single();
+      if (cartError) throw new Error(cartError.message);
+      cart = newCart;
     }
 
     // 3. Clear existing cart items
-    await prisma.cartItem.deleteMany({
-      where: { cartId: cart.id },
-    });
+    await supabase
+      .from("CartItem")
+      .delete()
+      .eq("cartId", cart.id);
 
     // 4. Create new cart items if items are provided
     if (items && Array.isArray(items) && items.length > 0) {
       for (const item of items) {
-        const prod = await prisma.product.findUnique({
-          where: { id: item.id },
-        });
+        // Ensure product exists
+        const { data: prod } = await supabase
+          .from("Product")
+          .select("id")
+          .eq("id", item.id)
+          .single();
 
         if (!prod) {
-          // If the product catalog is client-side fallback, we should ensure the product exists in the DB
-          await prisma.product.create({
-            data: {
-              id: item.id,
-              name: item.name || "Unknown Product",
-              subtitle: item.subtitle || "Premium Skincare",
-              priceUSD: item.price || 0,
-              image: item.image || "",
-              description: "Premium cellular skincare formula.",
-            },
+          await supabase.from("Product").insert({
+            id: item.id,
+            name: item.name || "Unknown Product",
+            subtitle: item.subtitle || "Premium Skincare",
+            priceUSD: item.price || 0,
+            image: item.image || "",
+            description: "Premium cellular skincare formula.",
+            inventory: 100,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           });
         }
 
-        await prisma.cartItem.create({
-          data: {
-            cartId: cart.id,
-            productId: item.id,
-            quantity: item.quantity || 1,
-          },
+        await supabase.from("CartItem").insert({
+          cartId: cart.id,
+          productId: item.id,
+          quantity: item.quantity || 1,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
       }
     }
 
     // Touch the cart updatedAt to mark activity time
-    await prisma.cart.update({
-      where: { id: cart.id },
-      data: { updatedAt: new Date() },
-    });
+    await supabase
+      .from("Cart")
+      .update({ updatedAt: new Date().toISOString() })
+      .eq("id", cart.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

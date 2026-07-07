@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export default async function ProductDetailPage({
   params,
@@ -11,33 +11,35 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id },
-  });
 
-  if (!product) {
+  const { data: product, error } = await supabase
+    .from("Product")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !product) {
     notFound();
   }
 
-  // Fetch recommendations
-  const recommendations = await prisma.product.findMany({
-    where: {
-      NOT: { id },
-    },
-    take: 4,
-  });
+  // Fetch recommendations (other products)
+  const { data: recommendations } = await supabase
+    .from("Product")
+    .select("*")
+    .neq("id", id)
+    .limit(4);
 
   // Serialize date types to string format for next.js client boundary safety
   const serializedProduct = {
     ...product,
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
   };
 
-  const serializedRecs = recommendations.map((r) => ({
+  const serializedRecs = (recommendations || []).map((r: any) => ({
     ...r,
-    createdAt: r.createdAt.toISOString(),
-    updatedAt: r.updatedAt.toISOString(),
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
   }));
 
   return (

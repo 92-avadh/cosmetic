@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -24,26 +24,21 @@ export async function POST(request: Request) {
 
     // Action 1: Get/Fetch user details
     if (action === "get") {
-      const user = await prisma.user.findUnique({
-        where: { email: emailKey },
-        include: {
-          addresses: {
-            orderBy: { isDefault: "desc" },
-          },
-          orders: {
-            orderBy: { createdAt: "desc" },
-            include: {
-              items: {
-                include: {
-                  product: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      const { data: user, error: userError } = await supabase
+        .from("User")
+        .select(`
+          id, email, firstName, lastName, role,
+          Address ( id, title, name, street, city, state, postalCode, country, isDefault, createdAt, updatedAt ),
+          Order ( id, status, totalUSD, shippingName, shippingStreet, shippingCity, shippingState, shippingZip, shippingCountry, createdAt, updatedAt,
+            OrderItem ( id, productId, quantity, pricePaid, createdAt,
+              Product ( id, name, subtitle, priceUSD, image )
+            )
+          )
+        `)
+        .eq("email", emailKey)
+        .single();
 
-      if (!user) {
+      if (userError || !user) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
       }
 
@@ -55,8 +50,11 @@ export async function POST(request: Request) {
           firstName: user.firstName,
           lastName: user.lastName,
           role: user.role,
-          addresses: user.addresses,
-          orders: user.orders,
+          addresses: user.Address || [],
+          orders: (user.Order || []).map((o: any) => ({
+            ...o,
+            items: o.OrderItem || [],
+          })),
         },
       });
     }
@@ -64,57 +62,72 @@ export async function POST(request: Request) {
     // Action 2: Update/Save user details
     if (action === "update") {
       // Check if user exists
-      let user = await prisma.user.findUnique({
-        where: { email: emailKey },
-      });
+      const { data: existingUser } = await supabase
+        .from("User")
+        .select("id")
+        .eq("email", emailKey)
+        .single();
 
-      if (!user) {
-        user = await prisma.user.create({
-          data: { email: emailKey },
-        });
+      let userId: string;
+
+      if (!existingUser) {
+        const { data: newUser, error: createError } = await supabase
+          .from("User")
+          .insert({ email: emailKey, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+          .select("id")
+          .single();
+        if (createError) throw new Error(createError.message);
+        userId = newUser.id;
+      } else {
+        userId = existingUser.id;
       }
 
       // Update profile
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
+      const { error: updateError } = await supabase
+        .from("User")
+        .update({
           firstName: firstName || undefined,
           lastName: lastName || undefined,
-        },
-      });
+          updatedAt: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      if (updateError) throw new Error(updateError.message);
 
       // Update address details if provided
       if (addressDetails && addressDetails.street) {
-        const existingAddress = await prisma.address.findFirst({
-          where: { userId: user.id },
-        });
+        const { data: existingAddress } = await supabase
+          .from("Address")
+          .select("id")
+          .eq("userId", userId)
+          .limit(1)
+          .single();
+
+        const addressData = {
+          name: addressDetails.name || `${firstName || ""} ${lastName || ""}`.trim() || "Valued Customer",
+          street: addressDetails.street,
+          city: addressDetails.city || "",
+          state: addressDetails.state || "",
+          postalCode: addressDetails.postalCode || "",
+          country: addressDetails.country || "US",
+          updatedAt: new Date().toISOString(),
+        };
 
         if (existingAddress) {
-          await prisma.address.update({
-            where: { id: existingAddress.id },
-            data: {
-              name: addressDetails.name || `${firstName || ""} ${lastName || ""}`.trim() || "Valued Customer",
-              street: addressDetails.street,
-              city: addressDetails.city || "",
-              state: addressDetails.state || "",
-              postalCode: addressDetails.postalCode || "",
-              country: addressDetails.country || "US",
-            },
-          });
+          await supabase
+            .from("Address")
+            .update(addressData)
+            .eq("id", existingAddress.id);
         } else {
-          await prisma.address.create({
-            data: {
-              userId: user.id,
+          await supabase
+            .from("Address")
+            .insert({
+              userId,
               title: "Primary Residence",
-              name: addressDetails.name || `${firstName || ""} ${lastName || ""}`.trim() || "Valued Customer",
-              street: addressDetails.street,
-              city: addressDetails.city || "",
-              state: addressDetails.state || "",
-              postalCode: addressDetails.postalCode || "",
-              country: addressDetails.country || "US",
               isDefault: true,
-            },
-          });
+              createdAt: new Date().toISOString(),
+              ...addressData,
+            });
         }
       }
 

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 // Authentication helper
 async function checkAdminAuth() {
@@ -22,39 +22,47 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const carts = await prisma.cart.findMany({
-      where: {
-        items: {
-          some: {}, // only carts with at least one item
-        },
-      },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        user: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
+    // Get all carts that have at least one item
+    const { data: cartItems } = await supabase
+      .from("CartItem")
+      .select("cartId");
 
-    // Format cart data for the dashboard
-    const formattedCarts = carts.map((cart) => {
-      const items = cart.items.map((item) => ({
-        id: item.productId,
-        name: item.product.name,
-        subtitle: item.product.subtitle,
-        priceUSD: item.product.priceUSD,
-        image: item.product.image,
+    const cartIdsWithItems = [...new Set((cartItems || []).map((ci: any) => ci.cartId))];
+
+    if (cartIdsWithItems.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const { data: carts, error } = await supabase
+      .from("Cart")
+      .select(`
+        id, updatedAt,
+        User ( email ),
+        CartItem (
+          quantity,
+          Product ( id, name, subtitle, priceUSD, image )
+        )
+      `)
+      .in("id", cartIdsWithItems)
+      .order("updatedAt", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    const formattedCarts = (carts || []).map((cart: any) => {
+      const items = (cart.CartItem || []).map((item: any) => ({
+        id: item.Product.id,
+        name: item.Product.name,
+        subtitle: item.Product.subtitle,
+        priceUSD: item.Product.priceUSD,
+        image: item.Product.image,
         quantity: item.quantity,
       }));
 
-      const totalUSD = items.reduce((acc, item) => acc + item.priceUSD * item.quantity, 0);
+      const totalUSD = items.reduce((acc: number, item: any) => acc + item.priceUSD * item.quantity, 0);
 
       return {
         id: cart.id,
-        userEmail: cart.user.email,
+        userEmail: cart.User?.email || "Unknown",
         updatedAt: cart.updatedAt,
         items,
         totalUSD,

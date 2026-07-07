@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ["pg", "@prisma/adapter-pg", "nodemailer"],
+  serverExternalPackages: ["nodemailer"],
 };
 
 export default nextConfig;

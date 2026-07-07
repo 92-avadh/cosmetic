@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 // Authentication helper
 async function checkAdminAuth() {
@@ -22,17 +22,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const orders = await prisma.order.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
+    const { data: orders, error } = await supabase
+      .from("Order")
+      .select(`
+        *,
+        User ( id, email, firstName, lastName ),
+        OrderItem (
+          id, quantity, pricePaid,
+          Product ( id, name, subtitle, priceUSD, image )
+        )
+      `)
+      .order("createdAt", { ascending: false });
+
+    if (error) throw new Error(error.message);
 
     return NextResponse.json(orders);
   } catch (error: any) {
@@ -63,18 +65,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
 
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status },
-      include: {
-        user: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
+    const { data: updatedOrder, error } = await supabase
+      .from("Order")
+      .update({ status, updatedAt: new Date().toISOString() })
+      .eq("id", orderId)
+      .select(`
+        *,
+        User ( id, email, firstName, lastName ),
+        OrderItem (
+          id, quantity, pricePaid,
+          Product ( id, name, subtitle, priceUSD, image )
+        )
+      `)
+      .single();
+
+    if (error) throw new Error(error.message);
 
     return NextResponse.json({ success: true, order: updatedOrder });
   } catch (error: any) {

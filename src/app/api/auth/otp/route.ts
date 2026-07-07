@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -19,23 +19,29 @@ export async function POST(request: Request) {
 
     // Generate a 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Store in PostgreSQL database with 5 minutes expiration
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    // Clear previous verification tokens for this email to avoid clutter
-    await prisma.verificationToken.deleteMany({
-      where: { email: emailKey },
-    });
+    // Store in Supabase with 5 minutes expiration
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    // Create the token in Supabase
-    await prisma.verificationToken.create({
-      data: {
+    // Clear previous verification tokens for this email
+    await supabase
+      .from("VerificationToken")
+      .delete()
+      .eq("email", emailKey);
+
+    // Create the token
+    const { error: insertError } = await supabase
+      .from("VerificationToken")
+      .insert({
         email: emailKey,
         code: otp,
         expiresAt,
-      },
-    });
+        createdAt: new Date().toISOString(),
+      });
+
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
 
     const emailHtml = `
       <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">

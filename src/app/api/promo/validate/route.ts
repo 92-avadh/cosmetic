@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -15,11 +15,13 @@ export async function POST(request: Request) {
     const cleanCode = code.toUpperCase().trim();
 
     // Look up the code in the database
-    const promo = await prisma.promoCode.findUnique({
-      where: { code: cleanCode },
-    });
+    const { data: promo, error } = await supabase
+      .from("PromoCode")
+      .select("*")
+      .eq("code", cleanCode)
+      .single();
 
-    if (!promo || !promo.isActive) {
+    if (error || !promo || !promo.isActive) {
       return NextResponse.json({ error: "Invalid or inactive promo code" }, { status: 400 });
     }
 

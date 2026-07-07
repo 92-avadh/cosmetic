@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 // Authentication helper
 async function checkAdminAuth() {
@@ -22,14 +22,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
 
-    const products = await prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        category: true,
-      },
-    });
+    const { data: products, error: productsError } = await supabase
+      .from("Product")
+      .select(`*, Category ( id, name, slug )`)
+      .order("createdAt", { ascending: false });
 
-    const categories = await prisma.category.findMany();
+    if (productsError) throw new Error(productsError.message);
+
+    const { data: categories, error: categoriesError } = await supabase
+      .from("Category")
+      .select("*");
+
+    if (categoriesError) throw new Error(categoriesError.message);
 
     return NextResponse.json({ products, categories });
   } catch (error: any) {
@@ -73,9 +77,11 @@ export async function POST(request: Request) {
       .replace(/(^-|-$)+/g, "");
 
     // Check if ID already exists, make unique if needed
-    const existing = await prisma.product.findUnique({
-      where: { id: cleanId },
-    });
+    const { data: existing } = await supabase
+      .from("Product")
+      .select("id")
+      .eq("id", cleanId)
+      .single();
 
     if (existing) {
       cleanId = `${cleanId}-${Math.round(Math.random() * 1000)}`;
@@ -85,25 +91,35 @@ export async function POST(request: Request) {
     let categoryId = null;
     if (categorySlug) {
       const slug = categorySlug.toLowerCase().trim();
-      let category = await prisma.category.findUnique({
-        where: { slug },
-      });
 
-      if (!category) {
-        // Create category
+      const { data: existingCategory } = await supabase
+        .from("Category")
+        .select("id")
+        .eq("slug", slug)
+        .single();
+
+      if (existingCategory) {
+        categoryId = existingCategory.id;
+      } else {
         const readableName = slug.charAt(0).toUpperCase() + slug.slice(1) + " System";
-        category = await prisma.category.create({
-          data: {
+        const { data: newCategory, error: catError } = await supabase
+          .from("Category")
+          .insert({
             name: readableName,
             slug,
-          },
-        });
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          })
+          .select("id")
+          .single();
+        if (catError) throw new Error(catError.message);
+        categoryId = newCategory.id;
       }
-      categoryId = category.id;
     }
 
-    const product = await prisma.product.create({
-      data: {
+    const { data: product, error: productError } = await supabase
+      .from("Product")
+      .insert({
         id: cleanId,
         name,
         subtitle,
@@ -113,8 +129,13 @@ export async function POST(request: Request) {
         description: description || "Premium cellular skincare formula.",
         inventory: parseInt(inventory) || 100,
         categoryId,
-      },
-    });
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (productError) throw new Error(productError.message);
 
     return NextResponse.json({ success: true, product });
   } catch (error: any) {

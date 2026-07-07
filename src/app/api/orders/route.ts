@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { verifySession } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
@@ -32,25 +32,37 @@ export async function POST(request: Request) {
     const emailKey = payload.email.toLowerCase().trim();
 
     // 1. Get or create user
-    let user = await prisma.user.findUnique({
-      where: { email: emailKey },
-    });
+    let { data: user } = await supabase
+      .from("User")
+      .select("id")
+      .eq("email", emailKey)
+      .single();
 
     if (!user) {
-      user = await prisma.user.create({
-        data: { email: emailKey },
-      });
+      const { data: newUser, error: createError } = await supabase
+        .from("User")
+        .insert({ email: emailKey, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+        .select("id")
+        .single();
+      if (createError) throw new Error(createError.message);
+      user = newUser;
     }
 
-    // 2. Double check that products exist in the DB (upsert if they don't, to avoid foreign key failures)
+    // 2. Double check that products exist in the DB (upsert if they don't)
     for (const item of items) {
-      await prisma.product.upsert({
-        where: { id: item.id },
-        update: {
-          name: item.name,
-          priceUSD: item.price,
-        },
-        create: {
+      const { data: existingProduct } = await supabase
+        .from("Product")
+        .select("id")
+        .eq("id", item.id)
+        .single();
+
+      if (existingProduct) {
+        await supabase
+          .from("Product")
+          .update({ name: item.name, priceUSD: item.price, updatedAt: new Date().toISOString() })
+          .eq("id", item.id);
+      } else {
+        await supabase.from("Product").insert({
           id: item.id,
           name: item.name,
           subtitle: item.subtitle || "Premium Body Wash",
@@ -58,15 +70,21 @@ export async function POST(request: Request) {
           image: item.image || "",
           hoverImage: "/products/texture-gel.png",
           description: item.description || "Premium physiological body wash.",
-        },
-      });
+          inventory: 100,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
     }
 
     // 2.5 Verify inventory before placing the order
     for (const item of items) {
-      const prod = await prisma.product.findUnique({
-        where: { id: item.id },
-      });
+      const { data: prod } = await supabase
+        .from("Product")
+        .select("name, inventory")
+        .eq("id", item.id)
+        .single();
+
       if (prod && prod.inventory < item.quantity) {
         return NextResponse.json(
           { error: `Insufficient stock for ${prod.name}. Available inventory: ${prod.inventory}` },
@@ -76,10 +94,11 @@ export async function POST(request: Request) {
     }
 
     // 3. Create the order
-    const order = await prisma.order.create({
-      data: {
+    const { data: order, error: orderError } = await supabase
+      .from("Order")
+      .insert({
         userId: user.id,
-        status: "PAID", // Default status is PAID when checkout is successful
+        status: "PAID",
         totalUSD,
         shippingName: `${shippingDetails.firstName || ""} ${shippingDetails.lastName || ""}`.trim() || "Customer",
         shippingStreet: shippingDetails.street,
@@ -87,39 +106,61 @@ export async function POST(request: Request) {
         shippingState: shippingDetails.state || "",
         shippingZip: shippingDetails.zip || "",
         shippingCountry: shippingDetails.country || "US",
-        items: {
-          create: items.map((item: any) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            pricePaid: item.price,
-          })),
-        },
-      },
-    });
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
 
-    // 4. Decrement inventory for each ordered item
+    if (orderError || !order) throw new Error(orderError?.message || "Failed to create order");
+
+    // 4. Create order items
+    const orderItems = items.map((item: any) => ({
+      orderId: order.id,
+      productId: item.id,
+      quantity: item.quantity,
+      pricePaid: item.price,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }));
+
+    const { error: itemsError } = await supabase.from("OrderItem").insert(orderItems);
+    if (itemsError) throw new Error(itemsError.message);
+
+    // 5. Decrement inventory for each ordered item
     for (const item of items) {
-      await prisma.product.update({
-        where: { id: item.id },
-        data: {
-          inventory: {
-            decrement: item.quantity,
-          },
-        },
-      });
+      const { data: prod } = await supabase
+        .from("Product")
+        .select("inventory")
+        .eq("id", item.id)
+        .single();
+
+      if (prod) {
+        await supabase
+          .from("Product")
+          .update({
+            inventory: Math.max(0, prod.inventory - item.quantity),
+            updatedAt: new Date().toISOString(),
+          })
+          .eq("id", item.id);
+      }
     }
 
-    // 5. Clear user's cart in database
-    const userCart = await prisma.cart.findUnique({
-      where: { userId: user.id },
-    });
+    // 6. Clear user's cart in database
+    const { data: userCart } = await supabase
+      .from("Cart")
+      .select("id")
+      .eq("userId", user.id)
+      .single();
+
     if (userCart) {
-      await prisma.cartItem.deleteMany({
-        where: { cartId: userCart.id },
-      });
+      await supabase
+        .from("CartItem")
+        .delete()
+        .eq("cartId", userCart.id);
     }
 
-    // 6. Construct items rows for HTML table & Send Confirmation Receipt
+    // 7. Send Confirmation Receipt
     const itemsHtml = items.map((item: any) => `
       <tr style="border-bottom: 1px solid #f0f0f0;">
         <td style="padding: 12px 0; font-size: 13px; color: #333;">
@@ -135,7 +176,7 @@ export async function POST(request: Request) {
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 16px; background-color: #ffffff;">
         <div style="text-align: center; border-bottom: 1px solid #eaeaea; padding-bottom: 20px; margin-bottom: 25px;">
           <h2 style="font-size: 18px; font-weight: 600; color: #111111; text-transform: uppercase; letter-spacing: 0.2em; margin: 0 0 5px 0;">BODYBARREL</h2>
-          <span style="font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.1em;">Order Receipt & Confirmation</span>
+          <span style="font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.1em;">Order Receipt &amp; Confirmation</span>
         </div>
 
         <p style="font-size: 13px; color: #666; line-height: 1.6;">Hello,</p>

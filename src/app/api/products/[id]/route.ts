@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET(
   request: Request,
@@ -10,11 +10,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const product = await prisma.product.findUnique({
-      where: { id },
-    });
 
-    if (!product) {
+    const { data: product, error } = await supabase
+      .from("Product")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error || !product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
