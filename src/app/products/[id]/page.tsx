@@ -1,23 +1,27 @@
-import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
-import ProductDetailClient from "./ProductDetailClient";
-import { notFound } from "next/navigation";
+"use client";
 
+// Required for @cloudflare/next-on-pages — routes without this are excluded from the Worker bundle
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
+import { useParams } from "next/navigation";
+import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
+import ProductDetailClient from "./ProductDetailClient";
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function ProductDetailPage() {
+  const params = useParams();
+  const id = typeof params?.id === "string" ? params.id : null;
 
-  // Look up from static catalog — no Supabase, no network call, no env vars needed
+  if (!id) return null;
+
   const staticProduct = PRODUCTS_CATALOG.find((p) => p.id === id);
 
   if (!staticProduct) {
-    notFound();
+    // notFound() cannot be called in client components — render a redirect instead
+    if (typeof window !== "undefined") {
+      window.location.href = "/shop";
+    }
+    return null;
   }
 
   const product = {
