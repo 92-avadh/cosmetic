@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node -e \"if (process.env.NEXT_ON_PAGES === '1') { require('child_process').execSync('next build', { stdio: 'inherit' }); } else { require('child_process').execSync('npx @cloudflare/next-on-pages', { stdio: 'inherit', env: { ...process.env, NEXT_ON_PAGES: '1' } }); }\"",
+    "build": "node -e \"if (process.env.NEXT_ON_PAGES === '1') { require('child_process').execSync('next build', { stdio: 'inherit' }); } else { require('child_process').execSync('npx @cloudflare/next-on-pages', { stdio: 'inherit', env: { ...process.env, NEXT_ON_PAGES: '1' } }); try { require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js\\n_routes.json\\n_headers\\n_redirects\\n'); console.log('.assetsignore created successfully'); } catch (e) { console.error('Failed to create .assetsignore:', e); } }\"",
     "start": "next start",
     "lint": "eslint",
     "pages:build": "npx @cloudflare/next-on-pages"
