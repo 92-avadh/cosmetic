@@ -8,8 +8,8 @@ export const runtime = "edge";
 
 // Authentication helper
 async function checkAdminAuth() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const cookieStore = await cookies().catch(() => null);
+  const sessionCookie = cookieStore?.get("session")?.value;
   if (!sessionCookie) return false;
   const payload = await verifySession(sessionCookie);
   return payload?.role === "ADMIN";

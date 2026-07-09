@@ -52,8 +52,9 @@ export function withApiHandler(
     // Try to inspect user context for audit trail logging
     let currentUser: Record<string, unknown> | null = null;
     try {
-      const cookieStore = await cookies();
-      const sessionToken = cookieStore.get("session")?.value;
+      // ponytail: cookies() may throw on edge runtimes (CF Workers) if request context is missing
+      const cookieStore = await cookies().catch(() => null);
+      const sessionToken = cookieStore?.get("session")?.value;
       if (sessionToken) {
         currentUser = await verifySession(sessionToken);
       }
@@ -71,21 +72,30 @@ export function withApiHandler(
         
         if (!isWebhook) {
           const origin = headers.get("origin");
-          const host = headers.get("host") || url.host;
           const referer = headers.get("referer");
+          // Use the URL's own hostname as the canonical host to avoid proxy/port mismatches on CF Workers
+          const canonicalHost = url.hostname;
 
           let isSameOrigin = false;
 
           if (origin) {
-            const originUrl = new URL(origin);
-            isSameOrigin = originUrl.host === host;
+            try {
+              const originUrl = new URL(origin);
+              isSameOrigin = originUrl.hostname === canonicalHost;
+            } catch {
+              isSameOrigin = false;
+            }
           } else if (referer) {
-            const refererUrl = new URL(referer);
-            isSameOrigin = refererUrl.host === host;
+            try {
+              const refererUrl = new URL(referer);
+              isSameOrigin = refererUrl.hostname === canonicalHost;
+            } catch {
+              isSameOrigin = false;
+            }
           }
 
           if (!isSameOrigin) {
-            console.warn(`[CSRF BLOCK] Origin/Referer header mismatch for mutation request on ${path}. Host: ${host}`);
+            console.warn(`[CSRF BLOCK] Origin/Referer mismatch for mutation request on ${path}. Host: ${canonicalHost}`);
             
             await logAudit({
               action: "SECURITY_CSRF_BLOCKED",
@@ -94,7 +104,7 @@ export function withApiHandler(
               userEmail: currentUserEmail,
               ip: clientIp,
               userAgent,
-              details: { path, host, origin, referer }
+              details: { path, canonicalHost, origin, referer }
             });
 
             return NextResponse.json(

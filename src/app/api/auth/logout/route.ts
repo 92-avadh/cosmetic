@@ -9,13 +9,13 @@ export const runtime = "edge";
 export const POST = withApiHandler(async (request: Request) => {
   let currentUser: any = null;
   try {
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("session")?.value;
+    const cookieStore = await cookies().catch(() => null);
+    const sessionToken = cookieStore?.get("session")?.value;
     if (sessionToken) {
       currentUser = await verifySession(sessionToken);
     }
 
-    cookieStore.delete("session");
+    cookieStore?.delete("session");
     
     if (currentUser) {
       await logAudit({

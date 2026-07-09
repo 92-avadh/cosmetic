@@ -110,7 +110,21 @@ export const POST = withApiHandler(async (request: Request) => {
       role: user.role,
     });
 
-    const cookieStore = await cookies();
+    const cookieStore = await cookies().catch(() => null);
+    if (!cookieStore) {
+      // ponytail: Edge runtime (CF Workers) may not support cookies() — return token in body for client to set via JS
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+        sessionToken: token,
+      });
+    }
     cookieStore.set("session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

@@ -133,6 +133,10 @@ function LoginForm() {
       }
 
       // Successful login
+      if (data.sessionToken) {
+        // ponytail: Edge runtime fallback — set session cookie via JS when cookies() is unavailable server-side
+        document.cookie = `session=${data.sessionToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax` + (location.protocol === "https:" ? "; secure" : "");
+      }
       login(email, data.user?.role);
       router.push(redirect);
     } catch (err: any) {

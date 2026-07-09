@@ -12,8 +12,8 @@ export const runtime = "edge";
 const checkoutCreateSchema = orderCreateSchema.omit({ totalUSD: true });
 
 export const POST = withApiHandler(async (request: Request) => {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const cookieStore = await cookies().catch(() => null);
+  const sessionCookie = cookieStore?.get("session")?.value;
   if (!sessionCookie) {
     const err = new Error("Unauthorized");
     (err as any).status = 401;

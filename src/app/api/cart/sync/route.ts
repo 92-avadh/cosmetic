@@ -10,8 +10,8 @@ export const runtime = "edge";
 
 // GET: Retrieve user's cart from database
 export const GET = withApiHandler(async (request: Request) => {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const cookieStore = await cookies().catch(() => null);
+  const sessionCookie = cookieStore?.get("session")?.value;
   if (!sessionCookie) {
     const err = new Error("Unauthorized");
     (err as any).status = 401;
@@ -67,8 +67,8 @@ export const GET = withApiHandler(async (request: Request) => {
 
 // POST: Sync user's cart with database
 export const POST = withApiHandler(async (request: Request) => {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const cookieStore = await cookies().catch(() => null);
+  const sessionCookie = cookieStore?.get("session")?.value;
   if (!sessionCookie) {
     const err = new Error("Unauthorized");
     (err as any).status = 401;

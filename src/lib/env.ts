@@ -43,7 +43,8 @@ export function getEnv(): Env {
     console.error("❌ Environment validation failed:", JSON.stringify(parsed.error.format(), null, 2));
     
     // In production, we throw and halt execution
-    if (process.env.NODE_ENV === "production") {
+    // ponytail: bypass validation crash during Next.js static build phase
+    if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== "phase-production-build") {
       throw new Error(`Environment validation failed: ${parsed.error.message}`);
     }
     
