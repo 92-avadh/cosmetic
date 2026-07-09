@@ -89,7 +89,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to submit review.");
+        throw new Error(data.error?.message || "Failed to submit review.");
       }
       setNewComment("");
       setNewRating(5);

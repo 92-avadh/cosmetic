@@ -98,7 +98,7 @@ export default function AccountPage() {
         setSaveSuccess("Profile settings updated successfully.");
         await fetchUserProfile();
       } else {
-        throw new Error(data.error || "Failed to update profile details.");
+        throw new Error(data.error?.message || "Failed to update profile details.");
       }
     } catch (err: any) {
       setSaveError(err.message || "Failed to save profile settings.");

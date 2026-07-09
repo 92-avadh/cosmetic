@@ -221,7 +221,7 @@ export default function AdminDashboardPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update order status.");
+      if (!res.ok) throw new Error(data.error?.message || "Failed to update order status.");
 
       showToast(`Order status updated to ${status} successfully.`);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
@@ -248,7 +248,7 @@ export default function AdminDashboardPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "File upload failed");
+      if (!res.ok) throw new Error(data.error?.message || "File upload failed");
 
       setNewProductImage(data.url);
       setNewProductHoverImage(data.url);
@@ -290,7 +290,7 @@ export default function AdminDashboardPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create product.");
+      if (!res.ok) throw new Error(data.error?.message || "Failed to create product.");
 
       showToast(`Product "${newProductName}" added successfully.`);
 

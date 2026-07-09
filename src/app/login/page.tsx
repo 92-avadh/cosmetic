@@ -64,7 +64,7 @@ function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to send verification code.");
+        throw new Error(data.error?.message || "Failed to send verification code.");
       }
 
       setStep("otp");
@@ -95,7 +95,7 @@ function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to resend verification code.");
+        throw new Error(data.error?.message || "Failed to resend verification code.");
       }
 
       setResendCount((prev) => prev + 1);
@@ -129,7 +129,7 @@ function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Invalid verification code.");
+        throw new Error(data.error?.message || "Invalid verification code.");
       }
 
       // Successful login

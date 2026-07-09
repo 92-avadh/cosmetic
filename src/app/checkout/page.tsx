@@ -167,7 +167,7 @@ export default function CheckoutPage() {
       
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to validate code");
+        throw new Error(data.error?.message || "Failed to validate code");
       }
       
       setAppliedPromo({
@@ -215,7 +215,7 @@ export default function CheckoutPage() {
       
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to save address.");
+        throw new Error(data.error?.message || "Failed to save address.");
       }
       
       setSavedAddresses(data.addresses || []);
@@ -240,7 +240,7 @@ export default function CheckoutPage() {
       
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to delete address.");
+        throw new Error(data.error?.message || "Failed to delete address.");
       }
       
       setSavedAddresses(data.addresses || []);
@@ -293,7 +293,7 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to process order.");
+        throw new Error(data.error?.message || "Failed to process order.");
       }
 
       const options = {
