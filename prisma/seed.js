@@ -5,12 +5,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  // 1. Create or ensure default Skincare category exists
+  // 1. Create or ensure default category exists
   const skincareCategory = await prisma.category.upsert({
     where: { slug: "skincare" },
-    update: {},
+    update: {
+      name: "Shower & Body Care",
+    },
     create: {
-      name: "Skincare System",
+      name: "Shower & Body Care",
       slug: "skincare",
     },
   });
@@ -21,23 +23,23 @@ async function main() {
   const initialProducts = [
     {
       id: "hydra-foam-cleanser",
-      name: "HYDRA-FOAM CLEANSER",
-      subtitle: "Age-Defying, Gentle Hydration Support, + 0.5% PDRN & Hyaluronic Acid",
+      name: "HYDRA-FOAM BODY WASH",
+      subtitle: "Active Rejuvenation, Lipid Barrier Support, + 0.5% PDRN & Hyaluronic Acid",
       priceUSD: 40.71856,
       image: "/model.png",
       hoverImage: "/products/texture-gel.png",
-      description: "With 0.5% Microspherized PDRN, hyaluronic acid, and natural plant based ingredients, it lifts sweat, oil, and buildup while calming, hydrating, and supporting the skin barrier.",
+      description: "With 0.5% Microspherized PDRN, hyaluronic acid, and pure botanical extracts, it lifts sweat, dirt, and impurities while deeply hydrating, leaving your body skin fresh, supple, and reinforced.",
       inventory: 100,
       categoryId: skincareCategory.id,
     },
     {
       id: "hydra-nutrition-essence",
-      name: "HYDRA-NUTRITION ESSENCE",
-      subtitle: "Moisture, Nourish + PDRN (Salmon DNA) & Multi-Peptide",
+      name: "HYDRA-NUTRITION BODY GLOW SHOWER OIL",
+      subtitle: "Cellular Body Moisture Recovery + PDRN (Salmon DNA) & Amino Acids",
       priceUSD: 75.4491,
       image: "/serum.png",
       hoverImage: "/products/cream-texture.png",
-      description: "Advanced moisture recovery essence formulated with pure salmon-derived PDRN DNA and multi-peptides to strengthen the dermal structure and boost cell elasticity.",
+      description: "Advanced cellular recovery shower oil formulated with pure salmon-derived PDRN DNA and bio-active amino acids to lock in moisture and restore dry body skin elasticity during your daily shower.",
       inventory: 80,
       categoryId: skincareCategory.id,
     },

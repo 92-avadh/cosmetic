@@ -1,22 +1,7 @@
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScroll";
 import CartSync from "@/components/CartSync";
-
-const archivo = Archivo({
-  subsets: ["latin"],
-  variable: "--font-archivo",
-  display: "swap",
-  weight: ["400", "600", "700"],
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: "BODYBARREL — Korean Skincare Science",
@@ -32,8 +17,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${inter.variable} antialiased selection:bg-accent selection:text-bg`}
+      className="antialiased selection:bg-accent selection:text-bg"
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+      </head>
       <body className="bg-bg text-ink font-body min-h-screen flex flex-col">
         <SmoothScrollProvider>
           <CartSync />

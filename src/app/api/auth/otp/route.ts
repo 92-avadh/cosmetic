@@ -1,24 +1,22 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
+import { withApiHandler } from "@/lib/api-helper";
+import { otpRequestSchema } from "@/lib/schemas";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "edge";
 
-export async function POST(request: Request) {
+export const POST = withApiHandler(async (request: Request) => {
+  let emailKey = "";
   try {
-    const { email } = await request.json();
-
-    if (!email || typeof email !== "string" || !email.includes("@")) {
-      return NextResponse.json(
-        { error: "A valid email address is required" },
-        { status: 400 }
-      );
-    }
-
-    const emailKey = email.toLowerCase().trim();
+    const body = await request.json();
+    const { email } = await otpRequestSchema.parseAsync(body);
+    emailKey = email;
 
     // Generate a 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`\n🔑 [OTP GENERATED] Email: ${emailKey} | Code: ${otp}\n`);
 
     // Store in Supabase with 5 minutes expiration
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -33,6 +31,7 @@ export async function POST(request: Request) {
     const { error: insertError } = await supabase
       .from("VerificationToken")
       .insert({
+        id: crypto.randomUUID(),
         email: emailKey,
         code: otp,
         expiresAt,
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
       });
 
     if (insertError) {
-      throw new Error(insertError.message);
+      throw new Error(`DB Insert Error: ${insertError.message}`);
     }
 
     const emailHtml = `
@@ -61,12 +60,23 @@ export async function POST(request: Request) {
       html: emailHtml,
     });
 
-    return NextResponse.json({ success: true });
+    await logAudit({
+      action: "OTP_GENERATED",
+      status: "SUCCESS",
+      userEmail: emailKey,
+    });
+
+    return { success: true };
   } catch (error: any) {
-    console.error("OTP API Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to generate OTP" },
-      { status: 500 }
-    );
+    if (emailKey) {
+      await logAudit({
+        action: "OTP_GENERATED",
+        status: "FAILED",
+        userEmail: emailKey,
+        details: error.message || String(error),
+      });
+    }
+    throw error;
   }
-}
+});
+

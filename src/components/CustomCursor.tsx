@@ -9,9 +9,10 @@ export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Only enable custom cursor for devices with fine pointer controls (desktop)
+    // Only enable custom cursor for devices with fine pointer controls (desktop) without reduced motion preferences
     const isFinePointer = window.matchMedia("(pointer: fine)").matches;
-    if (!isFinePointer) return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!isFinePointer || prefersReducedMotion) return;
 
     const cursor = cursorRef.current;
     if (!cursor) return;

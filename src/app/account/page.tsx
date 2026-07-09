@@ -26,7 +26,7 @@ export default function AccountPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [country, setCountry] = useState("US");
+  const [country, setCountry] = useState("IN");
 
   useEffect(() => {
     setMounted(true);
@@ -52,7 +52,7 @@ export default function AccountPage() {
           setCity(addr.city || "");
           setState(addr.state || "");
           setPostalCode(addr.postalCode || "");
-          setCountry(addr.country || "US");
+          setCountry(addr.country || "IN");
         }
       }
     } catch (err) {
@@ -281,7 +281,15 @@ export default function AccountPage() {
                       <div key={order.id} className="border border-line/70 rounded-xl p-5 bg-bg/50 space-y-4 hover:border-accent/40 transition-colors">
                         <div className="flex items-center justify-between text-xs border-b border-line/45 pb-3">
                           <span className="font-bold text-ink uppercase tracking-wider">Order #{order.id.slice(0, 8)}</span>
-                          <span className="text-muted">{new Date(order.createdAt).toLocaleDateString()}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-muted">{new Date(order.createdAt).toLocaleDateString()}</span>
+                            <Link
+                              href={`/orders/${order.id}`}
+                              className="text-accent hover:underline font-bold uppercase tracking-widest text-[9px]"
+                            >
+                              Track Details &rarr;
+                            </Link>
+                          </div>
                         </div>
                         <div className="flex items-start justify-between">
                           <div className="space-y-1 min-w-0 flex-1">

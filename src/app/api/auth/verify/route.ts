@@ -2,22 +2,18 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import { signSession } from "@/lib/session";
+import { withApiHandler } from "@/lib/api-helper";
+import { otpVerifySchema } from "@/lib/schemas";
+import { logAudit } from "@/lib/audit";
 
 export const runtime = "edge";
 
-export async function POST(request: Request) {
+export const POST = withApiHandler(async (request: Request) => {
+  let emailKey = "";
   try {
-    const { email, otp } = await request.json();
-
-    if (!email || !otp) {
-      return NextResponse.json(
-        { error: "Email and OTP code are required" },
-        { status: 400 }
-      );
-    }
-
-    const emailKey = email.toLowerCase().trim();
-    const cleanOtp = otp.trim();
+    const body = await request.json();
+    const { email, code } = await otpVerifySchema.parseAsync(body);
+    emailKey = email;
 
     // Query the database for the active token
     const { data: tokenRecord, error: tokenError } = await supabase
@@ -29,30 +25,38 @@ export async function POST(request: Request) {
       .single();
 
     if (tokenError || !tokenRecord) {
-      return NextResponse.json(
-        { error: "Verification code not found. Please request a new OTP." },
-        { status: 400 }
-      );
+      const err = new Error("Verification code not found. Please request a new OTP.");
+      (err as any).status = 400;
+      (err as any).code = "OTP_NOT_FOUND";
+      throw err;
     }
 
     // Verify expiration time
-    if (new Date() > new Date(tokenRecord.expiresAt)) {
+    const expiresAtRaw = tokenRecord.expiresAt;
+    const expiresDate = new Date(
+      typeof expiresAtRaw === "string"
+        ? (expiresAtRaw.endsWith("Z") ? expiresAtRaw : expiresAtRaw + "Z")
+        : expiresAtRaw
+    );
+
+    if (new Date() > expiresDate) {
       await supabase
         .from("VerificationToken")
         .delete()
         .eq("email", emailKey);
-      return NextResponse.json(
-        { error: "Verification code has expired. Please request a new OTP." },
-        { status: 400 }
-      );
+      
+      const err = new Error("Verification code has expired. Please request a new OTP.");
+      (err as any).status = 400;
+      (err as any).code = "OTP_EXPIRED";
+      throw err;
     }
 
     // Verify code correctness
-    if (tokenRecord.code !== cleanOtp) {
-      return NextResponse.json(
-        { error: "Invalid verification code. Please try again." },
-        { status: 400 }
-      );
+    if (tokenRecord.code !== code) {
+      const err = new Error("Invalid verification code. Please try again.");
+      (err as any).status = 400;
+      (err as any).code = "OTP_INVALID";
+      throw err;
     }
 
     // OTP matches! Clear the verification token
@@ -87,6 +91,7 @@ export async function POST(request: Request) {
       const { data: newUser, error: createError } = await supabase
         .from("User")
         .insert({
+          id: crypto.randomUUID(),
           email: emailKey,
           role: isAdmin ? "ADMIN" : "USER",
           createdAt: new Date().toISOString(),
@@ -114,6 +119,14 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
+    await logAudit({
+      action: "USER_LOGIN",
+      status: "SUCCESS",
+      userId: user.id,
+      userEmail: user.email,
+    });
+
+    // Return the response directly
     return NextResponse.json({
       success: true,
       user: {
@@ -125,10 +138,14 @@ export async function POST(request: Request) {
       },
     });
   } catch (error: any) {
-    console.error("Verification API Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to verify security code" },
-      { status: 500 }
-    );
+    if (emailKey) {
+      await logAudit({
+        action: "USER_LOGIN",
+        status: "FAILED",
+        userEmail: emailKey,
+        details: error.message || String(error),
+      });
+    }
+    throw error;
   }
-}
+});

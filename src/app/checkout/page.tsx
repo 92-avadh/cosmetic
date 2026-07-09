@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import CurtainButton from "@/components/CurtainButton";
-import { ShieldCheck, ArrowLeft, LogOut, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, LogOut, CheckCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -27,6 +27,16 @@ export default function CheckoutPage() {
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
 
+  // Saved address states
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+
+  const isAddressAlreadySaved = savedAddresses.some(
+    (addr: any) =>
+      addr.street?.toLowerCase().trim() === address.toLowerCase().trim() &&
+      addr.postalCode?.toLowerCase().trim() === zipCode.toLowerCase().trim()
+  );
+
   // Promo Code States
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
@@ -36,6 +46,77 @@ export default function CheckoutPage() {
   // Guard against hydration mismatches and check login status
   useEffect(() => {
     setMounted(true);
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") {
+      setOrderCompleted(true);
+      clearCart();
+      window.history.replaceState({}, "", "/checkout");
+    } else if (params.get("cancel") === "true") {
+      setFormError("Payment session was cancelled. You can try checkout again.");
+      window.history.replaceState({}, "", "/checkout");
+    }
+  }, []);
+
+  // Fetch saved addresses on mount
+  useEffect(() => {
+    if (mounted && isLoggedIn) {
+      fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "get" }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.user && data.user.addresses) {
+            setSavedAddresses(data.user.addresses);
+          }
+        })
+        .catch((err) => console.error("Error loading saved addresses:", err));
+    }
+  }, [mounted, isLoggedIn]);
+
+  // Zip/Postal Code Auto-complete City Fetcher
+  useEffect(() => {
+    const cleanZip = zipCode.trim();
+    if (/^\d{6}$/.test(cleanZip)) {
+      // Indian Pincode (6 digits)
+      fetch(`https://api.postalpincode.in/pincode/${cleanZip}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice[0]) {
+            const po = data[0].PostOffice[0];
+            const detectedCity = po.District || po.Name || "";
+            if (detectedCity) setCity(detectedCity);
+          }
+        })
+        .catch((err) => console.error("Indian PIN code lookup failed:", err));
+    } else if (/^\d{5}$/.test(cleanZip)) {
+      // US Zipcode (5 digits)
+      fetch(`https://api.zippopotam.us/us/${cleanZip}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.places && data.places[0]) {
+            const place = data.places[0];
+            const detectedCity = place["place name"] || "";
+            if (detectedCity) setCity(detectedCity);
+          }
+        })
+        .catch((err) => console.error("US ZIP code lookup failed:", err));
+    }
+  }, [zipCode]);
+
+  // Load Razorpay SDK script dynamically on mount
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -102,6 +183,72 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSaveAddress = async () => {
+    if (!firstName || !address || !city || !zipCode) {
+      setFormError("Please fill out Name, Address, City, and Postal code before saving.");
+      return;
+    }
+
+    if (isAddressAlreadySaved) {
+      setFormError("This address is already saved in your profile.");
+      return;
+    }
+    
+    setFormError("");
+    setIsSavingAddress(true);
+    
+    try {
+      const res = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "add_address",
+          addressDetails: {
+            name: `${firstName} ${lastName}`.trim(),
+            street: address,
+            city,
+            postalCode: zipCode,
+            country: "IN",
+          },
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save address.");
+      }
+      
+      setSavedAddresses(data.addresses || []);
+    } catch (err: any) {
+      setFormError(err.message || "Failed to save address. Please try again.");
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    setFormError("");
+    try {
+      const res = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "delete_address",
+          addressId,
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete address.");
+      }
+      
+      setSavedAddresses(data.addresses || []);
+    } catch (err: any) {
+      setFormError(err.message || "Failed to delete address.");
+    }
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName || !lastName || !address || !city || !zipCode) {
@@ -109,16 +256,22 @@ export default function CheckoutPage() {
       return;
     }
     
+    if (typeof (window as any).Razorpay === "undefined") {
+      setFormError("Razorpay payment gateway script is still loading. Please wait a second and try again.");
+      return;
+    }
+
     setFormError("");
     setIsOrdering(true);
     
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout/razorpay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: user?.email,
-          totalUSD: total / rate, // Send total in USD to the database
+          promoCode: appliedPromo?.code || null,
+          currency,
           items: cart.map((item) => ({
             id: item.id,
             name: item.name,
@@ -133,7 +286,7 @@ export default function CheckoutPage() {
             street: address,
             city,
             zip: zipCode,
-            country: "US",
+            country: "IN",
           },
         }),
       });
@@ -143,9 +296,58 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Failed to process order.");
       }
 
-      setIsOrdering(false);
-      setOrderCompleted(true);
-      clearCart();
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "BODYBARREL",
+        description: "Premium Body Wash Order",
+        order_id: data.razorpayOrderId,
+        handler: async function (response: any) {
+          try {
+            setIsOrdering(true);
+            setFormError("");
+            
+            const verifyRes = await fetch("/api/checkout/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                orderId: data.orderId,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok) {
+              throw new Error(verifyData.error || "Payment verification failed.");
+            }
+
+            clearCart();
+            setOrderCompleted(true);
+          } catch (verifyErr: any) {
+            setFormError(verifyErr.message || "Failed to verify transaction. Please contact support.");
+          } finally {
+            setIsOrdering(false);
+          }
+        },
+        prefill: {
+          name: `${firstName} ${lastName}`,
+          email: user?.email || "",
+        },
+        theme: {
+          color: "#121212",
+        },
+        modal: {
+          ondismiss: function () {
+            setIsOrdering(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (err: any) {
       setFormError(err.message || "Failed to place order. Please try again.");
       setIsOrdering(false);
@@ -238,6 +440,55 @@ export default function CheckoutPage() {
                 </div>
 
                 <form onSubmit={handlePlaceOrder} className="space-y-6">
+                  {savedAddresses.length > 0 && (
+                    <div className="space-y-3 p-4 bg-bg/50 border border-line/40 rounded-2xl">
+                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">
+                        Select a Saved Address ({savedAddresses.length}/3)
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {savedAddresses.map((addr: any) => (
+                          <div
+                            key={addr.id}
+                            className="p-3 border border-line/50 hover:border-accent rounded-xl cursor-pointer bg-bg/70 hover:bg-bg transition-colors flex flex-col justify-between"
+                            onClick={() => {
+                              const nameParts = addr.name.split(" ");
+                              setFirstName(nameParts[0] || "");
+                              setLastName(nameParts.slice(1).join(" ") || "");
+                              setAddress(addr.street || "");
+                              setCity(addr.city || "");
+                              setZipCode(addr.postalCode || "");
+                            }}
+                          >
+                            <div className="space-y-0.5">
+                              <span className="text-[10px] font-bold block uppercase tracking-wider text-ink truncate">
+                                {addr.title}
+                              </span>
+                              <span className="text-[9px] text-muted block truncate font-medium">
+                                {addr.name}
+                              </span>
+                              <span className="text-[9px] text-muted block truncate">
+                                {addr.street}
+                              </span>
+                              <span className="text-[9px] text-muted block truncate">
+                                {addr.city}, {addr.postalCode}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAddress(addr.id);
+                              }}
+                              className="text-[9px] text-accent mt-3 uppercase font-bold tracking-wider hover:underline w-fit select-none"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">First Name</label>
@@ -295,6 +546,17 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
+
+                  {savedAddresses.length < 3 && (
+                    <button
+                      type="button"
+                      onClick={handleSaveAddress}
+                      disabled={isSavingAddress || isAddressAlreadySaved}
+                      className="px-4 py-2.5 border border-line rounded-xl text-[9px] font-bold tracking-widest uppercase text-ink hover:text-accent hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 w-max select-none"
+                    >
+                      {isSavingAddress ? "Saving Address..." : isAddressAlreadySaved ? "Address Already Saved" : "Save Address to Profile"}
+                    </button>
+                  )}
 
                   {formError && (
                     <p className="text-[11px] text-accent font-medium leading-relaxed">
@@ -420,10 +682,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 justify-center text-[10px] text-muted tracking-widest uppercase pt-2 border-t border-line/30">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Secure 256-Bit SSL Checkout</span>
-                </div>
               </div>
             </div>
           )}

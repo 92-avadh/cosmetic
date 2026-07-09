@@ -1,40 +1,33 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { withApiHandler } from "@/lib/api-helper";
+import { promoValidateSchema } from "@/lib/schemas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
-export async function POST(request: Request) {
-  try {
-    const { code } = await request.json();
+export const POST = withApiHandler(async (request: Request) => {
+  const body = await request.json();
+  const { code } = await promoValidateSchema.parseAsync(body);
 
-    if (!code) {
-      return NextResponse.json({ error: "Promo code is required" }, { status: 400 });
-    }
+  // Look up the code in the database
+  const { data: promo, error } = await supabase
+    .from("PromoCode")
+    .select("*")
+    .eq("code", code)
+    .single();
 
-    const cleanCode = code.toUpperCase().trim();
-
-    // Look up the code in the database
-    const { data: promo, error } = await supabase
-      .from("PromoCode")
-      .select("*")
-      .eq("code", cleanCode)
-      .single();
-
-    if (error || !promo || !promo.isActive) {
-      return NextResponse.json({ error: "Invalid or inactive promo code" }, { status: 400 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      code: promo.code,
-      discount: promo.discount,
-    });
-  } catch (error: any) {
-    console.error("Promo Code Validation API Error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to validate promo code" },
-      { status: 500 }
-    );
+  if (error || !promo || !promo.isActive) {
+    const err = new Error("Invalid or inactive promo code");
+    (err as any).status = 400;
+    (err as any).code = "PROMO_INVALID";
+    throw err;
   }
-}
+
+  return {
+    success: true,
+    code: promo.code,
+    discount: promo.discount,
+  };
+});
+

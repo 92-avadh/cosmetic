@@ -9,20 +9,37 @@ import { useCartStore } from "@/store/useCartStore";
 import { Sparkles, HelpCircle, Layers, Droplet } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 
+const ProductCardSkeleton = () => (
+  <div className="border border-line/40 rounded-2xl p-4 bg-card-bg/40 animate-pulse space-y-4">
+    <div className="aspect-[4/5] bg-line/25 rounded-xl w-full" />
+    <div className="space-y-2">
+      <div className="h-4 bg-line/25 rounded w-2/3" />
+      <div className="h-3 bg-line/20 rounded w-1/2" />
+    </div>
+    <div className="flex justify-between items-center pt-2 border-t border-line/10">
+      <div className="h-3.5 bg-line/25 rounded w-1/4" />
+      <div className="h-8 bg-line/25 rounded-full w-24" />
+    </div>
+  </div>
+);
+
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const { products, fetchProducts } = useCartStore();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts().finally(() => {
+      setIsLoading(false);
+    });
   }, [fetchProducts]);
 
   const displayProducts = products.length > 0 ? products : PRODUCTS_CATALOG;
 
   const categories = [
     { id: "all", label: "All Products" },
-    { id: "skincare", label: "Skincare System" },
-    { id: "bodycare", label: "Bodycare System" },
+    { id: "skincare", label: "Hydra-Active Wash" },
+    { id: "bodycare", label: "Targeted Body Wash" },
   ];
 
   // Category filtering based on product category
@@ -117,14 +134,21 @@ export default function ShopPage() {
                   Korean formulation science emphasises how skin behaves, not how it appears.
                 </p>
                 <p>
-                  This is why Korean formulas lead in barrier-first design, advanced delivery systems, and recovery-focused skincare.
+                  This is why Korean formulas lead in barrier-first design, advanced delivery systems, and recovery-focused body care.
                 </p>
               </div>
             </div>
 
             {/* Right Product Grid */}
             <div className="lg:col-span-8">
-              {filteredProducts.length > 0 ? (
+              {isLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <ProductCardSkeleton />
+                  <ProductCardSkeleton />
+                  <ProductCardSkeleton />
+                  <ProductCardSkeleton />
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {filteredProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />

@@ -17,15 +17,15 @@
   --color-card-bg: var(--card-bg);
   --color-line: var(--line);
 
-  --font-display: var(--font-archivo);
-  --font-body: var(--font-inter);
+  --font-display: 'Archivo', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 /* Base resets & typography scale */
 body {
   background-color: var(--bg);
   color: var(--ink);
-  font-family: var(--font-inter), sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

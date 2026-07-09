@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import CurtainButton from "./CurtainButton";
+import Link from "next/link";
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,24 @@ export default function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      if (subtitleRef.current) {
+        gsap.set(subtitleRef.current, { opacity: 1, y: 0 });
+      }
+      const words = headlineRef.current?.querySelectorAll(".word-reveal");
+      if (words && words.length > 0) {
+        gsap.set(words, { y: "0%" });
+      }
+      if (ctaRef.current) {
+        gsap.set(ctaRef.current, { opacity: 1, y: 0 });
+      }
+      return;
+    }
+
     const ctx = gsap.context(() => {
       // 1. Fade/slide up for eyebrow label
       if (subtitleRef.current) {
@@ -70,6 +89,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0 select-none">
         <video
           src="/Create_a_cinematic_ultra_luxur (1).mp4"
+          poster="/hero-bg.png"
           autoPlay
           loop
           muted
@@ -103,15 +123,13 @@ export default function Hero() {
         </h1>
 
         <div ref={ctaRef} className="opacity-0">
-          <CurtainButton
-            onClick={() => {
-              const el = document.getElementById("shop");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="bg-transparent text-bg px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase border border-bg/40 rounded-full"
-          >
-            DISCOVER THE SYSTEM
-          </CurtainButton>
+          <Link href="/shop">
+            <CurtainButton
+              className="bg-transparent text-bg px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase border border-bg/40 rounded-full"
+            >
+              DISCOVER THE COLLECTION
+            </CurtainButton>
+          </Link>
         </div>
       </div>
     </section>

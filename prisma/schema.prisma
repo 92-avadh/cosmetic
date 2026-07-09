@@ -1,8 +1,7 @@
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
+
 
 generator client {
   provider = "prisma-client-js"
@@ -49,16 +48,18 @@ model Product {
   
   orderItems  OrderItem[]
   cartItems   CartItem[]
+  reviews     Review[]
 }
 
 model Cart {
-  id        String     @id @default(uuid())
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id                String     @id @default(uuid())
+  userId            String     @unique
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recoveryEmailSent Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
   
-  items     CartItem[]
+  items             CartItem[]
 }
 
 model CartItem {
@@ -149,4 +150,30 @@ model PromoCode {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  userName  String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  @@index([productId], name: "idx_review_productid")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  userEmail String?
+  action    String
+  status    String
+  ip        String?
+  userAgent String?
+  details   String?
+  createdAt DateTime @default(now())
+}
+
 

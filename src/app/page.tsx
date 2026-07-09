@@ -5,19 +5,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import ProductRow from "@/components/ProductRow";
-import PhilosophySection from "@/components/PhilosophySection";
-import PinnedStepsSection from "@/components/PinnedStepsSection";
-import IngredientsSection from "@/components/IngredientsSection";
 import MarqueeBand from "@/components/MarqueeBand";
-import StatsSection from "@/components/StatsSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import CurrencyModal from "@/components/CurrencyModal";
 import { useCartStore } from "@/store/useCartStore";
 import dynamic from "next/dynamic";
 
 const GlassBubble = dynamic(() => import("@/components/GlassBubble"), { ssr: false });
+const PhilosophySection = dynamic(() => import("@/components/PhilosophySection"), { ssr: false });
+const PinnedStepsSection = dynamic(() => import("@/components/PinnedStepsSection"), { ssr: false });
+const IngredientsSection = dynamic(() => import("@/components/IngredientsSection"), { ssr: false });
+const StatsSection = dynamic(() => import("@/components/StatsSection"), { ssr: false });
+const TestimonialsSection = dynamic(() => import("@/components/TestimonialsSection"), { ssr: false });
+const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);

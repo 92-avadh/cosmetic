@@ -3,17 +3,27 @@
 import { useEffect, useRef } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
+import { supabaseClient } from "@/lib/supabase-client";
 
 export default function CartSync() {
   const { cart, setCart, hasFetchedCart, setHasFetchedCart, clearCart } = useCartStore();
   const { user, isLoggedIn } = useUserStore();
   const isFetchingRef = useRef(false);
 
-  // 1. Fetch & Merge Cart on Login
+  const prevIsLoggedIn = useRef(isLoggedIn);
+
+  // 1. Clear Cart on Logout (Specifically when transitioning from logged in to logged out)
+  useEffect(() => {
+    if (prevIsLoggedIn.current && !isLoggedIn) {
+      clearCart();
+    }
+    prevIsLoggedIn.current = isLoggedIn;
+  }, [isLoggedIn, clearCart]);
+
+  // 2. Fetch & Merge Cart on Login
   useEffect(() => {
     if (!isLoggedIn || !user?.email) {
       if (hasFetchedCart) setHasFetchedCart(false);
-      if (cart.length > 0) clearCart();
       return;
     }
 
@@ -77,6 +87,32 @@ export default function CartSync() {
 
     return () => clearTimeout(timer);
   }, [cart, isLoggedIn, user?.email, hasFetchedCart]);
+
+  // 3. Realtime Stock Updates
+  const { updateProductInventory } = useCartStore();
+
+  useEffect(() => {
+    const channel = supabaseClient
+      .channel("supabase-realtime-products")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "Product",
+        },
+        (payload) => {
+          if (payload.new && payload.new.id) {
+            updateProductInventory(payload.new.id, Number(payload.new.inventory));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabaseClient.removeChannel(channel);
+    };
+  }, [updateProductInventory]);
 
   return null;
 }

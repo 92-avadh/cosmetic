@@ -22,6 +22,19 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
+  const [resendCount, setResendCount] = useState(0);
+
+  // Timer countdown logic
+  useEffect(() => {
+    if (step !== "otp" || timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
   // If already logged in, redirect away
   useEffect(() => {
@@ -55,9 +68,41 @@ function LoginForm() {
       }
 
       setStep("otp");
+      setTimer(30);
+      setResendCount(0);
       setMessage("Security code dispatched. Check your server terminal.");
     } catch (err: any) {
       setError(err.message || "Failed to initiate login request.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCount >= 2 || timer > 0 || isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/auth/otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to resend verification code.");
+      }
+
+      setResendCount((prev) => prev + 1);
+      setTimer(30);
+      setMessage(`New security code dispatched. Check your server terminal. (Resend ${resendCount + 1}/2)`);
+    } catch (err: any) {
+      setError(err.message || "Failed to resend code.");
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +143,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-card-bg/40 backdrop-blur-md border border-line/60 rounded-3xl p-8 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.03)] relative overflow-hidden">
+    <div className="no-reveal w-full max-w-md bg-card-bg/40 backdrop-blur-md border border-line/60 rounded-3xl p-8 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.03)] relative overflow-hidden">
       {/* Decorative top accent line */}
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
 
@@ -226,6 +271,27 @@ function LoginForm() {
                   )}
                 </CurtainButton>
 
+                {resendCount < 2 ? (
+                  <CurtainButton
+                    type="button"
+                    disabled={timer > 0 || isLoading}
+                    onClick={handleResendOtp}
+                    className="w-full border border-line text-ink bg-transparent text-[10px] font-semibold py-3.5 tracking-[0.2em] uppercase flex items-center justify-center space-x-2 disabled:opacity-55 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {timer > 0 ? (
+                      <span>Resend Code in {timer}s</span>
+                    ) : (
+                      <>
+                        <span>Resend Code ({2 - resendCount} left)</span>
+                      </>
+                    )}
+                  </CurtainButton>
+                ) : (
+                  <div className="text-[10px] uppercase tracking-wider font-semibold text-muted text-center py-2.5">
+                    Resend limit reached
+                  </div>
+                )}
+
                 <CurtainButton
                   type="button"
                   onClick={() => {
@@ -233,6 +299,8 @@ function LoginForm() {
                     setError(null);
                     setMessage(null);
                     setOtp("");
+                    setTimer(0);
+                    setResendCount(0);
                   }}
                   className="w-full border border-line text-ink bg-transparent text-[10px] font-semibold py-3.5 tracking-[0.2em] uppercase flex items-center justify-center space-x-2 cursor-pointer"
                 >

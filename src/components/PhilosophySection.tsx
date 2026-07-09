@@ -10,6 +10,14 @@ export default function PhilosophySection() {
   const bg2Ref = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
@@ -99,7 +107,7 @@ export default function PhilosophySection() {
             Our Philosophy
           </span>
           <h2 className="font-display font-semibold text-3xl sm:text-4xl md:text-6xl uppercase tracking-tight leading-[1.1] text-ink">
-            Skincare is not a quick fix. It is training for your skin's biological resilience.
+            Body care is not just washing. It is daily training for your skin's biological resilience.
           </h2>
           <div className="mt-8">
             <a

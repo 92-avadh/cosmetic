@@ -25,7 +25,7 @@ export default function CurtainButton({
       whileHover="hover"
       initial="rest"
       animate="rest"
-      className={`relative overflow-hidden cursor-pointer select-none transition-colors duration-300 border border-line ${className}`}
+      className={`relative overflow-hidden cursor-pointer select-none transition-colors duration-300 border border-line group ${className}`}
       style={{ isolation: "isolate" }}
     >
       {/* Layer 1: Pink curtain (#e8c5c1) */}
@@ -56,16 +56,9 @@ export default function CurtainButton({
       />
 
       {/* Text label / child contents centered on top */}
-      <motion.span
-        variants={{
-          rest: { color: "inherit" },
-          hover: { color: "#F6F4EE" },
-        }}
-        transition={{ duration: 0.3 }}
-        className="relative z-10 w-full h-full flex items-center justify-center gap-2 pointer-events-none"
-      >
+      <span className="relative z-10 w-full h-full flex items-center justify-center gap-2 pointer-events-none transition-colors duration-300 text-inherit group-hover:text-[#F6F4EE]">
         {children}
-      </motion.span>
+      </span>
     </motion.button>
   );
 }

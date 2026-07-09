@@ -36,7 +36,24 @@ export async function GET(request: Request) {
 
     if (error) throw new Error(error.message);
 
-    return NextResponse.json(orders);
+    const formattedOrders = orders?.map((order: any) => ({
+      ...order,
+      items: order.OrderItem?.map((item: any) => ({
+        id: item.id,
+        productId: item.Product?.id || "",
+        product: item.Product ? {
+          id: item.Product.id,
+          name: item.Product.name,
+          subtitle: item.Product.subtitle,
+          priceUSD: item.Product.priceUSD,
+          image: item.Product.image,
+        } : null,
+        quantity: item.quantity,
+        pricePaid: item.pricePaid,
+      })) || [],
+    })) || [];
+
+    return NextResponse.json(formattedOrders);
   } catch (error: any) {
     console.error("GET Admin Orders Error:", error);
     return NextResponse.json(
@@ -81,7 +98,24 @@ export async function POST(request: Request) {
 
     if (error) throw new Error(error.message);
 
-    return NextResponse.json({ success: true, order: updatedOrder });
+    const formattedOrder = updatedOrder ? {
+      ...updatedOrder,
+      items: updatedOrder.OrderItem?.map((item: any) => ({
+        id: item.id,
+        productId: item.Product?.id || "",
+        product: item.Product ? {
+          id: item.Product.id,
+          name: item.Product.name,
+          subtitle: item.Product.subtitle,
+          priceUSD: item.Product.priceUSD,
+          image: item.Product.image,
+        } : null,
+        quantity: item.quantity,
+        pricePaid: item.pricePaid,
+      })) || [],
+    } : null;
+
+    return NextResponse.json({ success: true, order: formattedOrder });
   } catch (error: any) {
     console.error("POST Admin Orders Error:", error);
     return NextResponse.json(

@@ -2,12 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
-import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
+import { X, Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PRODUCTS_CATALOG } from "./ProductRow";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import CurtainButton from "./CurtainButton";
+import ShoppingBagIcon from "./ShoppingBagIcon";
 
 export default function CartDrawer() {
   const {
@@ -96,7 +97,7 @@ export default function CartDrawer() {
             {/* Header */}
             <div className="p-6 border-b border-line flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
+                <ShoppingBagIcon className="w-5 h-5" />
                 <span className="font-display font-semibold text-sm tracking-wider uppercase">
                   Your Bag ({cart.reduce((total, i) => total + i.quantity, 0)})
                 </span>
@@ -114,7 +115,7 @@ export default function CartDrawer() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                  <ShoppingBag className="w-12 h-12 stroke-[1.2] text-muted opacity-40" />
+                  <ShoppingBagIcon className="w-12 h-12 text-muted opacity-40" />
                   <p className="text-xs uppercase tracking-widest text-muted">
                     Your shopping bag is empty.
                   </p>

@@ -6,7 +6,7 @@ const INGREDIENTS = [
   {
     link: "#system",
     text: "Marine PDRN",
-    image: "https://images.unsplash.com/photo-1615396879814-490196766457?q=80&w=600&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1505944270255-72b8c68c6a70?q=80&w=600&auto=format&fit=crop",
   },
   {
     link: "#system",

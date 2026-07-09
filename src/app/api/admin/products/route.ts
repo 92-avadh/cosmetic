@@ -105,6 +105,7 @@ export async function POST(request: Request) {
         const { data: newCategory, error: catError } = await supabase
           .from("Category")
           .insert({
+            id: crypto.randomUUID(),
             name: readableName,
             slug,
             createdAt: new Date().toISOString(),

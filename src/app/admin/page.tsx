@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -20,6 +21,7 @@ import {
   Clock,
   Mail,
   DollarSign,
+  Bell,
 } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 import { Button } from "@/components/ui/button";
@@ -121,8 +123,40 @@ export default function AdminDashboardPage() {
   const [orderStatusFilter, setOrderStatusFilter] = useState("ALL");
   const [productSearch, setProductSearch] = useState("");
 
+  // Notifications states
+  const [readOrderIds, setReadOrderIds] = useState<string[]>([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  const unreadOrders = orders.filter((order) => !readOrderIds.includes(order.id));
+
+  const markAsRead = (orderId: string) => {
+    const updated = [...readOrderIds, orderId];
+    setReadOrderIds(updated);
+    localStorage.setItem("bodybarrel-read-orders", JSON.stringify(updated));
+  };
+
+  const markAllAsRead = () => {
+    const allIds = orders.map((o) => o.id);
+    setReadOrderIds(allIds);
+    localStorage.setItem("bodybarrel-read-orders", JSON.stringify(allIds));
+  };
+
   useEffect(() => {
     setMounted(true);
+    const stored = localStorage.getItem("bodybarrel-read-orders");
+    if (stored) {
+      try {
+        setReadOrderIds(JSON.parse(stored));
+      } catch (e) {
+        console.error("Failed to parse read orders", e);
+      }
+    }
+
+    const handleDocumentClick = () => {
+      setIsNotificationsOpen(false);
+    };
+    window.addEventListener("click", handleDocumentClick);
+    return () => window.removeEventListener("click", handleDocumentClick);
   }, []);
 
   // Fetch all dashboard data
@@ -306,7 +340,7 @@ export default function AdminDashboardPage() {
             Access Restricted
           </h2>
           <p className="text-xs text-muted leading-relaxed max-w-sm mx-auto">
-            This terminal is reserved for administrative officers. Please sign in with an authorised account code.
+            This terminal is reserved for administrative. Please sign in with an authorised account code.
           </p>
           <Link
             href="/login?redirect=/admin"
@@ -378,6 +412,44 @@ export default function AdminDashboardPage() {
   const skincarePercent = totalCatSales > 0 ? (skincareSalesVal / totalCatSales) * 100 : 64.5;
   const bodycarePercent = totalCatSales > 0 ? (bodycareSalesVal / totalCatSales) * 100 : 35.5;
 
+  // 7-day revenue trend calculations
+  const last7DaysSales = Array.from({ length: 7 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    const dayStart = new Date(d.setHours(0,0,0,0)).getTime();
+    const dayEnd = new Date(d.setHours(23,59,59,999)).getTime();
+
+    const daySalesVal = orders
+      .filter(o => {
+        const oTime = new Date(o.createdAt).getTime();
+        return oTime >= dayStart && oTime <= dayEnd && (o.status === "DELIVERED" || o.status === "PAID" || o.status === "SHIPPED");
+      })
+      .reduce((sum, o) => sum + o.totalUSD, 0);
+
+    return { label: dateStr, value: daySalesVal };
+  }).reverse();
+
+  const max7DaysVal = Math.max(...last7DaysSales.map(d => d.value), 100);
+  
+  const last7DaysPoints = last7DaysSales.map((item, idx) => {
+    const x = 15 + idx * 78.33;
+    const y = 85 - (item.value / max7DaysVal) * 70;
+    return { x, y, label: item.label, value: item.value };
+  });
+
+  const linePathStr = last7DaysPoints.length > 0 
+    ? `M ${last7DaysPoints.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" L ")}`
+    : "";
+
+  const areaPathStr = last7DaysPoints.length > 0
+    ? `${linePathStr} L 485,95 L 15,95 Z`
+    : "";
+
+  const todaySales = last7DaysSales[6].value;
+  const yesterdaySales = last7DaysSales[5].value;
+  const growthPercent = yesterdaySales > 0 ? ((todaySales - yesterdaySales) / yesterdaySales) * 100 : todaySales > 0 ? 100 : 0;
+
   // Search filters
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
@@ -409,18 +481,106 @@ export default function AdminDashboardPage() {
       <aside className="w-72 bg-card-bg/40 border-r border-line flex flex-col h-full shrink-0 justify-between p-6">
         <div className="space-y-8 flex flex-col h-full">
           {/* Logo Brand Header */}
-          <div className="flex items-center gap-3 py-2 border-b border-line pb-4">
-            <img src="/logo.png" alt="BODYBARREL Logo" className="h-7 w-auto object-contain" />
-            <span className="text-[9px] tracking-[0.25em] font-semibold text-accent uppercase">Executive</span>
+          <div className="flex items-center justify-between py-2 border-b border-line pb-4 relative">
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="BODYBARREL Logo" className="h-7 w-auto object-contain" />
+              <span className="text-[9px] tracking-[0.25em] font-semibold text-accent uppercase">Admin Panel</span>
+            </div>
+
+            {/* Notifications Bell Button Trigger */}
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotificationsOpen(!isNotificationsOpen);
+                }}
+                className="relative p-1.5 text-ink hover:text-accent transition-colors cursor-pointer border border-line rounded-lg hover:bg-bg/60 flex items-center justify-center bg-transparent"
+                aria-label="Toggle notifications"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                {unreadOrders.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-bg text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center animate-pulse">
+                    {unreadOrders.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Absolute Dropdown */}
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute right-0 mt-3 w-80 bg-bg border border-line rounded-xl shadow-2xl p-4 z-50 space-y-3 cursor-default"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-between border-b border-line/60 pb-2">
+                      <span className="text-[9px] tracking-[0.2em] font-semibold text-accent uppercase">
+                        Notifications
+                      </span>
+                      {unreadOrders.length > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-[8px] uppercase tracking-widest text-accent hover:text-ink font-semibold cursor-pointer border-none bg-transparent"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+
+                    {unreadOrders.length > 0 ? (
+                      <div className="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                        {unreadOrders.map((order) => (
+                          <div
+                            key={order.id}
+                            className="p-2.5 bg-card-bg/40 border border-line/55 rounded-xl space-y-1.5 flex flex-col justify-between"
+                          >
+                            <div className="flex justify-between items-start gap-1">
+                              <span className="text-[9px] font-mono text-ink/80 truncate font-bold">
+                                #{order.id.slice(-6).toUpperCase()}
+                              </span>
+                              <span className="text-[8px] text-muted shrink-0">
+                                {new Date(order.createdAt).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-[8px] text-muted uppercase tracking-wider">
+                              <span className="truncate max-w-[150px]">{order.shippingName}</span>
+                              <span className="font-semibold text-ink">${order.totalUSD.toFixed(2)}</span>
+                            </div>
+                            <button
+                              onClick={() => markAsRead(order.id)}
+                              className="w-full mt-1 py-1 text-center bg-ink text-bg text-[7px] font-semibold tracking-widest uppercase hover:bg-accent hover:text-bg transition-colors duration-250 rounded-lg cursor-pointer border-none"
+                            >
+                              Mark as Read
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[9px] text-muted/75 italic py-4 text-center select-none">
+                        No new order activities.
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           <div className="pb-4 border-b border-line">
             <span className="text-[9px] tracking-[0.25em] font-semibold text-accent/80 uppercase block mb-1">
               Admin User
             </span>
-            <h2 className="font-display font-semibold text-sm uppercase text-ink">Bodybarrel Officer</h2>
+            <h2 className="font-display font-semibold text-sm uppercase text-ink">Bodybarrel</h2>
             <span className="text-[10px] text-muted truncate block max-w-[200px]">{user?.email}</span>
           </div>
+
+
 
           <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto pr-1">
             <span className="text-[8px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2">General</span>
@@ -525,7 +685,7 @@ export default function AdminDashboardPage() {
               <div className="absolute -top-12 -left-12 w-32 h-32 bg-accent/15 rounded-full blur-3xl pointer-events-none" />
 
               <div className="space-y-4 max-w-sm z-10 text-left">
-                <span className="text-[9px] tracking-[0.25em] font-semibold text-accent uppercase block">Executive Overview</span>
+                <span className="text-[9px] tracking-[0.25em] font-semibold text-accent uppercase block"> Overview</span>
                 <h3 className="font-display font-semibold text-2xl md:text-3xl leading-tight text-white uppercase tracking-tight">
                   Here&apos;s happening in your sales last weeks 👋
                 </h3>
@@ -559,92 +719,150 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Sales Funnel conversion banner with Visual SVG area plot */}
-            <div className="bg-bg/55 border border-line rounded-2xl p-6 space-y-6">
-              <div className="flex justify-between items-center">
-                <h4 className="font-display font-semibold text-xs text-ink uppercase tracking-wider flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                  Store Conversion Funnel
-                </h4>
-                <span className="text-[9px] text-muted tracking-widest font-semibold uppercase">Real-time Performance</span>
+            {/* Interactive Charts Panel Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Card 1: 7-Day Revenue Trend Line Chart */}
+              <div className="bg-bg/55 border border-line rounded-2xl p-6 space-y-6">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-display font-semibold text-xs text-ink uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                    Revenue Trend (Last 7 Days)
+                  </h4>
+                  <span className="text-[9px] text-muted tracking-widest font-semibold uppercase">Daily Performance</span>
+                </div>
+
+                {/* SVG Area Line Chart */}
+                <div className="relative h-28 w-full border border-line/30 rounded-xl overflow-hidden bg-bg/25 p-2 flex flex-col justify-between">
+                  <svg viewBox="0 0 500 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="revenueLineGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C97A5E" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#C97A5E" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    
+                    {/* Guidelines */}
+                    <line x1="0" y1="20" x2="500" y2="20" stroke="var(--line)" strokeOpacity="0.15" strokeDasharray="3 3" />
+                    <line x1="0" y1="50" x2="500" y2="50" stroke="var(--line)" strokeOpacity="0.15" strokeDasharray="3 3" />
+                    <line x1="0" y1="80" x2="500" y2="80" stroke="var(--line)" strokeOpacity="0.15" strokeDasharray="3 3" />
+
+                    {max7DaysVal > 0 && (
+                      <>
+                        {/* Area Fill */}
+                        <path d={areaPathStr} fill="url(#revenueLineGrad)" />
+                        {/* Stroke Path */}
+                        <path d={linePathStr} fill="none" stroke="#C97A5E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        
+                        {/* Intercept Circles */}
+                        {last7DaysPoints.map((p, idx) => (
+                          <circle
+                            key={idx}
+                            cx={p.x}
+                            cy={p.y}
+                            r="3.5"
+                            fill="#C97A5E"
+                            stroke="#F6F4EE"
+                            strokeWidth="1.5"
+                          />
+                        ))}
+                      </>
+                    )}
+                  </svg>
+
+                  {/* Daily Labels */}
+                  <div className="flex justify-between text-[8px] text-muted font-semibold tracking-wider px-1 pt-1.5 border-t border-line/10">
+                    {last7DaysSales.map((d, i) => (
+                      <span key={i} className="text-center w-full truncate">{d.label}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[9px] font-semibold text-muted uppercase">
+                  <span>Growth rate</span>
+                  <span className="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase">
+                    {growthPercent >= 0 ? `+${growthPercent.toFixed(1)}%` : `${growthPercent.toFixed(1)}%`} vs yesterday
+                  </span>
+                </div>
               </div>
 
-              {/* SVG Area Funnel Chart */}
-              <div className="relative h-28 w-full border border-line/30 rounded-xl overflow-hidden bg-bg/25">
-                <svg viewBox="0 0 800 120" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="funnelGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#C97A5E" stopOpacity="0.85" />
-                      <stop offset="33%" stopColor="#DCA38C" stopOpacity="0.7" />
-                      <stop offset="66%" stopColor="#ECC6B5" stopOpacity="0.5" />
-                      <stop offset="100%" stopColor="#EDE9DF" stopOpacity="0.3" />
-                    </linearGradient>
-                    <linearGradient id="funnelLineGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#C97A5E" />
-                      <stop offset="100%" stopColor="#EDE9DF" />
-                    </linearGradient>
-                  </defs>
-                  {/* Grid Lines */}
-                  <line x1="0" y1="0" x2="800" y2="0" stroke="var(--line)" strokeOpacity="0.25" strokeDasharray="4 4" />
-                  <line x1="0" y1="60" x2="800" y2="60" stroke="var(--line)" strokeOpacity="0.2" strokeDasharray="4 4" />
-                  <line x1="0" y1="120" x2="800" y2="120" stroke="var(--line)" strokeOpacity="0.25" strokeDasharray="4 4" />
-
-                  {/* Funnel Area Path */}
-                  <path
-                    d="M 0,20 Q 200,45 266,55 T 533,85 Q 700,95 800,102 L 800,120 L 0,120 Z"
-                    fill="url(#funnelGrad)"
-                  />
-                  <path
-                    d="M 0,20 Q 200,45 266,55 T 533,85 Q 700,95 800,102"
-                    fill="none"
-                    stroke="url(#funnelLineGrad)"
-                    strokeWidth="2.5"
-                  />
-
-                  {/* Data intercept nodes */}
-                  <circle cx="2" cy="20" r="4.5" fill="#C97A5E" stroke="#fff" strokeWidth="1.5" />
-                  <circle cx="266" cy="55" r="4.5" fill="#DCA38C" stroke="#fff" strokeWidth="1.5" />
-                  <circle cx="533" cy="85" r="4.5" fill="#ECC6B5" stroke="#fff" strokeWidth="1.5" />
-                  <circle cx="798" cy="102" r="4.5" fill="#C97A5E" stroke="#fff" strokeWidth="1.5" />
-                </svg>
-
-                <div className="absolute inset-0 grid grid-cols-4 pointer-events-none">
-                  <div className="border-r border-line/15 h-full" />
-                  <div className="border-r border-line/15 h-full" />
-                  <div className="border-r border-line/15 h-full" />
-                  <div className="h-full" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
-                  <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">1. Sessions</span>
-                  <p className="font-display font-semibold text-base text-ink">{mockSessions}</p>
-                  <span className="text-[8px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">100% Base</span>
+              {/* Card 2: Store Conversion Funnel */}
+              <div className="bg-bg/55 border border-line rounded-2xl p-6 space-y-6">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-display font-semibold text-xs text-ink uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                    Store Conversion Funnel
+                  </h4>
+                  <span className="text-[9px] text-muted tracking-widest font-semibold uppercase">Real-time Performance</span>
                 </div>
 
-                <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
-                  <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">2. Product Views</span>
-                  <p className="font-display font-semibold text-base text-ink">{mockProductViews}</p>
-                  <span className="text-[8px] text-accent bg-accent/10 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                    {((mockProductViews / mockSessions) * 100).toFixed(1)}% View rate
-                  </span>
+                {/* SVG Area Funnel Chart */}
+                <div className="relative h-28 w-full border border-line/30 rounded-xl overflow-hidden bg-bg/25">
+                  <svg viewBox="0 0 800 120" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="funnelGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#C97A5E" stopOpacity="0.85" />
+                        <stop offset="33%" stopColor="#DCA38C" stopOpacity="0.7" />
+                        <stop offset="66%" stopColor="#ECC6B5" stopOpacity="0.5" />
+                        <stop offset="100%" stopColor="#EDE9DF" stopOpacity="0.3" />
+                      </linearGradient>
+                      <linearGradient id="funnelLineGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#C97A5E" />
+                        <stop offset="100%" stopColor="#EDE9DF" />
+                      </linearGradient>
+                    </defs>
+                    <line x1="0" y1="0" x2="800" y2="0" stroke="var(--line)" strokeOpacity="0.25" strokeDasharray="4 4" />
+                    <line x1="0" y1="60" x2="800" y2="60" stroke="var(--line)" strokeOpacity="0.2" strokeDasharray="4 4" />
+                    <line x1="0" y1="120" x2="800" y2="120" stroke="var(--line)" strokeOpacity="0.25" strokeDasharray="4 4" />
+                    <path
+                      d="M 0,20 Q 200,45 266,55 T 533,85 Q 700,95 800,102 L 800,120 L 0,120 Z"
+                      fill="url(#funnelGrad)"
+                    />
+                    <path
+                      d="M 0,20 Q 200,45 266,55 T 533,85 Q 700,95 800,102"
+                      fill="none"
+                      stroke="url(#funnelLineGrad)"
+                      strokeWidth="2.5"
+                    />
+                    <circle cx="2" cy="20" r="4.5" fill="#C97A5E" stroke="#fff" strokeWidth="1.5" />
+                    <circle cx="266" cy="55" r="4.5" fill="#DCA38C" stroke="#fff" strokeWidth="1.5" />
+                    <circle cx="533" cy="85" r="4.5" fill="#ECC6B5" stroke="#fff" strokeWidth="1.5" />
+                    <circle cx="798" cy="102" r="4.5" fill="#C97A5E" stroke="#fff" strokeWidth="1.5" />
+                  </svg>
+                  <div className="absolute inset-0 grid grid-cols-4 pointer-events-none">
+                    <div className="border-r border-line/15 h-full" />
+                    <div className="border-r border-line/15 h-full" />
+                    <div className="border-r border-line/15 h-full" />
+                    <div className="h-full" />
+                  </div>
                 </div>
 
-                <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
-                  <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">3. Add To Cart</span>
-                  <p className="font-display font-semibold text-base text-ink">{totalCartCreates}</p>
-                  <span className="text-[8px] text-accent bg-accent/10 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                    {((totalCartCreates / mockProductViews) * 100).toFixed(1)}% Add rate
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">4. Checkouts</span>
-                  <p className="font-display font-semibold text-base text-ink">{orderCount}</p>
-                  <span className="text-[8px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                    {((orderCount / totalCartCreates) * 100).toFixed(1)}% Conversion
-                  </span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                  <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
+                    <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">1. Sessions</span>
+                    <p className="font-display font-semibold text-base text-ink">{mockSessions}</p>
+                    <span className="text-[8px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">100% Base</span>
+                  </div>
+                  <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
+                    <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">2. Product Views</span>
+                    <p className="font-display font-semibold text-base text-ink">{mockProductViews}</p>
+                    <span className="text-[8px] text-accent bg-accent/10 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                      {((mockProductViews / mockSessions) * 100).toFixed(1)}% View rate
+                    </span>
+                  </div>
+                  <div className="space-y-1 relative pr-4 after:hidden md:after:block after:absolute after:top-1/2 after:right-0 after:-translate-y-1/2 after:w-[1px] after:h-8 after:bg-line">
+                    <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">3. Add To Cart</span>
+                    <p className="font-display font-semibold text-base text-ink">{totalCartCreates}</p>
+                    <span className="text-[8px] text-accent bg-accent/10 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                      {((totalCartCreates / mockProductViews) * 100).toFixed(1)}% Add rate
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[8px] uppercase tracking-widest font-semibold text-muted block">4. Checkouts</span>
+                    <p className="font-display font-semibold text-base text-ink">{orderCount}</p>
+                    <span className="text-[8px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                      {((orderCount / totalCartCreates) * 100).toFixed(1)}% Conversion
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

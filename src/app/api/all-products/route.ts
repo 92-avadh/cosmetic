@@ -11,9 +11,13 @@ export async function GET() {
       .select("*")
       .order("createdAt", { ascending: true });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(`DB Fetch: ${error.message}`);
 
-    return NextResponse.json(products);
+    return NextResponse.json(products, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=600",
+      },
+    });
   } catch (error: any) {
     console.error("GET Products API Error:", error);
     return NextResponse.json(

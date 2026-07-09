@@ -6,6 +6,21 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePathname } from "next/navigation";
 
+// Intercept and suppress THREE.Clock deprecation warnings triggered internally by libraries
+if (typeof window !== "undefined") {
+  const originalWarn = console.warn;
+  console.warn = (...args: any[]) => {
+    if (
+      args[0] &&
+      typeof args[0] === "string" &&
+      args[0].includes("THREE.Clock: This module has been deprecated.")
+    ) {
+      return;
+    }
+    originalWarn(...args);
+  };
+}
+
 export default function SmoothScrollProvider({
   children,
 }: {
@@ -66,6 +81,9 @@ export default function SmoothScrollProvider({
 
   // Set up global text scroll-reveal trigger on page changes
   useEffect(() => {
+    // Skip scroll reveal logic on admin dashboard
+    if (pathname.startsWith("/admin")) return;
+
     // Prevent reveal animations if prefers-reduced-motion matches
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -76,12 +94,18 @@ export default function SmoothScrollProvider({
     const ctx = gsap.context(() => {
       const textElements = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, .reveal-text");
       textElements.forEach((el) => {
-        // Skip elements inside header, preloader, hero sections or those with inline reveals
+        // Skip elements inside header, footer, form, modals/dialogs, preloader, hero sections,
+        // or containers with explicit no-reveal overrides.
         if (
           el.closest("header") ||
+          el.closest("footer") ||
+          el.closest("form") ||
           el.closest("#preloader") ||
+          el.closest("[role='dialog']") ||
+          el.closest(".no-reveal") ||
           el.closest(".word-reveal") ||
-          el.classList.contains("word-reveal")
+          el.classList.contains("word-reveal") ||
+          el.classList.contains("no-reveal")
         ) {
           return;
         }

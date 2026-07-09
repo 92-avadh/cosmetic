@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useUserStore } from "@/store/useUserStore";
 import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 
@@ -30,6 +32,74 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string>(product.image);
   const [activeTab, setActiveTab] = useState<string>("science");
+
+  // Reviews Integration
+  const { user, isLoggedIn } = useUserStore();
+  const [reviewsList, setReviewsList] = useState<any[]>([]);
+  const [reviewStats, setReviewStats] = useState({ count: 0, average: 0 });
+
+  const [newRating, setNewRating] = useState(5);
+  const [newName, setNewName] = useState("");
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/products/${product.id}/reviews`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviewsList(data.reviews || []);
+        setReviewStats(data.stats || { count: 0, average: 0 });
+      }
+    } catch (err) {
+      console.error("Error loading reviews:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [product.id]);
+
+  useEffect(() => {
+    if (isLoggedIn && user?.email) {
+      const prefillName = user.email.split("@")[0];
+      setNewName(prefillName);
+    }
+  }, [isLoggedIn, user]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim() || !newComment.trim()) {
+      setReviewError("Please fill out both Name and Comment fields.");
+      return;
+    }
+    setIsSubmittingReview(true);
+    setReviewError(null);
+    try {
+      const res = await fetch(`/api/products/${product.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName: newName,
+          rating: newRating,
+          comment: newComment,
+          userId: null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to submit review.");
+      }
+      setNewComment("");
+      setNewRating(5);
+      await fetchReviews();
+    } catch (err: any) {
+      setReviewError(err.message || "Failed to submit review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handlePrevImage = () => {
     if (product.hoverImage && activeImage === product.hoverImage) {
@@ -84,6 +154,20 @@ export default function ProductDetailClient({ product, recommendations }: Produc
     setQuantity(1);
   };
 
+  const handleBuyNow = () => {
+    for (let i = 0; i < quantity; i++) {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.priceUSD,
+        image: product.image,
+        subtitle: product.subtitle,
+      });
+    }
+    useCartStore.setState({ isCartOpen: false });
+    router.push("/checkout");
+  };
+
   const productTabs = [
     {
       id: "science",
@@ -109,6 +193,11 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       content:
         "Lather 2-3 pumps onto wet body skin. Massage continuously for 60 seconds, allowing the bio-active molecules to bind with cellular lipids and deposit moisture barriers. Rinse thoroughly with lukewarm water. Follow immediately with body serum to lock in recovery.",
     },
+    {
+      id: "reviews",
+      label: `Reviews (${reviewStats.count})`,
+      content: "",
+    },
   ];
 
   return (
@@ -117,13 +206,13 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       <main className="bg-bg text-ink min-h-screen pt-32 pb-24 font-sans">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Back button */}
-          <button
-            onClick={() => router.push("/shop")}
-            className="flex items-center space-x-2 text-xs uppercase tracking-widest font-bold text-muted hover:text-accent transition-colors mb-12 cursor-pointer border-none bg-transparent"
+          <Link
+            href="/shop"
+            className="flex items-center space-x-2 text-xs uppercase tracking-widest font-bold text-muted hover:text-accent transition-colors mb-12 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Collection</span>
-          </button>
+          </Link>
 
           {/* Product Layout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -174,6 +263,20 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   {product.subtitle}
                 </span>
 
+                {/* Star rating summary */}
+                <div className="flex items-center space-x-2 text-xs font-semibold pt-1">
+                  <div className="flex text-accent">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} className="text-sm">
+                        {i < Math.round(reviewStats.average) ? "★" : "☆"}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-ink/80 pt-0.5">
+                    {reviewStats.average > 0 ? `${reviewStats.average} (${reviewStats.count} reviews)` : "No reviews yet"}
+                  </span>
+                </div>
+
                 <div className="pt-2">
                   <span className="text-2xl font-semibold text-ink">{priceString}</span>
                 </div>
@@ -213,9 +316,16 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                   <CurtainButton
                     onClick={handleAdd}
-                    className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-8 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                    className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
                   >
-                    <span>ADD TO CART</span>
+                    <span>ADD TO BAG</span>
+                  </CurtainButton>
+
+                  <CurtainButton
+                    onClick={handleBuyNow}
+                    className="flex-1 text-[#2d1c14] border border-[#2d1c14] bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                  >
+                    <span>BUY NOW</span>
                   </CurtainButton>
                 </div>
               </div>
@@ -245,7 +355,110 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   ))}
                 </div>
                 <div className="text-xs sm:text-sm text-muted leading-relaxed min-h-[80px] animate-fade-in">
-                  {productTabs.find((t) => t.id === activeTab)?.content}
+                  {activeTab === "reviews" ? (
+                    <div className="space-y-8 py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                        {/* Left: Reviews List */}
+                        <div className="md:col-span-7 space-y-6">
+                          <h4 className="text-xs uppercase tracking-widest font-bold text-ink mb-4">
+                            Customer Reviews ({reviewsList.length})
+                          </h4>
+                          
+                          {reviewsList.length === 0 ? (
+                            <p className="text-xs text-muted italic">No reviews yet for this product. Be the first to share your experience!</p>
+                          ) : (
+                            <div className="space-y-5 max-h-[450px] overflow-y-auto pr-2 divide-y divide-line/35">
+                              {reviewsList.map((rev) => (
+                                <div key={rev.id} className="pt-5 first:pt-0 space-y-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="font-semibold text-ink uppercase tracking-wide">{rev.userName}</span>
+                                    <span className="text-[10px] text-muted">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                                  </div>
+                                  <div className="flex text-accent text-xs">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                      <span key={i} className="text-sm">
+                                        {i < rev.rating ? "★" : "☆"}
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <p className="text-xs text-muted leading-relaxed whitespace-pre-wrap">{rev.comment}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Right: Submit Review Form */}
+                        <div className="md:col-span-5 border border-line/65 rounded-xl p-5 bg-card-bg/25 space-y-5">
+                          <h4 className="text-xs uppercase tracking-widest font-bold text-ink">
+                            Write a Review
+                          </h4>
+
+                          <form onSubmit={handleReviewSubmit} className="space-y-4">
+                            {reviewError && (
+                              <p className="text-rose-600 font-medium text-[10px] uppercase tracking-wider">{reviewError}</p>
+                            )}
+
+                            {/* Name */}
+                            <div className="space-y-1">
+                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Your Name</label>
+                              <input
+                                type="text"
+                                required
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                placeholder="e.g. Arjun S."
+                                className="w-full bg-bg/50 border border-line rounded px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent"
+                              />
+                            </div>
+
+                            {/* Rating Stars Selection */}
+                            <div className="space-y-1">
+                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block mb-1">Your Rating</label>
+                              <div className="flex items-center space-x-1 text-lg">
+                                {Array.from({ length: 5 }).map((_, idx) => {
+                                  const starVal = idx + 1;
+                                  return (
+                                    <button
+                                      key={idx}
+                                      type="button"
+                                      onClick={() => setNewRating(starVal)}
+                                      className="hover:scale-110 transition-transform cursor-pointer border-none bg-transparent p-0 text-accent text-sm"
+                                    >
+                                      {starVal <= newRating ? "★" : "☆"}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Comment */}
+                            <div className="space-y-1">
+                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Thoughts</label>
+                              <textarea
+                                required
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Share your experience with the body wash texture, foaming, or skin feels..."
+                                rows={4}
+                                className="w-full bg-bg/50 border border-line rounded p-3 text-xs text-ink focus:outline-none focus:border-accent"
+                              />
+                            </div>
+
+                            <CurtainButton
+                              type="submit"
+                              disabled={isSubmittingReview}
+                              className="w-full py-3 text-bg border-accent bg-accent text-[9px] font-bold tracking-widest uppercase rounded-[3px] flex items-center justify-center cursor-pointer"
+                            >
+                              <span>{isSubmittingReview ? "Submitting..." : "Submit Review"}</span>
+                            </CurtainButton>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    productTabs.find((t) => t.id === activeTab)?.content
+                  )}
                 </div>
               </div>
             </div>

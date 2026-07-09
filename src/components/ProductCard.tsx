@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
-import { Plus } from "lucide-react";
+import { useWishlistStore } from "@/store/useWishlistStore";
+import { Plus, Heart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import CurtainButton from "./CurtainButton";
 
 interface ProductCardProps {
@@ -23,8 +26,11 @@ export default function ProductCard({
   image,
   hoverImage,
 }: ProductCardProps) {
+  const router = useRouter();
   const { addItem, currency } = useCartStore();
+  const { toggleItem, isWishlisted } = useWishlistStore();
   const [isHovered, setIsHovered] = useState(false);
+  const wishlisted = isWishlisted(id);
 
   const convertedPrice = priceUSD * CURRENCY_RATES[currency];
   const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
@@ -47,6 +53,20 @@ export default function ProductCard({
     });
   };
 
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      id,
+      name,
+      price: priceUSD,
+      image,
+      subtitle,
+    });
+    useCartStore.setState({ isCartOpen: false });
+    router.push("/checkout");
+  };
+
   return (
     <Link
       href={`/products/${id}`}
@@ -60,6 +80,33 @@ export default function ProductCard({
         <div className="absolute top-3 left-3 bg-bg/90 backdrop-blur-sm px-2 py-0.5 border border-line/40 text-[7px] tracking-[0.22em] font-bold text-ink uppercase z-10 select-none rounded-[2px]">
           BODYBARREL
         </div>
+
+        {/* Wishlist Heart Toggle */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleItem({ id, name, subtitle, priceUSD, image, hoverImage });
+          }}
+          className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-bg/80 backdrop-blur-sm border border-line/30 rounded-full cursor-pointer hover:bg-bg transition-colors"
+          aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={wishlisted ? "filled" : "empty"}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              <Heart
+                className={`w-3.5 h-3.5 transition-colors duration-200 ${
+                  wishlisted ? "fill-red-500 text-red-500" : "fill-none text-ink/60"
+                }`}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </button>
 
         {/* Base Image */}
         <img
@@ -81,16 +128,22 @@ export default function ProductCard({
 
         {/* Quick Add Overlay */}
         <div
-          className={`absolute inset-x-0 bottom-0 p-4 transition-all duration-500 transform ${
+          className={`absolute inset-x-0 bottom-0 p-3 transition-all duration-500 transform grid grid-cols-2 gap-2 ${
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
           <CurtainButton
             onClick={handleQuickAdd}
-            className="w-full text-ink border-ink bg-transparent text-[10px] md:text-xs font-semibold py-3 px-4 tracking-[0.15em] uppercase flex items-center justify-center space-x-2"
+            className="w-full text-ink border-ink/40 bg-transparent text-[8px] md:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add to Bag</span>
+            <Plus className="w-3 h-3" />
+            <span>Add</span>
+          </CurtainButton>
+          <CurtainButton
+            onClick={handleBuyNow}
+            className="w-full text-[#2d1c14] border-[#2d1c14]/40 bg-transparent text-[8px] md:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
+          >
+            <span>Buy Now</span>
           </CurtainButton>
         </div>
       </div>

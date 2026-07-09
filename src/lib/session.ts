@@ -22,8 +22,11 @@ function base64ToUint8(str: string): Uint8Array {
   return arr;
 }
 
+import { getEnv } from "./env";
+
 async function getSecretKey() {
-  const secret = process.env.SESSION_SECRET || "default-secret-key-32-characters-long-bodybarrel";
+  const validatedEnv = getEnv();
+  const secret = validatedEnv.SESSION_SECRET;
   const rawKey = encoder.encode(secret);
   return await crypto.subtle.importKey(
     "raw",
@@ -34,7 +37,15 @@ async function getSecretKey() {
   );
 }
 
-export async function signSession(payload: any): Promise<string> {
+
+export interface SessionPayload {
+  email: string;
+  role?: string;
+  userId?: string;
+  [key: string]: unknown;
+}
+
+export async function signSession(payload: SessionPayload): Promise<string> {
   const key = await getSecretKey();
   const data = encoder.encode(JSON.stringify(payload));
   const signature = await crypto.subtle.sign("HMAC", key, data);
@@ -45,7 +56,7 @@ export async function signSession(payload: any): Promise<string> {
   return `${payloadBase64}.${signatureBase64}`;
 }
 
-export async function verifySession(token: string): Promise<any | null> {
+export async function verifySession(token: string): Promise<SessionPayload | null> {
   try {
     const [payloadBase64, signatureBase64] = token.split(".");
     if (!payloadBase64 || !signatureBase64) return null;
@@ -54,10 +65,10 @@ export async function verifySession(token: string): Promise<any | null> {
     const data = base64ToUint8(payloadBase64);
     const signature = base64ToUint8(signatureBase64);
     
-    const isValid = await crypto.subtle.verify("HMAC", key, signature as any, data as any);
+    const isValid = await crypto.subtle.verify("HMAC", key, signature, data);
     if (!isValid) return null;
     
-    return JSON.parse(decoder.decode(data));
+    return JSON.parse(decoder.decode(data)) as SessionPayload;
   } catch (e) {
     console.error("verifySession Error:", e);
     return null;

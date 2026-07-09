@@ -1,18 +1,43 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { withApiHandler } from "@/lib/api-helper";
+import { logAudit } from "@/lib/audit";
+import { verifySession } from "@/lib/session";
 
 export const runtime = "edge";
 
-export async function POST() {
+export const POST = withApiHandler(async (request: Request) => {
+  let currentUser: any = null;
   try {
     const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("session")?.value;
+    if (sessionToken) {
+      currentUser = await verifySession(sessionToken);
+    }
+
     cookieStore.delete("session");
     
-    return NextResponse.json({ success: true });
+    if (currentUser) {
+      await logAudit({
+        action: "USER_LOGOUT",
+        status: "SUCCESS",
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+      });
+    }
+
+    return { success: true };
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to log out" },
-      { status: 500 }
-    );
+    if (currentUser) {
+      await logAudit({
+        action: "USER_LOGOUT",
+        status: "FAILED",
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+        details: error.message || String(error),
+      });
+    }
+    throw error;
   }
-}
+});
+

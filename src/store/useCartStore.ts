@@ -43,6 +43,7 @@ interface CartState {
   fetchProducts: () => Promise<void>;
   setCart: (cart: CartItem[]) => void;
   setHasFetchedCart: (hasFetchedCart: boolean) => void;
+  updateProductInventory: (productId: string, newInventory: number) => void;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -83,6 +84,10 @@ export const useCartStore = create<CartState>((set, get) => ({
   setCart: (cart) => set({ cart }),
   
   setHasFetchedCart: (hasFetchedCart) => set({ hasFetchedCart }),
+
+  updateProductInventory: (productId, newInventory) => set((state) => ({
+    products: state.products.map((p) => p.id === productId ? { ...p, inventory: newInventory } : p)
+  })),
   
   getCartTotal: () => {
     const { cart, currency } = get();

@@ -1,11 +1,30 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Component, type ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
-import { MeshTransmissionMaterial, Environment, Float, Bvh } from "@react-three/drei";
+import { MeshTransmissionMaterial, Float, Bvh } from "@react-three/drei";
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// ponytail: local error boundary so a WebGL/HDR failure doesn't crash the whole page
+class CanvasErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error) {
+    console.warn("[GlassBubble] 3D render failed, hiding bubble:", error.message);
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 
 interface GlassBubbleProps {
   className?: string;
@@ -117,28 +136,28 @@ export default function GlassBubble({
       className={`absolute inset-0 pointer-events-none overflow-hidden select-none z-0 ${className}`}
     >
       {isInView && (
-        <Canvas
-          dpr={[1, 2]}
-          camera={{ position: [0, 0, 5], fov: 45 }}
-          gl={{
-            antialias: true,
-            alpha: true,
-            preserveDrawingBuffer: false,
-            powerPreference: "high-performance",
-          }}
-          className="w-full h-full"
-        >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[5, 5, 2]} intensity={1.5} />
-          <directionalLight position={[-5, -5, -2]} intensity={0.5} />
-          
-          <Bvh firstHitOnly>
-            <BubbleMesh scale={scale} position={position} />
-          </Bvh>
-
-          {/* Environmental light reflections */}
-          <Environment preset="studio" />
-        </Canvas>
+        <CanvasErrorBoundary>
+          <Canvas
+            dpr={[1, 2]}
+            camera={{ position: [0, 0, 5], fov: 45 }}
+            gl={{
+              antialias: true,
+              alpha: true,
+              preserveDrawingBuffer: false,
+              powerPreference: "high-performance",
+            }}
+            className="w-full h-full"
+          >
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[5, 5, 2]} intensity={1.5} />
+            <directionalLight position={[-5, -5, -2]} intensity={0.5} />
+            <directionalLight position={[0, 5, 5]} intensity={0.8} />
+            
+            <Bvh firstHitOnly>
+              <BubbleMesh scale={scale} position={position} />
+            </Bvh>
+          </Canvas>
+        </CanvasErrorBoundary>
       )}
     </div>
   );

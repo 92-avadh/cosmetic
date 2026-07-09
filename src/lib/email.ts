@@ -1,3 +1,5 @@
+import { getSafeRequestContext } from "./cloudflare";
+
 export async function sendEmail({
   to,
   subject,
@@ -7,8 +9,10 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  const context = getSafeRequestContext();
+  const env = context?.env || {};
+  const gmailUser = env.GMAIL_USER || process.env.GMAIL_USER;
+  const gmailPass = env.GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
 
   if (!gmailUser || !gmailPass) {
     console.log("\n");
@@ -28,6 +32,17 @@ export async function sendEmail({
   try {
     if (process.env.NEXT_RUNTIME === "edge") {
       console.warn("SMTP email sending is not supported in Edge runtime. Email was mocked.");
+      console.log("\n");
+      console.log("┌────────────────────────────────────────────────────────┐");
+      console.log("│ ⚠️ [MOCK EMAIL] EDGE RUNTIME - EMAIL WAS MOCKED         │");
+      console.log("├────────────────────────────────────────────────────────┤");
+      console.log(`│ To:      ${to.padEnd(46)} │`);
+      console.log(`│ Subject: ${subject.padEnd(46)} │`);
+      console.log(`│ Body Preview:                                          │`);
+      const plainText = html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+      console.log(`│ ${plainText.slice(0, 50).padEnd(52)} │`);
+      console.log("└────────────────────────────────────────────────────────┘");
+      console.log("\n");
       return { success: true, mocked: true };
     }
 

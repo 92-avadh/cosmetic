@@ -3,7 +3,7 @@
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { Trash2, Plus, Minus, ShieldCheck, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { PRODUCTS_CATALOG } from "@/components/ProductRow";
 import ProductCard from "@/components/ProductCard";
@@ -148,11 +148,6 @@ export default function CartPage() {
                     <ArrowRight className="w-4 h-4" />
                   </CurtainButton>
                 </div>
-
-                <div className="flex items-center gap-3 justify-center text-[10px] text-muted tracking-widest uppercase">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Secure 256-Bit SSL Checkout</span>
-                </div>
               </div>
             </div>
           ) : (
@@ -166,7 +161,7 @@ export default function CartPage() {
                   onClick={() => router.push("/shop")}
                   className="inline-block px-10 py-4 text-ink border border-ink bg-transparent text-xs font-semibold tracking-widest uppercase"
                 >
-                  Discover The System
+                  Discover The Collection
                 </CurtainButton>
               </div>
 
