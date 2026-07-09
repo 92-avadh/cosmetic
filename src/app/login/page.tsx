@@ -70,7 +70,7 @@ function LoginForm() {
       setStep("otp");
       setTimer(30);
       setResendCount(0);
-      setMessage("Security code dispatched. Check your server terminal.");
+      setMessage("Security code dispatched. Please check your email inbox.");
     } catch (err: any) {
       setError(err.message || "Failed to initiate login request.");
     } finally {
@@ -100,7 +100,7 @@ function LoginForm() {
 
       setResendCount((prev) => prev + 1);
       setTimer(30);
-      setMessage(`New security code dispatched. Check your server terminal. (Resend ${resendCount + 1}/2)`);
+      setMessage(`New security code dispatched. Please check your email inbox. (Resend ${resendCount + 1}/2)`);
     } catch (err: any) {
       setError(err.message || "Failed to resend code.");
     } finally {
