@@ -5,8 +5,6 @@ import { verifySession } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 async function checkAdminAuth() {
   const cookieStore = await cookies().catch(() => null);
   const sessionCookie = cookieStore?.get("session")?.value;

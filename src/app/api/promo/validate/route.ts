@@ -4,8 +4,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { promoValidateSchema } from "@/lib/schemas";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 export const POST = withApiHandler(async (request: Request) => {
   const body = await request.json();
   const { code } = await promoValidateSchema.parseAsync(body);

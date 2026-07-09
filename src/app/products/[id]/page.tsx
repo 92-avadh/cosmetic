@@ -5,8 +5,6 @@ import { notFound } from "next/navigation";
 
 // Required for @cloudflare/next-on-pages — routes without this are excluded from the Worker bundle
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 interface PageProps {
   params: Promise<{ id: string }>;
 }

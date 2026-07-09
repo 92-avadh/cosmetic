@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 export async function GET() {
   try {
     const { data: products, error } = await supabase

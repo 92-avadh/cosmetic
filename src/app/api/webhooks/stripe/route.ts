@@ -3,8 +3,6 @@ import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import Stripe from "stripe";
 
-export const runtime = "edge";
-
 export async function POST(request: Request) {
   const context = (globalThis as any)[Symbol.for("cloudflare.request_context")] || {};
   const env = context?.env || {};

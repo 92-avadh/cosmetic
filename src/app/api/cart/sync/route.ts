@@ -6,8 +6,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { cartSyncSchema } from "@/lib/schemas";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
-
 // GET: Retrieve user's cart from database
 export const GET = withApiHandler(async (request: Request) => {
   const cookieStore = await cookies().catch(() => null);

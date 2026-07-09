@@ -7,8 +7,6 @@ import { orderCreateSchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 
-export const runtime = "edge";
-
 const checkoutCreateSchema = orderCreateSchema.omit({ totalUSD: true });
 const razorpayCheckoutSchema = checkoutCreateSchema.extend({
   currency: z.string().max(10).optional().nullable(),

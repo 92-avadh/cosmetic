@@ -7,8 +7,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { orderCreateSchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 
-export const runtime = "edge";
-
 const checkoutCreateSchema = orderCreateSchema.omit({ totalUSD: true });
 
 export const POST = withApiHandler(async (request: Request) => {

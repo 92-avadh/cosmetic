@@ -5,8 +5,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { otpRequestSchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 
-export const runtime = "edge";
-
 export const POST = withApiHandler(async (request: Request) => {
   let emailKey = "";
   try {

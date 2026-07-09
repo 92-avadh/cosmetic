@@ -1,27 +1,4 @@
 {
   "version": 1,
-  "functions": {
-    "/api/admin/abandoned-carts": {},
-    "/api/admin/abandoned-carts/recover": {},
-    "/api/admin/orders": {},
-    "/api/admin/products": {},
-    "/api/admin/upload": {},
-    "/api/all-products": {},
-    "/api/auth/logout": {},
-    "/api/auth/otp": {},
-    "/api/auth/verify": {},
-    "/api/cart/sync": {},
-    "/api/checkout/razorpay": {},
-    "/api/checkout/razorpay/verify": {},
-    "/api/checkout/stripe": {},
-    "/api/orders": {},
-    "/api/orders/[id]": {},
-    "/api/products/[id]": {},
-    "/api/products/[id]/reviews": {},
-    "/api/promo/validate": {},
-    "/api/user": {},
-    "/api/webhooks/stripe": {},
-    "/orders/[id]": {},
-    "/products/[id]": {}
-  }
+  "functions": {}
 }

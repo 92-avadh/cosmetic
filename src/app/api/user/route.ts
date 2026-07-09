@@ -6,8 +6,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { userActionSchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 
-export const runtime = "edge";
-
 export const POST = withApiHandler(async (request: Request) => {
   const cookieStore = await cookies().catch(() => null);
   const sessionCookie = cookieStore?.get("session")?.value;

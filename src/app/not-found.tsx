@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 export default function NotFound() {
   return (
     <div className="fixed inset-0 z-50 bg-[#121212] flex flex-col items-center justify-center text-[#F6F4EE] px-6 select-none text-center">

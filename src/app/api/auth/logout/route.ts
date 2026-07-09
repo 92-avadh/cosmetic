@@ -4,8 +4,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { logAudit } from "@/lib/audit";
 import { verifySession } from "@/lib/session";
 
-export const runtime = "edge";
-
 export const POST = withApiHandler(async (request: Request) => {
   let currentUser: any = null;
   try {

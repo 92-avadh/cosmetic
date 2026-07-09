@@ -7,8 +7,6 @@ import { withApiHandler } from "@/lib/api-helper";
 import { razorpayVerifySchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 
-export const runtime = "edge";
-
 // Cryptographic signature verification using standard Web Crypto API (Edge-safe)
 async function verifyRazorpaySignature(
   orderId: string,

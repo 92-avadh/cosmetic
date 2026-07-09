@@ -3658,8 +3658,108 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route_client-reference-manifest.js": {
+      "bytes": 338,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route_client-reference-manifest.js": {
+      "bytes": 333,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route_client-reference-manifest.js": {
+      "bytes": 330,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route_client-reference-manifest.js": {
+      "bytes": 330,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route_client-reference-manifest.js": {
+      "bytes": 326,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route_client-reference-manifest.js": {
+      "bytes": 324,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route_client-reference-manifest.js": {
+      "bytes": 324,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/promo/validate/route_client-reference-manifest.js": {
+      "bytes": 323,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/products/route_client-reference-manifest.js": {
+      "bytes": 323,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/products/[id]/route_client-reference-manifest.js": {
+      "bytes": 322,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/all-products/route_client-reference-manifest.js": {
+      "bytes": 321,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
+      "bytes": 321,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
+      "bytes": 321,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route_client-reference-manifest.js": {
+      "bytes": 320,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/auth/verify/route_client-reference-manifest.js": {
+      "bytes": 320,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/auth/logout/route_client-reference-manifest.js": {
+      "bytes": 320,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/cart/sync/route_client-reference-manifest.js": {
+      "bytes": 318,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/auth/otp/route_client-reference-manifest.js": {
+      "bytes": 317,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/orders/route_client-reference-manifest.js": {
+      "bytes": 315,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/user/route_client-reference-manifest.js": {
+      "bytes": 313,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 149275,
+      "bytes": 135728,
       "imports": [
         {
           "path": "path",
@@ -3680,6 +3780,106 @@
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/deep-freeze.js",
           "kind": "require-call",
           "original": "../shared/lib/deep-freeze"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\abandoned-carts\\recover\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\razorpay\\verify\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\abandoned-carts\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\products\\[id]\\reviews\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\razorpay\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\webhooks\\stripe\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\stripe\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/promo/validate/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\promo\\validate\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/products/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\products\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/products/[id]/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\products\\[id]\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/all-products/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\all-products\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\upload\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\orders\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\orders\\[id]\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/verify/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\verify\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/logout/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\logout\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/cart/sync/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\cart\\sync\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/otp/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\otp\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/orders/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\orders\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/user/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\user\\route_client-reference-manifest.js"
         }
       ],
       "format": "cjs"
@@ -3688,6 +3888,234 @@
       "bytes": 42,
       "imports": [],
       "format": "esm"
+    },
+    ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
+      "bytes": 34642,
+      "imports": [
+        {
+          "path": "worker_threads",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": ".open-next/cloudflare-templates/shims/throw.js",
+          "kind": "dynamic-import",
+          "original": "next/dist/compiled/@vercel/og/index.edge.js"
+        },
+        {
+          "path": "path",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "fs",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "stream",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "url",
+          "kind": "require-call",
+          "external": true
+        },
+        {
+          "path": "<runtime>",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route.js": {
+      "bytes": 498,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route.js": {
+      "bytes": 583,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route.js": {
+      "bytes": 433,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route.js": {
+      "bytes": 399,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route.js": {
+      "bytes": 423,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route.js": {
+      "bytes": 493,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route.js": {
+      "bytes": 514,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/products/route.js": {
+      "bytes": 417,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/promo/validate/route.js": {
+      "bytes": 419,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/products/[id]/route.js": {
+      "bytes": 382,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/orders/route.js": {
+      "bytes": 415,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/admin/upload/route.js": {
+      "bytes": 345,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/all-products/route.js": {
+      "bytes": 375,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/auth/logout/route.js": {
+      "bytes": 413,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/auth/verify/route.js": {
+      "bytes": 411,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route.js": {
+      "bytes": 378,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/cart/sync/route.js": {
+      "bytes": 409,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js": {
       "bytes": 34652,
@@ -3731,7 +4159,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/_global-error/page.js": {
-      "bytes": 609,
+      "bytes": 610,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3741,49 +4169,30 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
-      "bytes": 34642,
+    ".open-next/server-functions/default/.next/server/app/api/auth/otp/route.js": {
+      "bytes": 463,
       "imports": [
         {
-          "path": "worker_threads",
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
           "kind": "require-call",
-          "external": true
-        },
+          "original": "../../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/products/[id]/page.js": {
+      "bytes": 1045,
+      "imports": [
         {
-          "path": ".open-next/cloudflare-templates/shims/throw.js",
-          "kind": "dynamic-import",
-          "original": "next/dist/compiled/@vercel/og/index.edge.js"
-        },
-        {
-          "path": "path",
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
           "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "fs",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "stream",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "url",
-          "kind": "require-call",
-          "external": true
-        },
-        {
-          "path": "<runtime>",
-          "kind": "import-statement",
-          "external": true
+          "original": "../../../chunks/ssr/[turbopack]_runtime.js"
         }
       ],
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/favicon.ico/route.js": {
-      "bytes": 329,
+      "bytes": 414,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
@@ -3793,8 +4202,52 @@
       ],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/api/orders/route.js": {
+      "bytes": 541,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/orders/[id]/page.js": {
+      "bytes": 1002,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/_not-found/page.js": {
+      "bytes": 930,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../chunks/ssr/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/api/user/route.js": {
+      "bytes": 394,
+      "imports": [
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js",
+          "kind": "require-call",
+          "original": "../../../chunks/[turbopack]_runtime.js"
+        }
+      ],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/checkout/page.js": {
-      "bytes": 992,
+      "bytes": 993,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3805,7 +4258,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/account/page.js": {
-      "bytes": 988,
+      "bytes": 989,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3816,7 +4269,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/science/page.js": {
-      "bytes": 990,
+      "bytes": 991,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3827,7 +4280,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/admin/page.js": {
-      "bytes": 986,
+      "bytes": 987,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3838,7 +4291,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/login/page.js": {
-      "bytes": 986,
+      "bytes": 987,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3849,7 +4302,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/cart/page.js": {
-      "bytes": 984,
+      "bytes": 985,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3860,7 +4313,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/shop/page.js": {
-      "bytes": 984,
+      "bytes": 985,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3871,7 +4324,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/us/page.js": {
-      "bytes": 980,
+      "bytes": 981,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3882,7 +4335,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/page.js": {
-      "bytes": 971,
+      "bytes": 972,
       "imports": [
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js",
@@ -3893,7 +4346,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-      "bytes": 6602,
+      "bytes": 12277,
       "imports": [
         {
           "path": "path",
@@ -3941,14 +4394,129 @@
           "external": true
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\abandoned-carts\\recover\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\razorpay\\verify\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\abandoned-carts\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\products\\[id]\\reviews\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\razorpay\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\checkout\\stripe\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\webhooks\\stripe\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/products/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\products\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/promo/validate/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\promo\\validate\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/products/[id]/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\products\\[id]\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/orders/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\orders\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/upload/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\upload\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/all-products/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\all-products\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/logout/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\logout\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/verify/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\verify\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\orders\\[id]\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/cart/sync/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\cart\\sync\\route.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/_global-error/page.js",
           "kind": "require-call",
           "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\_global-error\\page.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/api/auth/otp/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\auth\\otp\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/products/[id]/page.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\products\\[id]\\page.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/favicon.ico/route.js",
           "kind": "require-call",
           "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\favicon.ico\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/orders/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\orders\\route.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/orders/[id]/page.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\orders\\[id]\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/_not-found/page.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\_not-found\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/user/route.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\user\\route.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/checkout/page.js",
@@ -5576,7 +6144,7 @@
       "format": "esm"
     },
     ".open-next/server-functions/default/index.mjs": {
-      "bytes": 130090,
+      "bytes": 93702,
       "imports": [
         {
           "path": "node:module",
@@ -6756,53 +7324,182 @@
         ".open-next/server-functions/default/node_modules/next/dist/shared/lib/deep-freeze.js": {
           "bytesInOutput": 586
         },
+        ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route_client-reference-manifest.js": {
+          "bytesInOutput": 507
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route_client-reference-manifest.js": {
+          "bytesInOutput": 498
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route_client-reference-manifest.js": {
+          "bytesInOutput": 492
+        },
+        ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route_client-reference-manifest.js": {
+          "bytesInOutput": 492
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route_client-reference-manifest.js": {
+          "bytesInOutput": 484
+        },
+        ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route_client-reference-manifest.js": {
+          "bytesInOutput": 480
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route_client-reference-manifest.js": {
+          "bytesInOutput": 480
+        },
+        ".open-next/server-functions/default/.next/server/app/api/promo/validate/route_client-reference-manifest.js": {
+          "bytesInOutput": 478
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/products/route_client-reference-manifest.js": {
+          "bytesInOutput": 478
+        },
+        ".open-next/server-functions/default/.next/server/app/api/products/[id]/route_client-reference-manifest.js": {
+          "bytesInOutput": 477
+        },
+        ".open-next/server-functions/default/.next/server/app/api/all-products/route_client-reference-manifest.js": {
+          "bytesInOutput": 475
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
+          "bytesInOutput": 475
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
+          "bytesInOutput": 475
+        },
+        ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route_client-reference-manifest.js": {
+          "bytesInOutput": 473
+        },
+        ".open-next/server-functions/default/.next/server/app/api/auth/verify/route_client-reference-manifest.js": {
+          "bytesInOutput": 473
+        },
+        ".open-next/server-functions/default/.next/server/app/api/auth/logout/route_client-reference-manifest.js": {
+          "bytesInOutput": 473
+        },
+        ".open-next/server-functions/default/.next/server/app/api/cart/sync/route_client-reference-manifest.js": {
+          "bytesInOutput": 469
+        },
+        ".open-next/server-functions/default/.next/server/app/api/auth/otp/route_client-reference-manifest.js": {
+          "bytesInOutput": 467
+        },
+        ".open-next/server-functions/default/.next/server/app/api/orders/route_client-reference-manifest.js": {
+          "bytesInOutput": 463
+        },
+        ".open-next/server-functions/default/.next/server/app/api/user/route_client-reference-manifest.js": {
+          "bytesInOutput": 459
+        },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 123356
+          "bytesInOutput": 112195
         },
         ".open-next/cloudflare-templates/shims/throw.js": {
           "bytesInOutput": 215
         },
+        ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
+          "bytesInOutput": 16609
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/recover/route.js": {
+          "bytesInOutput": 630
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/verify/route.js": {
+          "bytesInOutput": 711
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/abandoned-carts/route.js": {
+          "bytesInOutput": 561
+        },
+        ".open-next/server-functions/default/.next/server/app/api/products/[id]/reviews/route.js": {
+          "bytesInOutput": 524
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/razorpay/route.js": {
+          "bytesInOutput": 547
+        },
+        ".open-next/server-functions/default/.next/server/app/api/checkout/stripe/route.js": {
+          "bytesInOutput": 615
+        },
+        ".open-next/server-functions/default/.next/server/app/api/webhooks/stripe/route.js": {
+          "bytesInOutput": 636
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/products/route.js": {
+          "bytesInOutput": 538
+        },
+        ".open-next/server-functions/default/.next/server/app/api/promo/validate/route.js": {
+          "bytesInOutput": 540
+        },
+        ".open-next/server-functions/default/.next/server/app/api/products/[id]/route.js": {
+          "bytesInOutput": 503
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/orders/route.js": {
+          "bytesInOutput": 535
+        },
+        ".open-next/server-functions/default/.next/server/app/api/admin/upload/route.js": {
+          "bytesInOutput": 465
+        },
+        ".open-next/server-functions/default/.next/server/app/api/all-products/route.js": {
+          "bytesInOutput": 498
+        },
+        ".open-next/server-functions/default/.next/server/app/api/auth/logout/route.js": {
+          "bytesInOutput": 532
+        },
+        ".open-next/server-functions/default/.next/server/app/api/auth/verify/route.js": {
+          "bytesInOutput": 530
+        },
+        ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route.js": {
+          "bytesInOutput": 497
+        },
+        ".open-next/server-functions/default/.next/server/app/api/cart/sync/route.js": {
+          "bytesInOutput": 526
+        },
         ".open-next/server-functions/default/.next/server/chunks/ssr/[turbopack]_runtime.js": {
-          "bytesInOutput": 16658
+          "bytesInOutput": 16659
         },
         ".open-next/server-functions/default/.next/server/app/_global-error/page.js": {
-          "bytesInOutput": 724
+          "bytesInOutput": 726
         },
-        ".open-next/server-functions/default/.next/server/chunks/[turbopack]_runtime.js": {
-          "bytesInOutput": 16610
+        ".open-next/server-functions/default/.next/server/app/api/auth/otp/route.js": {
+          "bytesInOutput": 579
+        },
+        ".open-next/server-functions/default/.next/server/app/products/[id]/page.js": {
+          "bytesInOutput": 1159
         },
         ".open-next/server-functions/default/.next/server/app/favicon.ico/route.js": {
-          "bytesInOutput": 449
+          "bytesInOutput": 535
+        },
+        ".open-next/server-functions/default/.next/server/app/api/orders/route.js": {
+          "bytesInOutput": 658
+        },
+        ".open-next/server-functions/default/.next/server/app/orders/[id]/page.js": {
+          "bytesInOutput": 1114
+        },
+        ".open-next/server-functions/default/.next/server/app/_not-found/page.js": {
+          "bytesInOutput": 1044
+        },
+        ".open-next/server-functions/default/.next/server/app/api/user/route.js": {
+          "bytesInOutput": 509
         },
         ".open-next/server-functions/default/.next/server/app/checkout/page.js": {
-          "bytesInOutput": 1103
+          "bytesInOutput": 1105
         },
         ".open-next/server-functions/default/.next/server/app/account/page.js": {
-          "bytesInOutput": 1098
-        },
-        ".open-next/server-functions/default/.next/server/app/science/page.js": {
           "bytesInOutput": 1100
         },
+        ".open-next/server-functions/default/.next/server/app/science/page.js": {
+          "bytesInOutput": 1102
+        },
         ".open-next/server-functions/default/.next/server/app/admin/page.js": {
-          "bytesInOutput": 1094
+          "bytesInOutput": 1096
         },
         ".open-next/server-functions/default/.next/server/app/login/page.js": {
-          "bytesInOutput": 1094
+          "bytesInOutput": 1096
         },
         ".open-next/server-functions/default/.next/server/app/cart/page.js": {
-          "bytesInOutput": 1091
+          "bytesInOutput": 1094
         },
         ".open-next/server-functions/default/.next/server/app/shop/page.js": {
-          "bytesInOutput": 1091
+          "bytesInOutput": 1094
         },
         ".open-next/server-functions/default/.next/server/app/us/page.js": {
-          "bytesInOutput": 1085
+          "bytesInOutput": 1088
         },
         ".open-next/server-functions/default/.next/server/app/page.js": {
-          "bytesInOutput": 1077
+          "bytesInOutput": 1079
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
-          "bytesInOutput": 3742
+          "bytesInOutput": 6053
         },
         ".open-next/server-functions/default/node_modules/next/dist/lib/interop-default.js": {
           "bytesInOutput": 363
@@ -7009,10 +7706,10 @@
           "bytesInOutput": 5074
         },
         ".open-next/server-functions/default/index.mjs": {
-          "bytesInOutput": 100965
+          "bytesInOutput": 66360
         }
       },
-      "bytes": 2160935
+      "bytes": 2141608
     }
   }
 }
