@@ -8,6 +8,9 @@ import CurtainButton from "@/components/CurtainButton";
 import { ArrowLeft, Clock, MapPin, Package, ShieldCheck, Mail, HelpCircle, CheckCircle, Truck } from "lucide-react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
+
 export default function OrderTrackingPage() {
   const params = useParams();
   const router = useRouter();
