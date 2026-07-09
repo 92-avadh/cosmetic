@@ -65,7 +65,7 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
     const data = base64ToUint8(payloadBase64);
     const signature = base64ToUint8(signatureBase64);
     
-    const isValid = await crypto.subtle.verify("HMAC", key, signature, data);
+    const isValid = await crypto.subtle.verify("HMAC", key, signature as Uint8Array<ArrayBuffer>, data as Uint8Array<ArrayBuffer>);
     if (!isValid) return null;
     
     return JSON.parse(decoder.decode(data)) as SessionPayload;
