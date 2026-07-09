@@ -6,8 +6,6 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import ProductRow from "@/components/ProductRow";
 import MarqueeBand from "@/components/MarqueeBand";
-import CartDrawer from "@/components/CartDrawer";
-import CurrencyModal from "@/components/CurrencyModal";
 import { useCartStore } from "@/store/useCartStore";
 import dynamic from "next/dynamic";
 
@@ -195,12 +193,6 @@ export default function Home() {
 
           {/* Footer and newsletter email captures */}
           <Footer />
-
-          {/* Slide-in cart state wrapper drawer */}
-          <CartDrawer />
-
-          {/* First-visit location & currency selector */}
-          <CurrencyModal />
         </motion.div>
       )}
     </>
