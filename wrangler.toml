@@ -1,4 +1,4 @@
-name = "cosmetic-web"
+name = "cosmetic"
 main = ".vercel/output/static/_worker.js"
 assets = { directory = ".vercel/output/static" }
 compatibility_date = "2024-05-02"
