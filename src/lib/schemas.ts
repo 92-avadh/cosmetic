@@ -71,6 +71,7 @@ export const orderCreateSchema = z.object({
     city: z.string().min(1, "City is required").max(100),
     state: z.string().max(100).optional().nullable(),
     zip: z.string().min(1, "ZIP / Postal code is required").max(20).regex(/^\d*$/, "Postal code must only contain numbers"),
+    phone: z.string().min(1, "Phone number is required").regex(/^\+91\s?\d{10}$/, "Invalid phone number. Must start with +91 followed by 10 digits"),
     country: z.string().min(1, "Country is required").max(50).default("US"),
   }),
   promoCode: z.string().max(50).optional().nullable(),

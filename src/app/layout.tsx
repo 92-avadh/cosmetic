@@ -3,7 +3,7 @@ import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScroll";
 import CartSync from "@/components/CartSync";
 import CartDrawer from "@/components/CartDrawer";
-import CurrencyModal from "@/components/CurrencyModal";
+
 
 export const metadata: Metadata = {
   title: "BODYBARREL — Korean Skincare Science",
@@ -30,7 +30,7 @@ export default function RootLayout({
         <SmoothScrollProvider>
           <CartSync />
           <CartDrawer />
-          <CurrencyModal />
+
           {children}
         </SmoothScrollProvider>
       </body>

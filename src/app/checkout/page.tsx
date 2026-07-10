@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
+  const [phone, setPhone] = useState("+91");
 
   // Saved address states
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
@@ -251,8 +252,14 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName || !lastName || !address || !city || !zipCode) {
+    if (!firstName || !lastName || !address || !city || !zipCode || !phone) {
       setFormError("All shipping fields are required.");
+      return;
+    }
+
+    const cleanedPhone = phone.replace(/\s+/g, "");
+    if (!/^\+91\d{10}$/.test(cleanedPhone)) {
+      setFormError("Invalid phone number. Must be +91 followed by 10 digits.");
       return;
     }
     
@@ -286,6 +293,7 @@ export default function CheckoutPage() {
             street: address,
             city,
             zip: zipCode,
+            phone: cleanedPhone,
             country: "IN",
           },
         }),
@@ -335,6 +343,7 @@ export default function CheckoutPage() {
         prefill: {
           name: `${firstName} ${lastName}`,
           email: user?.email || "",
+          contact: cleanedPhone,
         },
         theme: {
           color: "#121212",
@@ -545,6 +554,27 @@ export default function CheckoutPage() {
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={(e) => {
+                        let val = e.target.value;
+                        if (!val.startsWith("+91")) {
+                          val = "+91" + val.replace(/[^\d]/g, "");
+                        } else {
+                          const suffix = val.slice(3).replace(/[^\d]/g, "");
+                          val = "+91" + suffix.slice(0, 10);
+                        }
+                        setPhone(val);
+                      }}
+                      required
+                      placeholder="+91 98765 43210"
+                      className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs tracking-wider focus:outline-none focus:border-accent animate-fadeIn"
+                    />
                   </div>
 
                   {savedAddresses.length < 3 && (

@@ -15,7 +15,7 @@ const announcements = [
   "CELLULAR BODYCARE SCIENCE — 100% BIODEGRADABLE SURFACTANTS",
 ];
 
-function AnnouncementBar() {
+function AnnouncementBar({ show }: { show: boolean }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -26,18 +26,26 @@ function AnnouncementBar() {
   }, []);
 
   return (
-    <div className="bg-[#2d1c14] text-[#F6F4EE] py-1.5 md:py-2 px-4 text-center border-b border-[#2d1c14]/20 select-none overflow-hidden relative min-h-8 flex items-center justify-center">
+    <div
+      className={`bg-[#2d1c14] text-[#F6F4EE] px-4 text-center border-[#2d1c14]/20 select-none relative flex items-center justify-center transition-all duration-500 ease-in-out ${
+        show
+          ? "opacity-100 py-1.5 md:py-2 min-h-8 border-b"
+          : "opacity-0 py-0 min-h-0 h-0 border-none pointer-events-none overflow-hidden"
+      }`}
+    >
       <AnimatePresence mode="wait">
-        <motion.span
-          key={index}
-          initial={{ y: 12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -12, opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
-          className="text-[9px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
-        >
-          {announcements[index]}
-        </motion.span>
+        {show && (
+          <motion.span
+            key={index}
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -12, opacity: 0 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="text-[9px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
+          >
+            {announcements[index]}
+          </motion.span>
+        )}
       </AnimatePresence>
     </div>
   );
@@ -46,8 +54,10 @@ function AnnouncementBar() {
 export default function Nav() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   
-  const { cart, setCartOpen, setCurrencyModalOpen, currency } = useCartStore();
+  const { cart, setCartOpen, currency } = useCartStore();
   const { items: wishlistItems, setWishlistOpen } = useWishlistStore();
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
   const wishlistItemsCount = wishlistItems.length;
@@ -64,11 +74,24 @@ export default function Nav() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY <= 50) {
+        setShowAnnouncement(true);
+        setIsScrolled(false);
+      } else {
+        setIsScrolled(true);
+        if (currentScrollY > lastScrollY) {
+          setShowAnnouncement(false);
+        } else {
+          setShowAnnouncement(true);
+        }
+      }
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const navLinks = [
     { label: "Science", href: "/science" },
@@ -113,7 +136,7 @@ export default function Nav() {
         className="fixed top-0 left-0 w-full z-45 transition-all duration-500"
       >
         {/* Top Announcement Bar Carousel */}
-        <AnnouncementBar />
+        <AnnouncementBar show={showAnnouncement} />
 
         {/* Navbar Container */}
         <div
@@ -336,16 +359,10 @@ export default function Nav() {
               variants={linkVariants}
               className="border-t border-line/50 pt-8 flex items-center justify-between text-xs text-muted"
             >
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setCurrencyModalOpen(true);
-                }}
-                className="flex items-center space-x-2 p-1"
-              >
-                <Globe className="w-4 h-4" />
-                <span className="uppercase tracking-widest">Region / {currency}</span>
-              </button>
+              <div className="flex items-center space-x-2 p-1 select-none">
+                <Globe className="w-4 h-4 text-muted/70" />
+                <span className="uppercase tracking-widest text-[10px]">India (INR)</span>
+              </div>
               <p className="tracking-widest">© 2026 BODYBARREL</p>
             </motion.div>
           </motion.div>

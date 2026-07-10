@@ -49,7 +49,7 @@ interface CartState {
 export const useCartStore = create<CartState>((set, get) => ({
   cart: [],
   isCartOpen: false,
-  currency: "USD",
+  currency: "INR",
   isCurrencyModalOpen: false,
   products: [],
   hasFetchedCart: false,
