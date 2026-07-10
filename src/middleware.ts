@@ -124,12 +124,12 @@ export async function middleware(request: NextRequest) {
   // 4. Apply Security Headers
   const cspValue = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.razorpay.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.razorpay.com https://cdn.razorpay.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: https://gjlwnohlruwdfbjvrfas.supabase.co https://*.stripe.com https://checkout.razorpay.com https://images.unsplash.com",
     "connect-src 'self' https://gjlwnohlruwdfbjvrfas.supabase.co wss://gjlwnohlruwdfbjvrfas.supabase.co https://api.stripe.com https://api.razorpay.com https://raw.githack.com https://dl.polyhaven.org https://cdn.jsdelivr.net",
-    "frame-src 'self' https://js.stripe.com https://checkout.razorpay.com",
+    "frame-src 'self' https://js.stripe.com https://checkout.razorpay.com https://api.razorpay.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
