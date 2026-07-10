@@ -9,6 +9,7 @@ import { ArrowLeft, LogOut, CheckCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { getApiErrorMessage } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -169,7 +170,7 @@ export default function CheckoutPage() {
       
       const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(resJson.error?.message || "Failed to validate code");
+        throw new Error(getApiErrorMessage(resJson, "Failed to validate code"));
       }
       
       const data = resJson.data;
@@ -218,7 +219,7 @@ export default function CheckoutPage() {
       
       const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(resJson.error?.message || "Failed to save address.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to save address."));
       }
       
       const data = resJson.data;
@@ -244,7 +245,7 @@ export default function CheckoutPage() {
       
       const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(resJson.error?.message || "Failed to delete address.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to delete address."));
       }
       
       const data = resJson.data;
@@ -305,7 +306,7 @@ export default function CheckoutPage() {
 
       const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(resJson.error?.message || "Failed to process order.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to process order."));
       }
 
       const data = resJson.data;
@@ -335,7 +336,7 @@ export default function CheckoutPage() {
 
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) {
-              throw new Error(verifyData.error?.message || verifyData.error || "Payment verification failed.");
+              throw new Error(getApiErrorMessage(verifyData, "Payment verification failed."));
             }
 
             clearCart();

@@ -8,6 +8,7 @@ import CurtainButton from "@/components/CurtainButton";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { getApiErrorMessage } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 function LoginForm() {
@@ -61,10 +62,10 @@ function LoginForm() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
+      const resJson = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to send verification code.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to send verification code."));
       }
 
       setStep("otp");
@@ -92,10 +93,10 @@ function LoginForm() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
+      const resJson = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to resend verification code.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to resend verification code."));
       }
 
       setResendCount((prev) => prev + 1);
@@ -126,18 +127,18 @@ function LoginForm() {
         body: JSON.stringify({ email, code: cleanOtp }),
       });
 
-      const data = await res.json();
+      const resJson = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || "Invalid verification code.");
+        throw new Error(getApiErrorMessage(resJson, "Invalid verification code."));
       }
 
       // Successful login
-      if (data.sessionToken) {
+      if (resJson.sessionToken) {
         // ponytail: Edge runtime fallback — set session cookie via JS when cookies() is unavailable server-side
-        document.cookie = `session=${data.sessionToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax` + (location.protocol === "https:" ? "; secure" : "");
+        document.cookie = `session=${resJson.sessionToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax` + (location.protocol === "https:" ? "; secure" : "");
       }
-      login(email, data.user?.role);
+      login(email, resJson.user?.role);
       router.push(redirect);
     } catch (err: any) {
       setError(err.message || "Failed to verify security code.");

@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { User, ShoppingBag, MapPin, Compass, ShieldCheck, LogOut, Loader2, Save } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 import { useUserStore } from "@/store/useUserStore";
+import { getApiErrorMessage } from "@/lib/utils";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -101,7 +102,7 @@ export default function AccountPage() {
         setSaveSuccess("Profile settings updated successfully.");
         await fetchUserProfile();
       } else {
-        throw new Error(resJson.error?.message || "Failed to update profile details.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to update profile details."));
       }
     } catch (err: any) {
       setSaveError(err.message || "Failed to save profile settings.");

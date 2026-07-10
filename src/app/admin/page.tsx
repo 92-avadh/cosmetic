@@ -24,6 +24,7 @@ import {
   Bell,
 } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
+import { getApiErrorMessage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -222,7 +223,7 @@ export default function AdminDashboardPage() {
       });
 
       const resJson = await res.json();
-      if (!res.ok) throw new Error(resJson.error?.message || "Failed to update order status.");
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to update order status."));
 
       showToast(`Order status updated to ${status} successfully.`);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
@@ -249,7 +250,7 @@ export default function AdminDashboardPage() {
       });
 
       const resJson = await res.json();
-      if (!res.ok) throw new Error(resJson.error?.message || "File upload failed");
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "File upload failed"));
 
       const data = resJson.data;
       setNewProductImage(data.url);
@@ -292,7 +293,7 @@ export default function AdminDashboardPage() {
       });
 
       const resJson = await res.json();
-      if (!res.ok) throw new Error(resJson.error?.message || "Failed to create product.");
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to create product."));
 
       showToast(`Product "${newProductName}" added successfully.`);
 

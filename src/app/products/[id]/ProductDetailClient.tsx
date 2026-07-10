@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
+import { getApiErrorMessage } from "@/lib/utils";
 import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 
@@ -87,9 +88,9 @@ export default function ProductDetailClient({ product, recommendations }: Produc
           userId: null,
         }),
       });
-      const data = await res.json();
+      const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to submit review.");
+        throw new Error(getApiErrorMessage(resJson, "Failed to submit review."));
       }
       setNewComment("");
       setNewRating(5);
