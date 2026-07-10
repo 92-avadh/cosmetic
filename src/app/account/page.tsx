@@ -407,7 +407,7 @@ export default function AccountPage() {
                       <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z\s\-']/g, ""))}
                         placeholder="First Name"
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />
@@ -417,7 +417,7 @@ export default function AccountPage() {
                       <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z\s\-']/g, ""))}
                         placeholder="Last Name"
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />
@@ -474,7 +474,7 @@ export default function AccountPage() {
                           <input
                             type="text"
                             value={postalCode}
-                            onChange={(e) => setPostalCode(e.target.value)}
+                            onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
                             placeholder="10001"
                             className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                           />

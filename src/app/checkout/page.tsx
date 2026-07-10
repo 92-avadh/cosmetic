@@ -495,7 +495,7 @@ export default function CheckoutPage() {
                       <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z\s\-']/g, ""))}
                         required
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />
@@ -505,7 +505,7 @@ export default function CheckoutPage() {
                       <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z\s\-']/g, ""))}
                         required
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />
@@ -540,7 +540,7 @@ export default function CheckoutPage() {
                       <input
                         type="text"
                         value={zipCode}
-                        onChange={(e) => setZipCode(e.target.value)}
+                        onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
                         required
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent"
                       />

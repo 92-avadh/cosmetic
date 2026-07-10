@@ -65,12 +65,12 @@ export const orderCreateSchema = z.object({
     )
     .min(1, "Order must contain at least one item"),
   shippingDetails: z.object({
-    firstName: z.string().min(1, "First name is required").max(50),
-    lastName: z.string().min(1, "Last name is required").max(50),
+    firstName: z.string().min(1, "First name is required").max(50).regex(/^[a-zA-Z\s\-']*$/, "First name must only contain letters"),
+    lastName: z.string().min(1, "Last name is required").max(50).regex(/^[a-zA-Z\s\-']*$/, "Last name must only contain letters"),
     street: z.string().min(1, "Street address is required").max(150),
     city: z.string().min(1, "City is required").max(100),
     state: z.string().max(100).optional().nullable(),
-    zip: z.string().min(1, "ZIP / Postal code is required").max(20),
+    zip: z.string().min(1, "ZIP / Postal code is required").max(20).regex(/^\d*$/, "Postal code must only contain numbers"),
     country: z.string().min(1, "Country is required").max(50).default("US"),
   }),
   promoCode: z.string().max(50).optional().nullable(),
@@ -83,15 +83,15 @@ export const userActionSchema = z.discriminatedUnion("action", [
   }),
   z.object({
     action: z.literal("update"),
-    firstName: z.string().max(50).optional().nullable(),
-    lastName: z.string().max(50).optional().nullable(),
+    firstName: z.string().max(50).regex(/^[a-zA-Z\s\-']*$/, "First name must only contain letters").optional().nullable(),
+    lastName: z.string().max(50).regex(/^[a-zA-Z\s\-']*$/, "Last name must only contain letters").optional().nullable(),
     addressDetails: z
       .object({
         name: z.string().max(100).optional().nullable(),
         street: z.string().min(1, "Street address is required").max(150),
         city: z.string().max(100).optional().nullable(),
         state: z.string().max(100).optional().nullable(),
-        postalCode: z.string().max(20).optional().nullable(),
+        postalCode: z.string().max(20).regex(/^\d*$/, "Postal code must only contain numbers").optional().nullable(),
         country: z.string().max(50).optional().nullable(),
       })
       .optional()
@@ -104,7 +104,7 @@ export const userActionSchema = z.discriminatedUnion("action", [
       street: z.string().min(1, "Street address is required").max(150),
       city: z.string().max(100).optional().nullable(),
       state: z.string().max(100).optional().nullable(),
-      postalCode: z.string().max(20).optional().nullable(),
+      postalCode: z.string().max(20).regex(/^\d*$/, "Postal code must only contain numbers").optional().nullable(),
       country: z.string().max(50).optional().nullable(),
     }),
   }),
