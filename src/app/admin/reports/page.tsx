@@ -10,6 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/animate-ui/components/radix/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogPopup,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/animate-ui/components/base/alert-dialog";
 
 export default function AdminReportsPage() {
   const { orders } = useAdminContext();
@@ -20,6 +29,7 @@ export default function AdminReportsPage() {
   const [reportStatus, setReportStatus] = useState("ALL");
   const [reportSortKey, setReportSortKey] = useState("date_desc");
   const [reportSearch, setReportSearch] = useState("");
+  const [showPopupBlockerAlert, setShowPopupBlockerAlert] = useState(false);
 
   // Report filters and sorting
   const filteredReportOrders = orders
@@ -70,7 +80,7 @@ export default function AdminReportsPage() {
   const generatePDFReport = () => {
     const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      alert("Error: Blocked by popup blocker. Please allow popups for this site.");
+      setShowPopupBlockerAlert(true);
       return;
     }
 
@@ -444,6 +454,21 @@ export default function AdminReportsPage() {
             No transaction registry matches your configuration criteria.
           </div>
         )}
+      <AlertDialog open={showPopupBlockerAlert} onOpenChange={setShowPopupBlockerAlert}>
+        <AlertDialogPopup from="center" className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Popup Blocker Detected</AlertDialogTitle>
+            <AlertDialogDescription>
+              Error: The PDF print window was blocked by a popup blocker. Please allow popups for this site and try again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="bg-ink hover:opacity-90 text-bg">
+              Okay
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
       </div>
     </div>
   );

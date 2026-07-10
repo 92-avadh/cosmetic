@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 import CurtainButton from "@/components/CurtainButton";
 import { ArrowLeft, Clock, MapPin, Package, ShieldCheck, Mail, HelpCircle, CheckCircle, Truck } from "lucide-react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import {
+  AlertDialog,
+  AlertDialogPopup,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/animate-ui/components/base/alert-dialog";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +33,7 @@ export default function OrderTrackingPage() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportMessage, setSupportMessage] = useState("");
   const [supportSubmitted, setSupportSubmitted] = useState(false);
+  const [showInquiryAlert, setShowInquiryAlert] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -155,7 +165,7 @@ export default function OrderTrackingPage() {
       setShowSupportModal(false);
       setSupportMessage("");
       setSupportSubmitted(false);
-      alert("Your inquiry has been submitted. A service representative will email you shortly.");
+      setShowInquiryAlert(true);
     }, 1500);
   };
 
@@ -450,6 +460,22 @@ export default function OrderTrackingPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={showInquiryAlert} onOpenChange={setShowInquiryAlert}>
+        <AlertDialogPopup from="center" className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Inquiry Submitted</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your inquiry has been submitted. A service representative will email you shortly.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="bg-ink hover:opacity-90 text-bg">
+              Okay
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogPopup>
+      </AlertDialog>
     </>
   );
 }

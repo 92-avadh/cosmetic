@@ -12,6 +12,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/animate-ui/components/radix/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogPopup,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/animate-ui/components/base/alert-dialog";
 
 export default function AdminProductsPage() {
   const {
@@ -119,18 +130,7 @@ export default function AdminProductsPage() {
     }
   };
 
-  const onDeleteClick = async (id: string, name: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete product "${name}"? This action cannot be undone.`
-      )
-    ) {
-      await handleDeleteProduct(id, name);
-      if (editingProduct?.id === id) {
-        setEditingProduct(null);
-      }
-    }
-  };
+
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -348,12 +348,37 @@ export default function AdminProductsPage() {
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => onDeleteClick(prod.id, prod.name)}
-                    className="px-3 py-1 bg-red-50/20 text-red-500 border border-red-200/55 rounded text-[8px] font-bold tracking-wider hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer"
-                  >
-                    Delete
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={
+                        <button className="px-3 py-1 bg-red-50/20 text-red-500 border border-red-200/55 rounded text-[8px] font-bold tracking-wider hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer">
+                          Delete
+                        </button>
+                      }
+                    />
+                    <AlertDialogPopup from="bottom" className="sm:max-w-[425px]">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete product &ldquo;{prod.name}&rdquo;? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            await handleDeleteProduct(prod.id, prod.name);
+                            if (editingProduct?.id === prod.id) {
+                              setEditingProduct(null);
+                            }
+                          }}
+                          className="bg-red-500 hover:bg-red-600 text-white"
+                        >
+                          Delete Product
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogPopup>
+                  </AlertDialog>
                 </div>
               </div>
             </div>
