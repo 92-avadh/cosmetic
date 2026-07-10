@@ -45,6 +45,7 @@ export const GET = withApiHandler(async () => {
     const orderItems = (order.OrderItem as Record<string, unknown>[]) || [];
     return {
       ...order,
+      user: order.User,
       items: orderItems.map((item) => {
         const product = item.Product as Record<string, unknown> | null;
         return {
@@ -94,6 +95,7 @@ export const POST = withApiHandler(async (request) => {
 
   const formattedOrder = updatedOrder ? {
     ...updatedOrder,
+    user: (updatedOrder as Record<string, unknown>).User,
     items: ((updatedOrder as Record<string, unknown>).OrderItem as Record<string, unknown>[])?.map((item) => {
       const product = item.Product as Record<string, unknown> | null;
       return {
@@ -164,6 +166,7 @@ export const PUT = withApiHandler(async (request) => {
 
   const formattedOrder = updatedOrder ? {
     ...updatedOrder,
+    user: (updatedOrder as Record<string, unknown>).User,
     items: ((updatedOrder as Record<string, unknown>).OrderItem as Record<string, unknown>[])?.map((item) => {
       const product = item.Product as Record<string, unknown> | null;
       return {
