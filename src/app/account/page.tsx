@@ -9,6 +9,7 @@ import { User, ShoppingBag, MapPin, Compass, ShieldCheck, LogOut, Loader2, Save 
 import CurtainButton from "@/components/CurtainButton";
 import { useUserStore } from "@/store/useUserStore";
 import { getApiErrorMessage } from "@/lib/utils";
+import { SaveToggle, ButtonStatus } from "@/components/SaveToggle";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function AccountPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveButtonStatus, setSaveButtonStatus] = useState<ButtonStatus>("idle");
 
   // Form states
   const [firstName, setFirstName] = useState("");
@@ -75,6 +77,7 @@ export default function AccountPage() {
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.email) return;
+    setSaveButtonStatus("loading");
     setIsLoading(true);
     setSaveSuccess(null);
     setSaveError(null);
@@ -101,11 +104,19 @@ export default function AccountPage() {
       if (res.ok && resJson.success) {
         setSaveSuccess("Profile settings updated successfully.");
         await fetchUserProfile();
+        setSaveButtonStatus("success");
+        setTimeout(() => {
+          setSaveButtonStatus("saved");
+          setTimeout(() => {
+            setSaveButtonStatus("idle");
+          }, 2000);
+        }, 800);
       } else {
         throw new Error(getApiErrorMessage(resJson, "Failed to update profile details."));
       }
     } catch (err: any) {
       setSaveError(err.message || "Failed to save profile settings.");
+      setSaveButtonStatus("idle");
     } finally {
       setIsLoading(false);
     }
@@ -500,14 +511,15 @@ export default function AccountPage() {
                   )}
 
                   <div className="pt-2 flex items-center gap-4">
-                    <CurtainButton
+                    <SaveToggle
                       type="submit"
+                      status={saveButtonStatus}
+                      setStatus={setSaveButtonStatus}
+                      idleText="Save Settings"
+                      savedText="Saved"
                       disabled={isLoading}
-                      className="px-8 py-3.5 text-ink border border-ink bg-transparent text-[10px] font-semibold tracking-widest uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                    >
-                      <Save className="w-3.5 h-3.5" />
-                      <span>Save Profile Settings</span>
-                    </CurtainButton>
+                      className="cursor-pointer"
+                    />
                   </div>
                 </form>
               </div>
