@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 import { withApiHandler } from "@/lib/api-helper";
 import { razorpayVerifySchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
+import { getEnv } from "@/lib/env";
 
 // Cryptographic signature verification using standard Web Crypto API (Edge-safe)
 async function verifyRazorpaySignature(
@@ -56,7 +57,8 @@ export const POST = withApiHandler(async (request: Request) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = validatedData;
 
     // 3. Verify signature
-    const secret = process.env.RAZORPAY_SECRET;
+    const env = getEnv();
+    const secret = env.RAZORPAY_SECRET;
     if (!secret) {
       const err = new Error("Server payment configuration error");
       (err as any).status = 500;

@@ -488,7 +488,7 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Notifications Bell Button Trigger */}
-            <div className="relative">
+            <div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -513,7 +513,7 @@ export default function AdminDashboardPage() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute right-0 mt-3 w-80 bg-bg border border-line rounded-xl shadow-2xl p-4 z-50 space-y-3 cursor-default"
+                    className="absolute left-0 top-full mt-2 w-80 bg-bg border border-line rounded-xl shadow-2xl p-4 z-50 space-y-3 cursor-default"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-between border-b border-line/60 pb-2">

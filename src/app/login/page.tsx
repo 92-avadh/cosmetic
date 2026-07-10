@@ -152,9 +152,6 @@ function LoginForm() {
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
 
       <div className="text-center mb-8">
-        <span className="text-[10px] tracking-[0.25em] font-semibold text-accent uppercase block mb-2">
-          Cell-Fit Membership
-        </span>
         <h2 className="font-display font-semibold text-2xl uppercase tracking-tight text-ink">
           Sign In
         </h2>

@@ -6,6 +6,7 @@ import { withApiHandler } from "@/lib/api-helper";
 import { orderCreateSchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 import { z } from "zod";
+import { getEnv } from "@/lib/env";
 
 const checkoutCreateSchema = orderCreateSchema.omit({ totalUSD: true });
 const razorpayCheckoutSchema = checkoutCreateSchema.extend({
@@ -163,11 +164,12 @@ export const POST = withApiHandler(async (request: Request) => {
     if (itemsError) throw new Error(`DB Order Items Insert Error: ${itemsError.message}`);
 
     // 7. Initialize Razorpay credentials
-    const keyId = process.env.RAZORPAY_API_KEY;
-    const keySecret = process.env.RAZORPAY_SECRET;
+    const env = getEnv();
+    const keyId = env.RAZORPAY_API_KEY;
+    const keySecret = env.RAZORPAY_SECRET;
 
     if (!keyId || !keySecret) {
-      console.warn("⚠️ Razorpay API keys are not defined in .env.");
+      console.warn("⚠️ Razorpay API keys are not defined in env configuration.");
       const err = new Error("Razorpay credentials are not configured on the server.");
       (err as any).status = 500;
       throw err;

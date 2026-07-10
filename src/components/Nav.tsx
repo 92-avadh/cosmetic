@@ -26,15 +26,15 @@ function AnnouncementBar() {
   }, []);
 
   return (
-    <div className="bg-[#2d1c14] text-[#F6F4EE] py-2 px-4 text-center border-b border-[#2d1c14]/20 select-none overflow-hidden relative h-8 flex items-center justify-center">
+    <div className="bg-[#2d1c14] text-[#F6F4EE] py-1.5 md:py-2 px-4 text-center border-b border-[#2d1c14]/20 select-none overflow-hidden relative min-h-8 flex items-center justify-center">
       <AnimatePresence mode="wait">
         <motion.span
           key={index}
-          initial={{ y: 15, opacity: 0 }}
+          initial={{ y: 12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -15, opacity: 0 }}
+          exit={{ y: -12, opacity: 0 }}
           transition={{ duration: 0.35, ease: "easeInOut" }}
-          className="text-[8px] sm:text-[9.5px] font-semibold uppercase tracking-[0.25em] block whitespace-nowrap"
+          className="text-[9px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
         >
           {announcements[index]}
         </motion.span>
@@ -166,7 +166,7 @@ export default function Nav() {
           </nav>
 
           {/* Center Brand Logo */}
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-start md:justify-center">
             <Link
               href="/"
               className="hover:opacity-85 transition-opacity"

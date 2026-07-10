@@ -136,9 +136,6 @@ export default function AccountPage() {
           <div className="w-full max-w-md bg-card-bg/40 backdrop-blur-md border border-line/60 rounded-3xl p-8 md:p-10 text-center space-y-6 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
             <div className="text-center space-y-2">
-              <span className="text-[10px] tracking-[0.25em] font-semibold text-accent uppercase block">
-                Cell-Fit Member Portal
-              </span>
               <h2 className="font-display font-semibold text-2xl uppercase tracking-tight text-ink mt-2">
                 Access Your Account
               </h2>
