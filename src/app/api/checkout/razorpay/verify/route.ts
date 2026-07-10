@@ -183,8 +183,8 @@ export const POST = withApiHandler(async (request: Request) => {
         </td>
         <td style="padding: 12px 0; font-size: 13px; color: #333; text-align: center;">${item.quantity}</td>
         <td style="padding: 12px 0; font-size: 13px; color: #333; text-align: right;">$${(
-          item.price * item.quantity
-        ).toFixed(2)}</td>
+            item.price * item.quantity
+          ).toFixed(2)}</td>
       </tr>
     `
       )
@@ -198,7 +198,7 @@ export const POST = withApiHandler(async (request: Request) => {
         </div>
 
         <p style="font-size: 13px; color: #666; line-height: 1.6;">Hello,</p>
-        <p style="font-size: 13px; color: #666; line-height: 1.6;">Thank you for your purchase. We have received your order payment via Razorpay. Below is your billing summary.</p>
+        <p style="font-size: 13px; color: #666; line-height: 1.6;">Thank you for your purchase. received your order payment. Below is your billing summary.</p>
         
         <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eaeaea; margin: 25px 0; font-size: 12px; line-height: 1.6; color: #444;">
           <strong style="display: block; font-size: 13px; color: #111; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #eaeaea; padding-bottom: 5px;">Order Details</strong>

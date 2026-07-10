@@ -387,7 +387,7 @@ export default function CheckoutPage() {
                 Thank You For Your Order
               </h2>
               <p className="text-xs text-muted leading-relaxed">
-                Your skin fitness regimen is being compiled. A confirmation receipt and shipment details have been sent to <span className="font-semibold text-ink">{user?.email}</span>.
+               Your order has been placed successfully. A confirmation receipt and shipment details have been sent to <span className="font-semibold text-ink">{user?.email}</span>.
               </p>
             </div>
             <div className="pt-4 border-t border-line/50">

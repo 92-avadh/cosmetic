@@ -128,3 +128,100 @@ export const POST = withApiHandler(async (request) => {
 
   return { success: true, product };
 });
+
+// PUT: Edit existing product
+export const PUT = withApiHandler(async (request) => {
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { id, name, subtitle, priceUSD, image, hoverImage, description, inventory, categorySlug } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+  }
+
+  // Find or create category if categorySlug is provided
+  let categoryId = null;
+  if (categorySlug) {
+    const slug = categorySlug.toLowerCase().trim();
+    const { data: existingCategory } = await supabase
+      .from("Category")
+      .select("id")
+      .eq("slug", slug)
+      .single();
+
+    if (existingCategory) {
+      categoryId = existingCategory.id;
+    } else {
+      const readableName = slug.charAt(0).toUpperCase() + slug.slice(1) + " System";
+      const { data: newCategory, error: catError } = await supabase
+        .from("Category")
+        .insert({
+          id: crypto.randomUUID(),
+          name: readableName,
+          slug,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .select("id")
+        .single();
+      if (catError) throw new Error(catError.message);
+      categoryId = newCategory.id;
+    }
+  }
+
+  const { data: updatedProduct, error: productError } = await supabase
+    .from("Product")
+    .update({
+      name,
+      subtitle,
+      priceUSD,
+      image,
+      hoverImage: hoverImage || undefined,
+      description: description || undefined,
+      inventory,
+      categoryId,
+      updatedAt: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (productError) throw new Error(productError.message);
+
+  return { success: true, product: updatedProduct };
+});
+
+// DELETE: Remove product from catalog
+export const DELETE = withApiHandler(async (request) => {
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
+
+  const url = new URL(request.url);
+  let id = url.searchParams.get("id");
+
+  if (!id) {
+    try {
+      const body = await request.json();
+      id = body.id;
+    } catch {
+      // ignore JSON parse error
+    }
+  }
+
+  if (!id) {
+    return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from("Product")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  return { success: true, message: "Product deleted successfully" };
+});

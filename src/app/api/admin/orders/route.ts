@@ -41,22 +41,28 @@ export const GET = withApiHandler(async () => {
 
   if (error) throw new Error(error.message);
 
-  const formattedOrders = orders?.map((order: any) => ({
-    ...order,
-    items: order.OrderItem?.map((item: any) => ({
-      id: item.id,
-      productId: item.Product?.id || "",
-      product: item.Product ? {
-        id: item.Product.id,
-        name: item.Product.name,
-        subtitle: item.Product.subtitle,
-        priceUSD: item.Product.priceUSD,
-        image: item.Product.image,
-      } : null,
-      quantity: item.quantity,
-      pricePaid: item.pricePaid,
-    })) || [],
-  })) || [];
+  const formattedOrders = (orders as Record<string, unknown>[])?.map((order) => {
+    const orderItems = (order.OrderItem as Record<string, unknown>[]) || [];
+    return {
+      ...order,
+      items: orderItems.map((item) => {
+        const product = item.Product as Record<string, unknown> | null;
+        return {
+          id: String(item.id),
+          productId: product?.id ? String(product.id) : "",
+          product: product ? {
+            id: String(product.id),
+            name: String(product.name),
+            subtitle: String(product.subtitle),
+            priceUSD: Number(product.priceUSD),
+            image: String(product.image),
+          } : null,
+          quantity: Number(item.quantity),
+          pricePaid: Number(item.pricePaid),
+        };
+      }),
+    };
+  }) || [];
 
   return formattedOrders;
 });
@@ -88,20 +94,125 @@ export const POST = withApiHandler(async (request) => {
 
   const formattedOrder = updatedOrder ? {
     ...updatedOrder,
-    items: updatedOrder.OrderItem?.map((item: any) => ({
-      id: item.id,
-      productId: item.Product?.id || "",
-      product: item.Product ? {
-        id: item.Product.id,
-        name: item.Product.name,
-        subtitle: item.Product.subtitle,
-        priceUSD: item.Product.priceUSD,
-        image: item.Product.image,
-      } : null,
-      quantity: item.quantity,
-      pricePaid: item.pricePaid,
-    })) || [],
+    items: ((updatedOrder as Record<string, unknown>).OrderItem as Record<string, unknown>[])?.map((item) => {
+      const product = item.Product as Record<string, unknown> | null;
+      return {
+        id: String(item.id),
+        productId: product?.id ? String(product.id) : "",
+        product: product ? {
+          id: String(product.id),
+          name: String(product.name),
+          subtitle: String(product.subtitle),
+          priceUSD: Number(product.priceUSD),
+          image: String(product.image),
+        } : null,
+        quantity: Number(item.quantity),
+        pricePaid: Number(item.pricePaid),
+      };
+    }) || [],
   } : null;
 
   return { success: true, order: formattedOrder };
+});
+
+// PUT: Edit existing order details
+export const PUT = withApiHandler(async (request) => {
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const { 
+    orderId, 
+    status, 
+    shippingName, 
+    shippingStreet, 
+    shippingCity, 
+    shippingState, 
+    shippingZip, 
+    shippingCountry 
+  } = body;
+
+  if (!orderId) {
+    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+  }
+
+  const { data: updatedOrder, error } = await supabase
+    .from("Order")
+    .update({
+      status: status || undefined,
+      shippingName: shippingName || undefined,
+      shippingStreet: shippingStreet || undefined,
+      shippingCity: shippingCity || undefined,
+      shippingState: shippingState || undefined,
+      shippingZip: shippingZip || undefined,
+      shippingCountry: shippingCountry || undefined,
+      updatedAt: new Date().toISOString(),
+    })
+    .eq("id", orderId)
+    .select(`
+      *,
+      User ( id, email, firstName, lastName ),
+      OrderItem (
+        id, quantity, pricePaid,
+        Product ( id, name, subtitle, priceUSD, image )
+      )
+    `)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  const formattedOrder = updatedOrder ? {
+    ...updatedOrder,
+    items: ((updatedOrder as Record<string, unknown>).OrderItem as Record<string, unknown>[])?.map((item) => {
+      const product = item.Product as Record<string, unknown> | null;
+      return {
+        id: String(item.id),
+        productId: product?.id ? String(product.id) : "",
+        product: product ? {
+          id: String(product.id),
+          name: String(product.name),
+          subtitle: String(product.subtitle),
+          priceUSD: Number(product.priceUSD),
+          image: String(product.image),
+        } : null,
+        quantity: Number(item.quantity),
+        pricePaid: Number(item.pricePaid),
+      };
+    }) || [],
+  } : null;
+
+  return { success: true, order: formattedOrder };
+});
+
+// DELETE: Remove order from database
+export const DELETE = withApiHandler(async (request) => {
+  if (!(await checkAdminAuth())) {
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
+
+  const url = new URL(request.url);
+  let id = url.searchParams.get("id");
+
+  if (!id) {
+    try {
+      const body = await request.json();
+      id = body.id;
+    } catch {
+      // ignore
+    }
+  }
+
+  if (!id) {
+    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from("Order")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  return { success: true, message: "Order deleted successfully" };
 });

@@ -44,6 +44,7 @@ interface Product {
   inventory: number;
   categoryId?: string;
   category?: { name: string };
+  Category?: { id: string; name: string; slug: string } | null;
 }
 
 interface OrderItem {
@@ -118,6 +119,15 @@ export default function AdminDashboardPage() {
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Edit Product / Order state
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [editShippingName, setEditShippingName] = useState("");
+  const [editShippingStreet, setEditShippingStreet] = useState("");
+  const [editShippingCity, setEditShippingCity] = useState("");
+  const [editShippingZip, setEditShippingZip] = useState("");
+  const [editShippingCountry, setEditShippingCountry] = useState("");
 
   // Search/Filters
   const [orderSearch, setOrderSearch] = useState("");
@@ -227,8 +237,9 @@ export default function AdminDashboardPage() {
 
       showToast(`Order status updated to ${status} successfully.`);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
-    } catch (err: any) {
-      showToast(`Error: ${err.message}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
     } finally {
       setIsActionLoading(false);
     }
@@ -256,8 +267,9 @@ export default function AdminDashboardPage() {
       setNewProductImage(data.url);
       setNewProductHoverImage(data.url);
       showToast("Photo uploaded successfully.");
-    } catch (err: any) {
-      showToast(`Upload failed: ${err.message}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Upload failed: ${msg}`);
     } finally {
       setUploadingImage(false);
     }
@@ -308,8 +320,160 @@ export default function AdminDashboardPage() {
 
       // Refresh list
       await fetchDashboardData();
-    } catch (err: any) {
-      showToast(`Error: ${err.message}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Update Product Submit
+  const handleUpdateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.email || !editingProduct) return;
+    if (!newProductName || !newProductSubtitle || !newProductPrice || !newProductImage) {
+      showToast("Error: Name, subtitle, price and photo are required.");
+      return;
+    }
+
+    setIsActionLoading(true);
+    try {
+      const res = await fetch("/api/admin/products", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-email": user.email,
+        },
+        body: JSON.stringify({
+          id: editingProduct.id,
+          name: newProductName,
+          subtitle: newProductSubtitle,
+          priceUSD: parseFloat(newProductPrice),
+          inventory: parseInt(newProductInventory),
+          description: newProductDescription,
+          image: newProductImage,
+          hoverImage: newProductHoverImage,
+          categorySlug: newProductCategory,
+        }),
+      });
+
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to update product."));
+
+      showToast(`Product "${newProductName}" updated successfully.`);
+      setEditingProduct(null);
+      
+      // Reset form fields
+      setNewProductName("");
+      setNewProductSubtitle("");
+      setNewProductPrice("");
+      setNewProductInventory("100");
+      setNewProductDescription("");
+      setNewProductImage("");
+      setNewProductHoverImage("");
+
+      // Refresh list
+      await fetchDashboardData();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Delete Product
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete product "${name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    if (!user?.email) return;
+    setIsActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-email": user.email,
+        },
+      });
+
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to delete product."));
+
+      showToast(`Product "${name}" deleted successfully.`);
+      if (editingProduct?.id === id) {
+        setEditingProduct(null);
+      }
+      await fetchDashboardData();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Update Order Details
+  const handleUpdateOrderDetails = async (orderId: string) => {
+    if (!user?.email) return;
+    setIsActionLoading(true);
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-email": user.email,
+        },
+        body: JSON.stringify({
+          orderId,
+          shippingName: editShippingName,
+          shippingStreet: editShippingStreet,
+          shippingCity: editShippingCity,
+          shippingZip: editShippingZip,
+          shippingCountry: editShippingCountry,
+        }),
+      });
+
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to update order details."));
+
+      showToast("Order shipping details updated successfully.");
+      setEditingOrderId(null);
+      await fetchDashboardData();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Delete Order
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!window.confirm(`Are you sure you want to delete Order #${orderId.slice(0, 8)}? This action will permanently remove the order and payment records.`)) {
+      return;
+    }
+
+    if (!user?.email) return;
+    setIsActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/orders?id=${orderId}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-email": user.email,
+        },
+      });
+
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to delete order."));
+
+      showToast(`Order #${orderId.slice(0, 8)} deleted successfully.`);
+      await fetchDashboardData();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Error: ${msg}`);
     } finally {
       setIsActionLoading(false);
     }
@@ -1066,16 +1230,109 @@ export default function AdminDashboardPage() {
                     </div>
 
                     {/* Shipping + Total */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-bg/30 border border-line/20 rounded-lg p-3 gap-2">
-                      <div className="text-[9px] text-muted uppercase tracking-wider">
-                        <span className="font-bold text-ink block">Ship To:</span>
-                        <span>{order.shippingName}, {order.shippingStreet}, {order.shippingCity}, {order.shippingCountry} {order.shippingZip}</span>
+                    {editingOrderId === order.id ? (
+                      <div className="bg-bg/40 border border-line rounded-lg p-4 space-y-4">
+                        <h5 className="text-[10px] font-bold text-ink uppercase tracking-wider">Edit Shipping Destination</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[7.5px] uppercase tracking-wider text-muted font-bold block">Recipient Name</label>
+                            <input
+                              type="text"
+                              value={editShippingName}
+                              onChange={(e) => setEditShippingName(e.target.value)}
+                              className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[7.5px] uppercase tracking-wider text-muted font-bold block">Street Address</label>
+                            <input
+                              type="text"
+                              value={editShippingStreet}
+                              onChange={(e) => setEditShippingStreet(e.target.value)}
+                              className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[7.5px] uppercase tracking-wider text-muted font-bold block">City</label>
+                            <input
+                              type="text"
+                              value={editShippingCity}
+                              onChange={(e) => setEditShippingCity(e.target.value)}
+                              className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <label className="text-[7.5px] uppercase tracking-wider text-muted font-bold block">Zip Code</label>
+                              <input
+                                type="text"
+                                value={editShippingZip}
+                                onChange={(e) => setEditShippingZip(e.target.value)}
+                                className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[7.5px] uppercase tracking-wider text-muted font-bold block">Country</label>
+                              <input
+                                type="text"
+                                value={editShippingCountry}
+                                onChange={(e) => setEditShippingCountry(e.target.value)}
+                                className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-accent"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-2 flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingOrderId(null)}
+                            className="px-3.5 py-1.5 bg-transparent border border-line rounded-lg text-[9px] font-bold tracking-widest uppercase hover:border-ink transition-colors cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleUpdateOrderDetails(order.id)}
+                            disabled={isActionLoading}
+                            className="px-3.5 py-1.5 bg-ink text-bg border border-ink rounded-lg text-[9px] font-bold tracking-widest uppercase hover:bg-accent hover:border-accent hover:text-bg transition-colors cursor-pointer"
+                          >
+                            Save Details
+                          </button>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <span className="text-[8px] text-muted uppercase tracking-widest block">Total</span>
-                        <span className="font-display font-bold text-sm text-accent">${order.totalUSD.toFixed(2)}</span>
+                    ) : (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-bg/30 border border-line/20 rounded-lg p-3 gap-2">
+                        <div className="text-[9px] text-muted uppercase tracking-wider">
+                          <span className="font-bold text-ink block">Ship To:</span>
+                          <span>{order.shippingName}, {order.shippingStreet}, {order.shippingCity}, {order.shippingCountry} {order.shippingZip}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <span className="text-[8px] text-muted uppercase tracking-widest block">Total</span>
+                            <span className="font-display font-bold text-sm text-accent">${order.totalUSD.toFixed(2)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 pl-3 border-l border-line/30">
+                            <button
+                              onClick={() => {
+                                setEditingOrderId(order.id);
+                                setEditShippingName(order.shippingName || "");
+                                setEditShippingStreet(order.shippingStreet || "");
+                                setEditShippingCity(order.shippingCity || "");
+                                setEditShippingZip(order.shippingZip || "");
+                                setEditShippingCountry(order.shippingCountry || "US");
+                              }}
+                              className="px-2.5 py-1 bg-bg border border-line rounded text-[8px] font-bold tracking-wider hover:border-accent hover:text-accent transition-colors cursor-pointer"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOrder(order.id)}
+                              className="px-2.5 py-1 bg-red-50/20 text-red-500 border border-red-200/50 rounded text-[8px] font-bold tracking-wider hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1107,10 +1364,10 @@ export default function AdminDashboardPage() {
             {/* Add product Form */}
             <div className="bg-bg/40 border border-line rounded-xl p-5 md:p-6 space-y-6">
               <h4 className="font-display font-semibold text-xs text-ink uppercase tracking-wider border-b border-line/35 pb-2">
-                Inject New Formulation
+                {editingProduct ? `Edit Formulation (ID: ${editingProduct.id})` : "Inject New Formulation"}
               </h4>
 
-              <form onSubmit={handleCreateProduct} className="space-y-5">
+              <form onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div className="space-y-2">
                     <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product Name</label>
@@ -1229,7 +1486,25 @@ export default function AdminDashboardPage() {
                   </div>
                 )}
 
-                <div className="pt-2 flex justify-end">
+                <div className="pt-2 flex justify-end gap-3">
+                  {editingProduct && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingProduct(null);
+                        setNewProductName("");
+                        setNewProductSubtitle("");
+                        setNewProductPrice("");
+                        setNewProductInventory("100");
+                        setNewProductDescription("");
+                        setNewProductImage("");
+                        setNewProductHoverImage("");
+                      }}
+                      className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
                   <CurtainButton
                     type="submit"
                     disabled={isActionLoading || uploadingImage}
@@ -1240,7 +1515,7 @@ export default function AdminDashboardPage() {
                     ) : (
                       <Check className="w-3.5 h-3.5" />
                     )}
-                    <span>Inject Product to Catalog</span>
+                    <span>{editingProduct ? "Save Product Changes" : "Inject Product to Catalog"}</span>
                   </CurtainButton>
                 </div>
               </form>
@@ -1266,6 +1541,31 @@ export default function AdminDashboardPage() {
                       <div className="border-t border-line/30 pt-2 flex items-center justify-between text-[9px] uppercase font-semibold">
                         <span className="text-ink/80">Stock: <span className="font-bold text-ink">{prod.inventory} units</span></span>
                         <span className="text-accent font-bold">${prod.priceUSD.toFixed(2)}</span>
+                      </div>
+                      <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-line/10">
+                        <button
+                          onClick={() => {
+                            setEditingProduct(prod);
+                            setNewProductName(prod.name);
+                            setNewProductSubtitle(prod.subtitle);
+                            setNewProductPrice(String(prod.priceUSD));
+                            setNewProductInventory(String(prod.inventory));
+                            setNewProductDescription(prod.description || "");
+                            setNewProductImage(prod.image);
+                            setNewProductHoverImage(prod.hoverImage || "");
+                            setNewProductCategory(prod.Category?.slug || "skincare");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="px-3 py-1 bg-bg border border-line rounded text-[8px] font-bold tracking-wider hover:border-accent hover:text-accent transition-colors cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(prod.id, prod.name)}
+                          className="px-3 py-1 bg-red-50/20 text-red-500 border border-red-200/50 rounded text-[8px] font-bold tracking-wider hover:bg-red-50 hover:border-red-500 hover:text-red-600 transition-colors cursor-pointer"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   </div>
