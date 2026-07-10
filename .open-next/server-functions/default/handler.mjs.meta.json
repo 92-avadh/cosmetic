@@ -3713,12 +3713,12 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
       "bytes": 321,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
+    ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
       "bytes": 321,
       "imports": [],
       "format": "cjs"
@@ -3759,7 +3759,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 135728,
+      "bytes": 150280,
       "imports": [
         {
           "path": "path",
@@ -3837,14 +3837,14 @@
           "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\all-products\\route_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\upload\\route_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js",
           "kind": "require-call",
           "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\orders\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "C:\\Users\\dhame\\Desktop\\Cosmetic-web\\.open-next\\server-functions\\default\\.next\\server\\app\\api\\admin\\upload\\route_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route_client-reference-manifest.js",
@@ -7357,10 +7357,10 @@
         ".open-next/server-functions/default/.next/server/app/api/all-products/route_client-reference-manifest.js": {
           "bytesInOutput": 475
         },
-        ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
           "bytesInOutput": 475
         },
-        ".open-next/server-functions/default/.next/server/app/api/admin/orders/route_client-reference-manifest.js": {
+        ".open-next/server-functions/default/.next/server/app/api/admin/upload/route_client-reference-manifest.js": {
           "bytesInOutput": 475
         },
         ".open-next/server-functions/default/.next/server/app/api/orders/[id]/route_client-reference-manifest.js": {
@@ -7385,7 +7385,7 @@
           "bytesInOutput": 459
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 112195
+          "bytesInOutput": 125523
         },
         ".open-next/cloudflare-templates/shims/throw.js": {
           "bytesInOutput": 215
@@ -7709,7 +7709,7 @@
           "bytesInOutput": 66360
         }
       },
-      "bytes": 2141608
+      "bytes": 2154936
     }
   }
 }

@@ -68,8 +68,9 @@ export default function CheckoutPage() {
         body: JSON.stringify({ action: "get" }),
       })
         .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.user && data.user.addresses) {
+        .then((resJson) => {
+          const data = resJson.data;
+          if (data && data.success && data.user && data.user.addresses) {
             setSavedAddresses(data.user.addresses);
           }
         })
@@ -166,11 +167,12 @@ export default function CheckoutPage() {
         body: JSON.stringify({ code: promoCode }),
       });
       
-      const data = await res.json();
+      const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to validate code");
+        throw new Error(resJson.error?.message || "Failed to validate code");
       }
       
+      const data = resJson.data;
       setAppliedPromo({
         code: data.code,
         discount: data.discount,
@@ -214,11 +216,12 @@ export default function CheckoutPage() {
         }),
       });
       
-      const data = await res.json();
+      const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to save address.");
+        throw new Error(resJson.error?.message || "Failed to save address.");
       }
       
+      const data = resJson.data;
       setSavedAddresses(data.addresses || []);
     } catch (err: any) {
       setFormError(err.message || "Failed to save address. Please try again.");
@@ -239,11 +242,12 @@ export default function CheckoutPage() {
         }),
       });
       
-      const data = await res.json();
+      const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to delete address.");
+        throw new Error(resJson.error?.message || "Failed to delete address.");
       }
       
+      const data = resJson.data;
       setSavedAddresses(data.addresses || []);
     } catch (err: any) {
       setFormError(err.message || "Failed to delete address.");
@@ -299,10 +303,12 @@ export default function CheckoutPage() {
         }),
       });
 
-      const data = await res.json();
+      const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to process order.");
+        throw new Error(resJson.error?.message || "Failed to process order.");
       }
+
+      const data = resJson.data;
 
       const options = {
         key: data.key,
@@ -329,7 +335,7 @@ export default function CheckoutPage() {
 
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) {
-              throw new Error(verifyData.error || "Payment verification failed.");
+              throw new Error(verifyData.error?.message || verifyData.error || "Payment verification failed.");
             }
 
             clearCart();
@@ -380,7 +386,7 @@ export default function CheckoutPage() {
                 Thank You For Your Order
               </h2>
               <p className="text-xs text-muted leading-relaxed">
-                Your skin fitness regimen is being compiled. A confirmation receipt and shipment details have been dispatched to <span className="font-semibold text-ink">{user?.email}</span>.
+                Your skin fitness regimen is being compiled. A confirmation receipt and shipment details have been sent to <span className="font-semibold text-ink">{user?.email}</span>.
               </p>
             </div>
             <div className="pt-4 border-t border-line/50">

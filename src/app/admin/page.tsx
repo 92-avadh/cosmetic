@@ -175,21 +175,22 @@ export default function AdminDashboardPage() {
       // 1. Fetch Orders
       const ordersRes = await fetch("/api/admin/orders", { headers });
       if (!ordersRes.ok) throw new Error("Failed to load orders");
-      const ordersData = await ordersRes.json();
-      setOrders(ordersData);
+      const ordersResJson = await ordersRes.json();
+      setOrders(ordersResJson.data);
 
       // 2. Fetch Products
       const productsRes = await fetch("/api/admin/products", { headers });
       if (!productsRes.ok) throw new Error("Failed to load products");
-      const { products: productsData, categories: categoriesData } = await productsRes.json();
+      const productsResJson = await productsRes.json();
+      const { products: productsData, categories: categoriesData } = productsResJson.data;
       setProducts(productsData);
       setCategories(categoriesData);
 
       // 3. Fetch Abandoned Carts
       const cartsRes = await fetch("/api/admin/abandoned-carts", { headers });
       if (!cartsRes.ok) throw new Error("Failed to load abandoned carts");
-      const cartsData = await cartsRes.json();
-      setAbandonedCarts(cartsData);
+      const cartsResJson = await cartsRes.json();
+      setAbandonedCarts(cartsResJson.data);
 
     } catch (err: any) {
       console.error(err);
@@ -220,8 +221,8 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({ orderId, status }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "Failed to update order status.");
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(resJson.error?.message || "Failed to update order status.");
 
       showToast(`Order status updated to ${status} successfully.`);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
@@ -247,9 +248,10 @@ export default function AdminDashboardPage() {
         body: formData,
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "File upload failed");
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(resJson.error?.message || "File upload failed");
 
+      const data = resJson.data;
       setNewProductImage(data.url);
       setNewProductHoverImage(data.url);
       showToast("Photo uploaded successfully.");
@@ -289,8 +291,8 @@ export default function AdminDashboardPage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || "Failed to create product.");
+      const resJson = await res.json();
+      if (!res.ok) throw new Error(resJson.error?.message || "Failed to create product.");
 
       showToast(`Product "${newProductName}" added successfully.`);
 
@@ -314,7 +316,7 @@ export default function AdminDashboardPage() {
 
   // Simulate recovery email send
   const handleSimulateRecoveryEmail = (cart: AbandonedCart) => {
-    showToast(`Simulated: Recovery email dispatched to ${cart.userEmail}!`);
+    showToast(`Simulated: Recovery email sent to ${cart.userEmail}!`);
   };
 
   // Toast Helper

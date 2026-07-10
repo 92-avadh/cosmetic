@@ -41,18 +41,21 @@ export default function AccountPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "get", email: user.email }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setDbUser(data.user);
-        setFirstName(data.user.firstName || "");
-        setLastName(data.user.lastName || "");
-        if (data.user.addresses && data.user.addresses.length > 0) {
-          const addr = data.user.addresses[0];
-          setStreet(addr.street || "");
-          setCity(addr.city || "");
-          setState(addr.state || "");
-          setPostalCode(addr.postalCode || "");
-          setCountry(addr.country || "IN");
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
+        const data = resJson.data;
+        if (data && data.user) {
+          setDbUser(data.user);
+          setFirstName(data.user.firstName || "");
+          setLastName(data.user.lastName || "");
+          if (data.user.addresses && data.user.addresses.length > 0) {
+            const addr = data.user.addresses[0];
+            setStreet(addr.street || "");
+            setCity(addr.city || "");
+            setState(addr.state || "");
+            setPostalCode(addr.postalCode || "");
+            setCountry(addr.country || "IN");
+          }
         }
       }
     } catch (err) {
@@ -93,12 +96,12 @@ export default function AccountPage() {
           },
         }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
+      const resJson = await res.json();
+      if (res.ok && resJson.success) {
         setSaveSuccess("Profile settings updated successfully.");
         await fetchUserProfile();
       } else {
-        throw new Error(data.error?.message || "Failed to update profile details.");
+        throw new Error(resJson.error?.message || "Failed to update profile details.");
       }
     } catch (err: any) {
       setSaveError(err.message || "Failed to save profile settings.");

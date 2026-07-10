@@ -34,7 +34,8 @@ export default function CartSync() {
       try {
         const res = await fetch("/api/cart/sync");
         if (res.ok) {
-          const dbItems = await res.json();
+          const resJson = await res.json();
+          const dbItems = resJson.data;
           if (Array.isArray(dbItems) && dbItems.length > 0) {
             // Merge logic: Merge local cart with database cart
             const mergedCart = [...cart];

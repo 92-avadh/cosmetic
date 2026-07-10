@@ -152,7 +152,7 @@ export async function POST(request: Request) {
         html: emailHtml,
       });
 
-      console.log(`✓ Confirmation email successfully dispatched to ${email || order.userId}`);
+      console.log(`✓ Confirmation email successfully sent to ${email || order.userId}`);
 
     } catch (err: any) {
       console.error(`❌ Webhook Order processing error for Order ${orderId}:`, err);
