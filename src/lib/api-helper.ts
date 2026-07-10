@@ -4,6 +4,8 @@ import { logAudit } from "./audit";
 import { verifySession } from "./session";
 import { cookies } from "next/headers";
 
+import { checkRateLimit } from "./rate-limit";
+
 export type ApiResponse<T = unknown> = {
   success: boolean;
   data?: T;
@@ -65,7 +67,41 @@ export function withApiHandler(
     const currentUserId = currentUser ? String(currentUser.id) : undefined;
     const currentUserEmail = currentUser ? String(currentUser.email) : undefined;
 
+    let userEmailForLimit = currentUserEmail;
+    const isAuthRoute = path.startsWith("/api/auth/") || path.includes("/login") || path.includes("/signup");
+    if (!userEmailForLimit && isAuthRoute && method === "POST") {
+      try {
+        const clonedRequest = request.clone();
+        const body = await clonedRequest.json();
+        if (body && typeof body === "object" && typeof body.email === "string") {
+          userEmailForLimit = body.email;
+        }
+      } catch {
+        // Safe to ignore
+      }
+    }
+
     try {
+      // 0. Rate Limiting Check
+      const rateLimitResult = await checkRateLimit(request, path, clientIp, userEmailForLimit);
+      if (!rateLimitResult.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              message: rateLimitResult.message || "Too many requests. Please try again later.",
+              code: "TOO_MANY_REQUESTS",
+            },
+          },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": String(Math.ceil(rateLimitResult.retryAfterSeconds || 60)),
+            },
+          }
+        );
+      }
+
       // 1. CSRF Protection for mutation requests (POST, PUT, DELETE, PATCH)
       if (["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
         const isWebhook = path.startsWith("/api/webhooks");

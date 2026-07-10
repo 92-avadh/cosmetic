@@ -176,4 +176,11 @@ model AuditLog {
   createdAt DateTime @default(now())
 }
 
+model RateLimit {
+  key          String    @id
+  attempts     Int       @default(0)
+  lastAttempt  DateTime  @default(now())
+  blockedUntil DateTime?
+}
+
 

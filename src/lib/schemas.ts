@@ -122,3 +122,21 @@ export const razorpayVerifySchema = z.object({
   razorpay_signature: z.string().min(1, "Razorpay signature is required"),
   orderId: z.string().uuid("Invalid checkout order reference ID"),
 });
+
+export const reviewCreateSchema = z.object({
+  userName: z.string().min(1, "Name is required").max(100).regex(/^[a-zA-Z\s\-']+$/, "Invalid name format"),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().min(1, "Comment is required").max(1000),
+  userId: z.string().uuid().optional().nullable(),
+});
+
+export const productCreateSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100).regex(/^[a-zA-Z0-9\s\-'&]+$/, "Invalid name format"),
+  subtitle: z.string().min(1, "Subtitle is required").max(150),
+  priceUSD: z.number().positive("Price must be a positive number"),
+  image: z.string().min(1, "Image is required").max(300),
+  hoverImage: z.string().max(300).optional().nullable(),
+  description: z.string().max(1000).optional().nullable(),
+  inventory: z.number().int().nonnegative().default(100),
+  categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/, "Invalid category slug format").optional().nullable(),
+});
