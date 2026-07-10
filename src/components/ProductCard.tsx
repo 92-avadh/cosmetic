@@ -32,6 +32,9 @@ export default function ProductCard({
   const [isHovered, setIsHovered] = useState(false);
   const wishlisted = isWishlisted(id);
 
+  const primaryImage = image.includes(",") ? image.split(",")[0] : image;
+  const hoverImageToShow = hoverImage || (image.includes(",") ? image.split(",")[1] : primaryImage);
+
   const convertedPrice = priceUSD * CURRENCY_RATES[currency];
   const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
     undefined,
@@ -110,7 +113,7 @@ export default function ProductCard({
 
         {/* Base Image */}
         <img
-          src={image}
+          src={primaryImage}
           alt={`BODYBARREL - ${name}`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
@@ -119,7 +122,7 @@ export default function ProductCard({
 
         {/* Hover Alt Image */}
         <img
-          src={hoverImage}
+          src={hoverImageToShow}
           alt={`BODYBARREL - ${name} Texture`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-100 scale-100" : "opacity-0 scale-95"

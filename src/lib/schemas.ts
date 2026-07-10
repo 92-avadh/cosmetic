@@ -135,6 +135,7 @@ export const productCreateSchema = z.object({
   subtitle: z.string().min(1, "Subtitle is required").max(150),
   priceUSD: z.number().positive("Price must be a positive number"),
   image: z.string().min(1, "Image is required").max(300),
+  sku: z.string().max(100).optional().nullable(),
   hoverImage: z.string().max(300).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   inventory: z.number().int().nonnegative().default(100),

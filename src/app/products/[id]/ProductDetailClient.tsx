@@ -30,8 +30,13 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   const router = useRouter();
   const { addItem, currency } = useCartStore();
 
+  const images = [
+    ...(product.image ? product.image.split(",") : []),
+    ...(product.hoverImage && !product.image.includes(product.hoverImage) ? [product.hoverImage] : [])
+  ];
+
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState<string>(product.image);
+  const [activeImage, setActiveImage] = useState<string>(images[0] || product.image);
   const [activeTab, setActiveTab] = useState<string>("science");
 
   // Reviews Integration
@@ -103,18 +108,20 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   };
 
   const handlePrevImage = () => {
-    if (product.hoverImage && activeImage === product.hoverImage) {
-      setActiveImage(product.image);
-    } else if (product.hoverImage) {
-      setActiveImage(product.hoverImage);
+    const currentIndex = images.indexOf(activeImage);
+    if (currentIndex > 0) {
+      setActiveImage(images[currentIndex - 1]);
+    } else {
+      setActiveImage(images[images.length - 1]);
     }
   };
 
   const handleNextImage = () => {
-    if (product.hoverImage && activeImage === product.image) {
-      setActiveImage(product.hoverImage);
-    } else if (product.hoverImage) {
-      setActiveImage(product.image);
+    const currentIndex = images.indexOf(activeImage);
+    if (currentIndex < images.length - 1) {
+      setActiveImage(images[currentIndex + 1]);
+    } else {
+      setActiveImage(images[0]);
     }
   };
 
@@ -232,7 +239,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 />
 
                 {/* Navigation Chevrons Overlay (Image 2 design) */}
-                {product.hoverImage && (
+                {images.length > 1 && (
                   <>
                     <button
                       onClick={handlePrevImage}
@@ -251,6 +258,23 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   </>
                 )}
               </div>
+
+              {/* Thumbnails indicator */}
+              {images.length > 1 && (
+                <div className="flex gap-2 justify-center pt-2">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveImage(img)}
+                      className={`w-12 h-16 rounded border overflow-hidden transition-all ${
+                        activeImage === img ? "border-accent scale-105" : "border-line opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={img} className="w-full h-full object-cover" alt="" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product Configuration Column */}

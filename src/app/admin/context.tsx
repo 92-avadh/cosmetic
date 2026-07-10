@@ -6,6 +6,7 @@ import { getApiErrorMessage } from "@/lib/utils";
 
 export interface Product {
   id: string;
+  sku?: string;
   name: string;
   subtitle: string;
   priceUSD: number;
@@ -89,6 +90,7 @@ interface AdminContextType {
   
   // product helpers
   handleCreateProduct: (productData: {
+    sku?: string;
     name: string;
     subtitle: string;
     priceUSD: number;
@@ -100,6 +102,7 @@ interface AdminContextType {
   }) => Promise<void>;
   handleUpdateProduct: (productData: {
     id: string;
+    sku?: string;
     name: string;
     subtitle: string;
     priceUSD: number;
@@ -321,6 +324,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   // Product creation
   const handleCreateProduct = async (productData: {
+    sku?: string;
     name: string;
     subtitle: string;
     priceUSD: number;
@@ -359,6 +363,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Product updating
   const handleUpdateProduct = async (productData: {
     id: string;
+    sku?: string;
     name: string;
     subtitle: string;
     priceUSD: number;

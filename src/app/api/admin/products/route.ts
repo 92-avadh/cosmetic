@@ -52,11 +52,18 @@ export const POST = withApiHandler(async (request) => {
     subtitle,
     priceUSD,
     image,
+    sku,
     hoverImage,
     description,
     inventory,
     categorySlug,
   } = await productCreateSchema.parseAsync(body);
+
+  // Autogenerate SKU if empty
+  let productSku = sku ? sku.trim() : "";
+  if (!productSku) {
+    productSku = `BB-${(categorySlug || "GEN").slice(0, 4).toUpperCase()}-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
 
   // Generate custom slug ID from name
   let cleanId = name
@@ -110,6 +117,7 @@ export const POST = withApiHandler(async (request) => {
     .from("Product")
     .insert({
       id: cleanId,
+      sku: productSku,
       name,
       subtitle,
       priceUSD,
@@ -136,7 +144,13 @@ export const PUT = withApiHandler(async (request) => {
   }
 
   const body = await request.json();
-  const { id, name, subtitle, priceUSD, image, hoverImage, description, inventory, categorySlug } = body;
+  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, inventory, categorySlug } = body;
+
+  // Autogenerate SKU if empty
+  let productSku = sku ? sku.trim() : "";
+  if (!productSku) {
+    productSku = `BB-${(categorySlug || "GEN").slice(0, 4).toUpperCase()}-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
 
   if (!id) {
     return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
@@ -176,6 +190,7 @@ export const PUT = withApiHandler(async (request) => {
     .from("Product")
     .update({
       name,
+      sku: productSku,
       subtitle,
       priceUSD,
       image,

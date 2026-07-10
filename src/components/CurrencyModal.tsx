@@ -15,12 +15,18 @@ export default function CurrencyModal() {
 
     // Geolocation detection simulation based on navigator configurations
     const userLang = navigator.language.toLowerCase();
-    let detectedCur: Currency = "USD";
-    let detectedCountryName = "United States";
+    let detectedCur: Currency = "INR";
+    let detectedCountryName = "India";
 
     if (userLang.includes("kr") || userLang.includes("ko")) {
       detectedCur = "KRW";
       detectedCountryName = "South Korea";
+    } else if (
+      userLang.includes("us") ||
+      userLang.includes("en-us")
+    ) {
+      detectedCur = "USD";
+      detectedCountryName = "United States";
     } else if (
       userLang.includes("de") ||
       userLang.includes("fr") ||
@@ -112,13 +118,15 @@ export default function CurrencyModal() {
 
               {/* Select Options */}
               <div className="flex flex-col space-y-2">
-                {(["USD", "EUR", "KRW"] as Currency[]).map((cur) => {
+                {(["USD", "EUR", "KRW", "INR"] as Currency[]).map((cur) => {
                   const label =
                     cur === "USD"
                       ? "United States (USD)"
                       : cur === "EUR"
                       ? "Europe (EUR)"
-                      : "South Korea (KRW)";
+                      : cur === "KRW"
+                      ? "South Korea (KRW)"
+                      : "India (INR)";
                   const isCurrent = currency === cur;
 
                   return (

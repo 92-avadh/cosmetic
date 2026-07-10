@@ -640,7 +640,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex gap-4 border-b border-line/30 pb-4 last:border-b-0 last:pb-0 items-center justify-between">
                       <div className="flex gap-3 items-center min-w-0">
                         <div className="w-12 h-14 bg-card-bg border border-line/50 rounded-lg overflow-hidden shrink-0">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-display font-semibold text-xs uppercase text-ink truncate">{item.name}</h4>

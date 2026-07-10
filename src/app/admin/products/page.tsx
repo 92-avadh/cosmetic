@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAdminContext, Product } from "../context";
 import { Loader2, Upload, Check } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
@@ -41,6 +41,7 @@ export default function AdminProductsPage() {
 
   // Product Form states
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [newProductSku, setNewProductSku] = useState("");
   const [newProductName, setNewProductName] = useState("");
   const [newProductSubtitle, setNewProductSubtitle] = useState("");
   const [newProductPrice, setNewProductPrice] = useState("");
@@ -49,7 +50,14 @@ export default function AdminProductsPage() {
   const [newProductCategory, setNewProductCategory] = useState("skincare");
   const [newProductImage, setNewProductImage] = useState("");
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
+  const [newProductImages, setNewProductImages] = useState<string[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Sync image and hoverImage whenever newProductImages changes
+  useEffect(() => {
+    setNewProductImage(newProductImages.join(","));
+    setNewProductHoverImage(newProductImages[1] || newProductImages[0] || "");
+  }, [newProductImages]);
 
   const filteredProducts = products.filter((prod) => {
     return (
@@ -59,12 +67,19 @@ export default function AdminProductsPage() {
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (files.length + newProductImages.length > 5) {
+      showToast("Error: Maximum of 5 photos allowed per product.");
+      return;
+    }
 
     setUploadingImage(true);
     const formData = new FormData();
-    formData.append("file", file);
+    for (let i = 0; i < files.length; i++) {
+      formData.append("file", files[i]);
+    }
 
     try {
       const res = await fetch("/api/admin/upload", {
@@ -76,14 +91,18 @@ export default function AdminProductsPage() {
       if (!res.ok) throw new Error(getApiErrorMessage(resJson, "File upload failed"));
 
       const data = resJson.data;
-      setNewProductImage(data.url);
-      setNewProductHoverImage(data.url);
-      showToast("Photo uploaded successfully.");
+      const uploadedUrls = data.urls || [data.url];
+      
+      // Append new uploaded images to existing list
+      setNewProductImages((prev) => [...prev, ...uploadedUrls]);
+      showToast(`Uploaded ${uploadedUrls.length} photo(s) successfully.`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Upload failed: ${msg}`);
     } finally {
       setUploadingImage(false);
+      // Reset input value so same files can be uploaded again if needed
+      e.target.value = "";
     }
   };
 
@@ -96,6 +115,7 @@ export default function AdminProductsPage() {
 
     try {
       const payload = {
+        sku: newProductSku,
         name: newProductName,
         subtitle: newProductSubtitle,
         priceUSD: parseFloat(newProductPrice),
@@ -117,14 +137,14 @@ export default function AdminProductsPage() {
       }
 
       // Reset form
+      setNewProductSku("");
       setNewProductName("");
       setNewProductSubtitle("");
       setNewProductPrice("");
       setNewProductInventory("100");
       setNewProductDescription("");
       setNewProductCategory("skincare");
-      setNewProductImage("");
-      setNewProductHoverImage("");
+      setNewProductImages([]);
     } catch {
       // toast is already displayed inside context helpers
     }
@@ -181,7 +201,7 @@ export default function AdminProductsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-5">
             <div className="space-y-2">
               <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Price (USD)</label>
               <input
@@ -207,6 +227,17 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="space-y-2">
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">SKU Code (Optional)</label>
+              <input
+                type="text"
+                placeholder="Auto-generated"
+                value={newProductSku}
+                onChange={(e) => setNewProductSku(e.target.value)}
+                className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">System category</label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -223,18 +254,19 @@ export default function AdminProductsPage() {
 
             {/* File Uploader */}
             <div className="space-y-2">
-              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product image photo</label>
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product image photos (Up to 5)</label>
               <div className="flex gap-2">
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleImageUpload}
                   className="hidden"
                   ref={fileInputRef}
                 />
                 <button
                   type="button"
-                  disabled={uploadingImage}
+                  disabled={uploadingImage || newProductImages.length >= 5}
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center gap-2 px-3.5 py-2.5 bg-bg border border-line rounded-xl text-[10px] uppercase font-bold tracking-widest hover:border-accent hover:text-accent transition-colors w-full justify-center cursor-pointer disabled:opacity-50"
                 >
@@ -243,7 +275,7 @@ export default function AdminProductsPage() {
                   ) : (
                     <Upload className="w-3.5 h-3.5" />
                   )}
-                  <span>{newProductImage ? "Change Photo" : "Upload Image"}</span>
+                  <span>{newProductImages.length > 0 ? `Add Photos (${newProductImages.length}/5)` : "Upload Images"}</span>
                 </button>
               </div>
             </div>
@@ -260,16 +292,26 @@ export default function AdminProductsPage() {
             />
           </div>
 
-          {/* Image Preview Box */}
-          {newProductImage && (
-            <div className="flex gap-4 items-center p-3 bg-bg border border-line rounded-xl w-fit">
-              <div className="w-14 h-16 border border-line rounded overflow-hidden relative">
-                <img src={newProductImage} className="w-full h-full object-cover" alt="Preview" />
-              </div>
-              <div className="text-[9px] uppercase tracking-wider text-muted space-y-1">
-                <span className="font-bold text-ink block">Upload Completed</span>
-                <span className="block truncate max-w-[200px]">{newProductImage}</span>
-              </div>
+          {/* Image Previews Box */}
+          {newProductImages.length > 0 && (
+            <div className="flex flex-wrap gap-4 items-center p-3 bg-bg border border-line rounded-xl w-full">
+              {newProductImages.map((imgUrl, idx) => (
+                <div key={idx} className="flex gap-3 items-center p-2.5 bg-bg border border-line rounded-xl relative">
+                  <div className="w-14 h-16 border border-line rounded overflow-hidden relative shrink-0">
+                    <img src={imgUrl} className="w-full h-full object-cover" alt={`Preview ${idx + 1}`} />
+                  </div>
+                  <div className="text-[9px] uppercase tracking-wider text-muted space-y-1">
+                    <span className="font-bold text-ink block">Photo {idx + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => setNewProductImages((prev) => prev.filter((_, i) => i !== idx))}
+                      className="text-red-500 hover:text-red-600 font-bold block cursor-pointer transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -279,13 +321,13 @@ export default function AdminProductsPage() {
                 type="button"
                 onClick={() => {
                   setEditingProduct(null);
+                  setNewProductSku("");
                   setNewProductName("");
                   setNewProductSubtitle("");
                   setNewProductPrice("");
                   setNewProductInventory("100");
                   setNewProductDescription("");
-                  setNewProductImage("");
-                  setNewProductHoverImage("");
+                  setNewProductImages([]);
                   setNewProductCategory("skincare");
                 }}
                 className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
@@ -321,7 +363,10 @@ export default function AdminProductsPage() {
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div className="space-y-1">
-                  <span className="text-[7.5px] uppercase tracking-widest text-accent font-bold">ID: {prod.id}</span>
+                  <div className="flex flex-wrap gap-2 text-[7.5px] uppercase tracking-widest font-bold">
+                    <span className="text-accent">ID: {prod.id}</span>
+                    {prod.sku && <span className="text-muted">| SKU: {prod.sku}</span>}
+                  </div>
                   <h5 className="font-display font-bold text-xs uppercase text-ink truncate leading-tight">{prod.name}</h5>
                   <p className="text-[9px] text-muted truncate">{prod.subtitle}</p>
                 </div>
@@ -334,13 +379,14 @@ export default function AdminProductsPage() {
                   <button
                     onClick={() => {
                       setEditingProduct(prod);
+                      setNewProductSku(prod.sku || "");
                       setNewProductName(prod.name);
                       setNewProductSubtitle(prod.subtitle);
                       setNewProductPrice(String(prod.priceUSD));
                       setNewProductInventory(String(prod.inventory));
                       setNewProductDescription(prod.description || "");
-                      setNewProductImage(prod.image);
-                      setNewProductHoverImage(prod.hoverImage || "");
+                      const imgs = prod.image ? prod.image.split(",") : [];
+                      setNewProductImages(imgs);
                       setNewProductCategory(prod.Category?.slug || "skincare");
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}

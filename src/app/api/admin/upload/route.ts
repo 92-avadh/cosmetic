@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/session";
 import { withApiHandler } from "@/lib/api-helper";
+import fs from "fs/promises";
+import path from "path";
 
 export const dynamic = "force-dynamic";
 
@@ -78,10 +80,18 @@ export const POST = withApiHandler(async (request) => {
     const uniqueSuffix = crypto.randomUUID();
     const filename = `${uniqueSuffix}.${extension}`;
 
-    // 4. Return isolated web path. In production, this resolves to an isolated Cloudflare R2 bucket
+    // 4. Write file locally in dev/local mode, and return web path
     const relativeUrl = `/uploads/${filename}`;
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await fs.mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(uploadDir, filename);
+      await fs.writeFile(filePath, new Uint8Array(buffer));
+      console.log(`[EDGE SECURE UPLOAD] Wrote uploaded file to disk: ${filePath}`);
+    } catch (writeErr) {
+      console.error("[EDGE SECURE UPLOAD] Local disk write failed:", writeErr);
+    }
     
-    console.log(`[EDGE SECURE UPLOAD] Validated & simulated upload: ${file.name} -> ${relativeUrl}`);
     uploadedUrls.push(relativeUrl);
   }
 

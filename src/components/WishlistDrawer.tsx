@@ -128,7 +128,7 @@ export default function WishlistDrawer() {
                             BODYBARREL
                           </div>
                           <img
-                            src={item.image}
+                            src={item.image.includes(",") ? item.image.split(",")[0] : item.image}
                             alt={`BODYBARREL - ${item.name}`}
                             className="w-full h-full object-cover"
                           />

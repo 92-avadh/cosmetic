@@ -65,7 +65,7 @@ export default function CartPage() {
                   >
                     <div className="flex gap-4 items-center">
                       <div className="w-20 h-24 bg-card-bg border border-line rounded-lg overflow-hidden shrink-0 relative aspect-[3/4]">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase tracking-widest text-muted">{item.subtitle}</span>
