@@ -54,6 +54,7 @@ export default function AdminProductsPage() {
   const [newProductImage, setNewProductImage] = useState("");
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
+  const [uploadedFileMetadata, setUploadedFileMetadata] = useState<{ name: string; size: number }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   // Sync image and hoverImage whenever newProductImages changes
@@ -73,15 +74,43 @@ export default function AdminProductsPage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    if (files.length + newProductImages.length > 5) {
+    // 1. Client-side duplicate check
+    const filesToUpload: File[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const isDuplicate = uploadedFileMetadata.some(
+        (m) => m.name === file.name && m.size === file.size
+      );
+      if (isDuplicate) {
+        showToast(`Warning: '${file.name}' has already been uploaded.`);
+        continue;
+      }
+      filesToUpload.push(file);
+    }
+
+    if (filesToUpload.length === 0) return;
+
+    // Filter duplicates in the current selection
+    const uniqueFilesToUpload: File[] = [];
+    const seenInSelection = new Set<string>();
+    for (const file of filesToUpload) {
+      const fileKey = `${file.name}-${file.size}`;
+      if (seenInSelection.has(fileKey)) {
+        continue;
+      }
+      seenInSelection.add(fileKey);
+      uniqueFilesToUpload.push(file);
+    }
+
+    // Check count limit
+    if (uniqueFilesToUpload.length + newProductImages.length > 5) {
       showToast("Error: Maximum of 5 photos allowed per product.");
       return;
     }
 
-    // Client-side validation: format and size
+    // 2. Client-side format and size validation
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/jpg"];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    for (const file of uniqueFilesToUpload) {
       if (file.size > 1 * 1024 * 1024) {
         showToast(`Upload failed: '${file.name}' exceeds the 1 MB size limit.`);
         return;
@@ -94,8 +123,8 @@ export default function AdminProductsPage() {
 
     setUploadingImage(true);
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("file", files[i]);
+    for (const file of uniqueFilesToUpload) {
+      formData.append("file", file);
     }
 
     try {
@@ -116,8 +145,12 @@ export default function AdminProductsPage() {
       const data = resJson.data;
       const uploadedUrls = data.urls || [data.url];
       
-      // Append new uploaded images to existing list
+      // Append new uploaded images and track their metadata
       setNewProductImages((prev) => [...prev, ...uploadedUrls]);
+      setUploadedFileMetadata((prev) => [
+        ...prev,
+        ...uniqueFilesToUpload.map((f) => ({ name: f.name, size: f.size }))
+      ]);
       showToast(`Uploaded ${uploadedUrls.length} photo(s) successfully.`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -168,6 +201,7 @@ export default function AdminProductsPage() {
       setNewProductDescription("");
       setNewProductCategory("skincare");
       setNewProductImages([]);
+      setUploadedFileMetadata([]);
     } catch {
       // toast is already displayed inside context helpers
     }
@@ -194,7 +228,7 @@ export default function AdminProductsPage() {
       {/* Add/Edit Product Form */}
       <div className="bg-bg/40 border border-line rounded-xl p-5 md:p-6 space-y-6 text-left">
         <h4 className="font-display font-semibold text-xs text-ink uppercase tracking-wider border-b border-line/35 pb-2">
-          {editingProduct ? `Edit Formulation (ID: ${editingProduct.id})` : "Inject New Formulation"}
+          {editingProduct ? `Edit Formulation (ID: ${editingProduct.id})` : "Upload New Formulation"}
         </h4>
 
         <form onSubmit={onSubmit} className="space-y-5">
@@ -331,7 +365,10 @@ export default function AdminProductsPage() {
                     <span className="font-bold text-ink block">Photo {idx + 1}</span>
                     <button
                       type="button"
-                      onClick={() => setNewProductImages((prev) => prev.filter((_, i) => i !== idx))}
+                      onClick={() => {
+                        setNewProductImages((prev) => prev.filter((_, i) => i !== idx));
+                        setUploadedFileMetadata((prev) => prev.filter((_, i) => i !== idx));
+                      }}
                       className="text-red-500 hover:text-red-600 font-bold block cursor-pointer transition-colors"
                     >
                       Delete
@@ -355,6 +392,7 @@ export default function AdminProductsPage() {
                   setNewProductInventory("100");
                   setNewProductDescription("");
                   setNewProductImages([]);
+                  setUploadedFileMetadata([]);
                   setNewProductCategory("skincare");
                 }}
                 className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
@@ -372,7 +410,7 @@ export default function AdminProductsPage() {
               ) : (
                 <Check className="w-3.5 h-3.5" />
               )}
-              <span>{editingProduct ? "Save Product Changes" : "Inject Product to Catalog"}</span>
+              <span>{editingProduct ? "Save Product Changes" : "Upload Product to Catalog"}</span>
             </CurtainButton>
           </div>
         </form>
@@ -420,6 +458,7 @@ export default function AdminProductsPage() {
                       setNewProductDescription(prod.description || "");
                       const imgs = prod.image ? prod.image.split(",") : [];
                       setNewProductImages(imgs);
+                      setUploadedFileMetadata([]);
                       setNewProductCategory(prod.Category?.slug || "skincare");
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}

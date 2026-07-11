@@ -22,7 +22,7 @@ export default function SciencePage() {
     {
       step: "02",
       title: "Lipid Membrane Infusion",
-      desc: "Our proprietary bioreactors inject micro-fragmented lipids, ceramides, and essential fatty acids deep into the stratum corneum, reconstructing the intercellular lipid matrix."
+      desc: "Our proprietary bioreactors infuses micro-fragmented lipids, ceramides, and essential fatty acids deep into the stratum corneum, reconstructing the intercellular lipid matrix."
     },
     {
       step: "03",
