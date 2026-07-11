@@ -6,6 +6,7 @@ import { Loader2, Upload, Check } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 import { Button } from "@/components/ui/button";
 import { getApiErrorMessage } from "@/lib/utils";
+import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,8 @@ export default function AdminProductsPage() {
     handleUpdateProduct,
     handleDeleteProduct,
   } = useAdminContext();
+
+  const { currency } = useCartStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +78,20 @@ export default function AdminProductsPage() {
       return;
     }
 
+    // Client-side validation: format and size
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/jpg"];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 1 * 1024 * 1024) {
+        showToast(`Upload failed: '${file.name}' exceeds the 1 MB size limit.`);
+        return;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        showToast(`Upload failed: '${file.name}' has an unsupported format. Only JPEG, PNG, GIF, and WEBP are allowed.`);
+        return;
+      }
+    }
+
     setUploadingImage(true);
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
@@ -87,7 +104,13 @@ export default function AdminProductsPage() {
         body: formData,
       });
 
-      const resJson = await res.json();
+      let resJson: any;
+      try {
+        resJson = await res.json();
+      } catch {
+        resJson = null;
+      }
+
       if (!res.ok) throw new Error(getApiErrorMessage(resJson, "File upload failed"));
 
       const data = resJson.data;
@@ -255,7 +278,7 @@ export default function AdminProductsPage() {
             {/* File Uploader */}
             <div className="space-y-2">
               <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product image photos (Up to 5)</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                 <input
                   type="file"
                   accept="image/*"
@@ -268,7 +291,7 @@ export default function AdminProductsPage() {
                   type="button"
                   disabled={uploadingImage || newProductImages.length >= 5}
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 px-3.5 py-2.5 bg-bg border border-line rounded-xl text-[10px] uppercase font-bold tracking-widest hover:border-accent hover:text-accent transition-colors w-full justify-center cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-2 px-3.5 py-2.5 bg-bg border border-line rounded-xl text-[10px] uppercase font-bold tracking-widest hover:border-accent hover:text-accent transition-colors w-full sm:w-auto justify-center cursor-pointer disabled:opacity-50 shrink-0"
                 >
                   {uploadingImage ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -277,6 +300,10 @@ export default function AdminProductsPage() {
                   )}
                   <span>{newProductImages.length > 0 ? `Add Photos (${newProductImages.length}/5)` : "Upload Images"}</span>
                 </button>
+                <div className="text-[9px] text-muted tracking-wide leading-relaxed text-left">
+                  <span className="font-semibold text-ink block">Requirements:</span>
+                  <span>JPEG, PNG, GIF, WEBP. Max size: 1 MB per image.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -373,7 +400,13 @@ export default function AdminProductsPage() {
 
                 <div className="border-t border-line/30 pt-2 flex items-center justify-between text-[9px] uppercase font-semibold">
                   <span className="text-ink/80">Stock: <span className="font-bold text-ink">{prod.inventory} units</span></span>
-                  <span className="text-accent font-bold">${prod.priceUSD.toFixed(2)}</span>
+                  <span className="text-accent font-bold">
+                    {CURRENCY_SYMBOLS[currency]}
+                    {(prod.priceUSD * CURRENCY_RATES[currency]).toLocaleString(undefined, {
+                      minimumFractionDigits: currency === "KRW" ? 0 : 2,
+                      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                    })}
+                  </span>
                 </div>
                 <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-line/10">
                   <button

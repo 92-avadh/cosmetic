@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAdminContext } from "../context";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,8 @@ export default function AdminOrdersPage() {
     handleUpdateOrderDetails,
     handleDeleteOrder,
   } = useAdminContext();
+
+  const { currency } = useCartStore();
 
   // Search/Filters local state
   const [orderSearch, setOrderSearch] = useState("");
@@ -144,7 +147,13 @@ export default function AdminOrdersPage() {
                     </div>
                     <div className="flex-1 min-w-0 text-left">
                       <h5 className="text-[10px] font-bold text-ink truncate uppercase">{item.product?.name || "Unknown"}</h5>
-                      <span className="text-[9px] text-muted">Qty: {item.quantity} · ${item.pricePaid.toFixed(2)} ea.</span>
+                      <span className="text-[9px] text-muted">
+                        Qty: {item.quantity} · {CURRENCY_SYMBOLS[currency]}
+                        {(item.pricePaid * CURRENCY_RATES[currency]).toLocaleString(undefined, {
+                          minimumFractionDigits: currency === "KRW" ? 0 : 2,
+                          maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                        })} ea.
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -228,7 +237,13 @@ export default function AdminOrdersPage() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <span className="text-[8px] text-muted uppercase tracking-widest block">Total</span>
-                      <span className="font-display font-bold text-sm text-accent">${order.totalUSD.toFixed(2)}</span>
+                      <span className="font-display font-bold text-sm text-accent">
+                        {CURRENCY_SYMBOLS[currency]}
+                        {(order.totalUSD * CURRENCY_RATES[currency]).toLocaleString(undefined, {
+                          minimumFractionDigits: currency === "KRW" ? 0 : 2,
+                          maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                        })}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 pl-3 border-l border-line/30">
                       <button
