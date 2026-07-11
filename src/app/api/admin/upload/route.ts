@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/session";
 import { withApiHandler } from "@/lib/api-helper";
-import fs from "fs/promises";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -73,26 +72,42 @@ export const POST = withApiHandler(async (request) => {
 
     // 3. Enforce a safe static extension mapping
     let extension = "png";
-    if (isJpg) extension = "jpg";
-    if (isGif) extension = "gif";
-    if (isWebp) extension = "webp";
+    let contentType = "image/png";
+    if (isJpg) {
+      extension = "jpg";
+      contentType = "image/jpeg";
+    }
+    if (isGif) {
+      extension = "gif";
+      contentType = "image/gif";
+    }
+    if (isWebp) {
+      extension = "webp";
+      contentType = "image/webp";
+    }
 
     const uniqueSuffix = crypto.randomUUID();
     const filename = `${uniqueSuffix}.${extension}`;
 
-    // 4. Write file locally in dev/local mode, and return web path
-    const relativeUrl = `/uploads/${filename}`;
-    try {
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await fs.mkdir(uploadDir, { recursive: true });
-      const filePath = path.join(uploadDir, filename);
-      await fs.writeFile(filePath, new Uint8Array(buffer));
-      console.log(`[EDGE SECURE UPLOAD] Wrote uploaded file to disk: ${filePath}`);
-    } catch (writeErr) {
-      console.error("[EDGE SECURE UPLOAD] Local disk write failed:", writeErr);
+    // 4. Upload file to Supabase Storage
+    const { data: uploadData, error: uploadErr } = await supabase.storage
+      .from("uploads")
+      .upload(filename, new Uint8Array(buffer), {
+        contentType,
+        upsert: true,
+      });
+
+    if (uploadErr) {
+      console.error("[SUPABASE UPLOAD ERROR]:", uploadErr.message);
+      return NextResponse.json(
+        { error: `Failed to upload '${file.name}' to storage: ${uploadErr.message}` },
+        { status: 500 }
+      );
     }
-    
-    uploadedUrls.push(relativeUrl);
+
+    const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(filename);
+    const publicUrl = urlData.publicUrl;
+    uploadedUrls.push(publicUrl);
   }
 
   // If only 1 file was uploaded, return singular "url" for backwards compatibility, otherwise return all
