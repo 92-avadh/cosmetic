@@ -6,8 +6,24 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getApiErrorMessage(resJson: unknown, defaultMessage: string = "An unexpected error occurred."): string {
-  const errorObj = (resJson as Record<string, unknown>)?.error as Record<string, unknown> | undefined;
-  if (!errorObj) return defaultMessage;
+  const errorProp = (resJson as Record<string, unknown>)?.error;
+  if (!errorProp) return defaultMessage;
+
+  if (typeof errorProp === "string") {
+    if (
+      errorProp.toLowerCase().includes("database") || 
+      errorProp.toLowerCase().includes("prisma") || 
+      (errorProp.toLowerCase().includes("supabase") && 
+       !errorProp.toLowerCase().includes("storage") && 
+       !errorProp.toLowerCase().includes("bucket") && 
+       !errorProp.toLowerCase().includes("upload"))
+    ) {
+      return "A connection issue occurred while accessing our database. Please try again in a few moments.";
+    }
+    return errorProp;
+  }
+
+  const errorObj = errorProp as Record<string, unknown>;
 
   // Format validation errors (Zod validation issues)
   if (errorObj.details && Array.isArray(errorObj.details) && errorObj.details.length > 0) {
@@ -28,7 +44,10 @@ export function getApiErrorMessage(resJson: unknown, defaultMessage: string = "A
     code === "DATABASE_ERROR" || 
     message.toLowerCase().includes("database") || 
     message.toLowerCase().includes("prisma") || 
-    message.toLowerCase().includes("supabase")
+    (message.toLowerCase().includes("supabase") && 
+     !message.toLowerCase().includes("storage") && 
+     !message.toLowerCase().includes("bucket") && 
+     !message.toLowerCase().includes("upload"))
   ) {
     return "A connection issue occurred while accessing our database. Please try again in a few moments.";
   }
