@@ -29,38 +29,41 @@ const DEFAULT_ANNOUNCEMENTS = [
   "CELLULAR BODYCARE SCIENCE — 100% BIODEGRADABLE SURFACTANTS"
 ];
 
+const DEFAULT_DATA = {
+  id: "default",
+  isActive: true,
+  backgroundColor: "#2d1c14",
+  textColor: "#F6F4EE",
+  interval: 4500,
+  announcements: JSON.stringify(DEFAULT_ANNOUNCEMENTS),
+};
+
 export const GET = withApiHandler(async () => {
-  let { data, error } = await supabase
-    .from("AnnouncementBar")
-    .select("*")
-    .eq("id", "default")
-    .single();
-
-  if (error || !data) {
-    // If not found, create a default record
-    const defaultData = {
-      id: "default",
-      isActive: true,
-      backgroundColor: "#2d1c14",
-      textColor: "#F6F4EE",
-      interval: 4500,
-      announcements: JSON.stringify(DEFAULT_ANNOUNCEMENTS),
-    };
-
-    const { data: inserted, error: insertError } = await supabase
+  try {
+    const { data, error } = await supabase
       .from("AnnouncementBar")
-      .insert(defaultData)
-      .select()
+      .select("*")
+      .eq("id", "default")
       .single();
 
-    if (insertError) {
-      console.error("Error inserting default announcement bar:", insertError);
-      return defaultData;
-    }
-    data = inserted;
-  }
+    if (error || !data) {
+      const { data: inserted, error: insertError } = await supabase
+        .from("AnnouncementBar")
+        .insert(DEFAULT_DATA)
+        .select()
+        .single();
 
-  return data;
+      if (insertError || !inserted) {
+        return DEFAULT_DATA;
+      }
+      return inserted;
+    }
+
+    return data;
+  } catch (e) {
+    console.error("AnnouncementBar GET failed, returning defaults:", e);
+    return DEFAULT_DATA;
+  }
 });
 
 export const POST = withApiHandler(async (request) => {
@@ -79,15 +82,21 @@ export const POST = withApiHandler(async (request) => {
     announcements: JSON.stringify(parsed.announcements),
   };
 
-  const { data, error } = await supabase
-    .from("AnnouncementBar")
-    .upsert({ id: "default", ...updateData })
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("AnnouncementBar")
+      .upsert({ id: "default", ...updateData })
+      .select()
+      .single();
 
-  if (error) {
-    throw new Error("Failed to update announcement");
+    if (error) {
+      console.error("AnnouncementBar upsert error:", error);
+      throw new Error("Failed to update announcement bar in database.");
+    }
+
+    return data;
+  } catch (e) {
+    console.error("AnnouncementBar POST failed:", e);
+    throw e;
   }
-
-  return data;
 });

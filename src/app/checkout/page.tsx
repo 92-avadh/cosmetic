@@ -570,18 +570,8 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Country</label>
-                      <input
-                        type="text"
-                        value="India (+91)"
-                        readOnly
-                        className="w-full bg-bg/50 border border-line/50 rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none cursor-not-allowed text-muted font-medium"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
+                  <div className="space-y-2">
+                    <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
                       <input
                         type="text"
                         value={phone}
@@ -600,7 +590,6 @@ export default function CheckoutPage() {
                         className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs tracking-wider focus:outline-none focus:border-accent animate-fadeIn"
                       />
                     </div>
-                  </div>
 
                   {savedAddresses.length < 3 && (
                     <button
