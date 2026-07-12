@@ -27,13 +27,11 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
-  const [country, setCountry] = useState<"IN" | "US" | "KR">("IN");
+  const [country] = useState<"IN">("IN");
   const [phone, setPhone] = useState("+91");
 
   const PHONE_CONFIG = {
     IN: { prefix: "+91", pattern: /^\+91\d{10}$/, placeholder: "+91 98765 43210", digits: 10 },
-    US: { prefix: "+1", pattern: /^\+1\d{10}$/, placeholder: "+1 202 555 0123", digits: 10 },
-    KR: { prefix: "+82", pattern: /^\+82\d{9,10}$/, placeholder: "+82 10 1234 5678", digits: 9 },
   } as const;
 
   const phoneConfig = PHONE_CONFIG[country];
@@ -575,19 +573,12 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Country</label>
-                      <select
-                        value={country}
-                        onChange={(e) => {
-                          const c = e.target.value as "IN" | "US" | "KR";
-                          setCountry(c);
-                          setPhone(PHONE_CONFIG[c].prefix);
-                        }}
-                        className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent appearance-none"
-                      >
-                        <option value="IN">India (+91)</option>
-                        <option value="US">United States (+1)</option>
-                        <option value="KR">South Korea (+82)</option>
-                      </select>
+                      <input
+                        type="text"
+                        value="India (+91)"
+                        readOnly
+                        className="w-full bg-bg/50 border border-line/50 rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none cursor-not-allowed text-muted font-medium"
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
