@@ -43,36 +43,23 @@ export const POST = withApiHandler(async (request: Request) => {
         .insert({ id: crypto.randomUUID(), email: emailKey, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
         .select("id")
         .single();
-      if (createError) throw new Error(createError.message);
+      if (createError) throw new Error("Failed to create user");
       user = newUser;
     }
 
-    // 2. Double check that products exist in the DB (upsert if they don't)
+    // 2. Verify all products exist in the catalog (reject if not)
     for (const item of items) {
       const { data: existingProduct } = await supabase
         .from("Product")
-        .select("id")
+        .select("id, name, inventory")
         .eq("id", item.id)
         .single();
 
-      if (existingProduct) {
-        await supabase
-          .from("Product")
-          .update({ name: item.name || "Skincare Product", updatedAt: new Date().toISOString() })
-          .eq("id", item.id);
-      } else {
-        await supabase.from("Product").insert({
-          id: item.id,
-          name: item.name || "Skincare Product",
-          subtitle: "Premium Cellular Skincare",
-          priceUSD: totalUSD / items.length, // approximation if not existing
-          image: "",
-          hoverImage: "/products/texture-gel.png",
-          description: "Premium physiological formula.",
-          inventory: 100,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+      if (!existingProduct) {
+        const err = new Error("One or more products in your order are no longer available.");
+        (err as any).status = 400;
+        (err as any).code = "PRODUCT_NOT_FOUND";
+        throw err;
       }
     }
 
@@ -133,7 +120,7 @@ export const POST = withApiHandler(async (request: Request) => {
     }
 
     const { error: itemsError } = await supabase.from("OrderItem").insert(orderItems);
-    if (itemsError) throw new Error(itemsError.message);
+    if (itemsError) throw new Error("Failed to create order items");
 
     // 5. Decrement inventory for each ordered item
     for (const item of items) {

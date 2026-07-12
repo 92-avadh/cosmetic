@@ -87,7 +87,11 @@ export default function PhilosophySection() {
         <img
           ref={bg1Ref}
           src="/philosophy-bg1.png"
-          alt="Fluid Ripples Parallax Layer"
+          alt=""
+          width={320}
+          height={320}
+          loading="lazy"
+          decoding="async"
           className="absolute top-10 left-[5%] w-[35vw] max-w-[320px] aspect-square object-cover rounded-full opacity-35 mix-blend-multiply filter blur-[2px]"
         />
 
@@ -95,7 +99,11 @@ export default function PhilosophySection() {
         <img
           ref={bg2Ref}
           src="/philosophy-bg2.png"
-          alt="Sculptural Stone Parallax Layer"
+          alt=""
+          width={360}
+          height={450}
+          loading="lazy"
+          decoding="async"
           className="absolute bottom-10 right-[5%] w-[40vw] max-w-[360px] aspect-[4/5] object-cover rounded-3xl opacity-25 mix-blend-multiply filter blur-[1px]"
         />
       </div>

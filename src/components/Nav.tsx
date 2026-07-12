@@ -9,25 +9,48 @@ import Link from "next/link";
 import ShoppingBagIcon from "./ShoppingBagIcon";
 import WishlistDrawer from "./WishlistDrawer";
 
-const announcements = [
-  "FREE SHIPPING ON ALL ORDERS ACROSS INDIA — RESTORING RESILIENCE",
-  "NEW CLIENT EXCLUSIVE: USE CODE 'RECOVER10' FOR 10% OFF YOUR BAG",
-  "CELLULAR BODYCARE SCIENCE — 100% BIODEGRADABLE SURFACTANTS",
-];
+interface AnnouncementSettings {
+  isActive: boolean;
+  backgroundColor: string;
+  textColor: string;
+  interval: number;
+  announcements: string[];
+}
 
-function AnnouncementBar({ show }: { show: boolean }) {
+const DEFAULT_SETTINGS: AnnouncementSettings = {
+  isActive: true,
+  backgroundColor: "#2d1c14",
+  textColor: "#F6F4EE",
+  interval: 4500,
+  announcements: [
+    "FREE SHIPPING ON ALL ORDERS ACROSS INDIA — RESTORING RESILIENCE",
+    "NEW CLIENT EXCLUSIVE: USE CODE 'RECOVER10' FOR 10% OFF YOUR BAG",
+    "CELLULAR BODYCARE SCIENCE — 100% BIODEGRADABLE SURFACTANTS",
+  ],
+};
+
+function AnnouncementBar({ show, settings }: { show: boolean; settings: AnnouncementSettings }) {
   const [index, setIndex] = useState(0);
+  const list = settings.announcements;
 
   useEffect(() => {
+    if (list.length <= 1) return;
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % announcements.length);
-    }, 4500);
+      setIndex((prev) => (prev + 1) % list.length);
+    }, settings.interval);
     return () => clearInterval(timer);
-  }, []);
+  }, [list.length, settings.interval]);
+
+  if (!settings.isActive || list.length === 0) return null;
 
   return (
     <div
-      className={`bg-[#2d1c14] text-[#F6F4EE] px-4 text-center border-[#2d1c14]/20 select-none relative flex items-center justify-center transition-all duration-500 ease-in-out ${
+      style={{
+        backgroundColor: settings.backgroundColor,
+        color: settings.textColor,
+        borderBottomColor: `${settings.backgroundColor}20`,
+      }}
+      className={`px-4 text-center select-none relative flex items-center justify-center transition-all duration-500 ease-in-out ${
         show
           ? "opacity-100 py-1.5 md:py-2 min-h-8 border-b"
           : "opacity-0 py-0 min-h-0 h-0 border-none pointer-events-none overflow-hidden"
@@ -43,7 +66,7 @@ function AnnouncementBar({ show }: { show: boolean }) {
             transition={{ duration: 0.35, ease: "easeInOut" }}
             className="text-[9px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
           >
-            {announcements[index]}
+            {list[index]}
           </motion.span>
         )}
       </AnimatePresence>
@@ -52,6 +75,35 @@ function AnnouncementBar({ show }: { show: boolean }) {
 }
 
 export default function Nav() {
+  const [settings, setSettings] = useState<AnnouncementSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    fetch("/api/announcement-bar")
+      .then((res) => {
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((resJson) => {
+        if (resJson && resJson.success && resJson.data) {
+          const apiData = resJson.data;
+          try {
+            setSettings({
+              isActive: apiData.isActive,
+              backgroundColor: apiData.backgroundColor,
+              textColor: apiData.textColor,
+              interval: apiData.interval,
+              announcements: JSON.parse(apiData.announcements),
+            });
+          } catch (e) {
+            console.error("Failed to parse dynamic announcements:", e);
+          }
+        }
+      })
+      .catch((err) => {
+        // Fallback silently
+      });
+  }, []);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
@@ -71,6 +123,16 @@ export default function Nav() {
       return () => clearTimeout(timer);
     }
   }, [cartItemsCount]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -136,7 +198,7 @@ export default function Nav() {
         className="fixed top-0 left-0 w-full z-45 transition-all duration-500"
       >
         {/* Top Announcement Bar Carousel */}
-        <AnnouncementBar show={showAnnouncement} />
+        <AnnouncementBar show={showAnnouncement} settings={settings} />
 
         {/* Navbar Container */}
         <div
@@ -197,6 +259,8 @@ export default function Nav() {
               <img
                 src="/logo.png"
                 alt="BODYBARREL Logo"
+                width={200}
+                height={56}
                 className="h-10 md:h-14 w-auto object-contain"
               />
             </Link>
@@ -315,6 +379,9 @@ export default function Nav() {
                 <img
                   src="/logo.png"
                   alt="BODYBARREL Logo"
+                  width={180}
+                  height={50}
+                  decoding="async"
                   className="h-9 w-auto object-contain"
                 />
               </div>

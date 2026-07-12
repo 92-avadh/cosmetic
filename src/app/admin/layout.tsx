@@ -16,6 +16,7 @@ import {
   Bell,
   Loader2,
   AlertCircle,
+  Megaphone,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -99,7 +100,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           {/* Logo Brand Header */}
           <div className="flex items-center justify-between py-2 border-b border-line pb-4 relative">
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="BODYBARREL Logo" className="h-7 w-auto object-contain" />
+              <img src="/logo.png" alt="BODYBARREL Logo" width={140} height={28} decoding="async" className="h-7 w-auto object-contain" />
               <span className="text-[9px] tracking-[0.25em] font-semibold text-accent uppercase">Admin Panel</span>
             </div>
 
@@ -241,6 +242,16 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-4 h-4" />
                 <span>Reports</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-muted/60" />
+            </Link>
+
+            <span className="text-[8px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2 text-left mt-2">Marketing & Styling</span>
+
+            <Link href="/admin/announcement" className={getNavLinkClass("/admin/announcement")}>
+              <div className="flex items-center gap-3">
+                <Megaphone className="w-4 h-4" />
+                <span>Announcement Bar</span>
               </div>
               <ChevronRight className="w-3.5 h-3.5 text-muted/60" />
             </Link>

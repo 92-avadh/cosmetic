@@ -52,7 +52,7 @@ export const POST = withApiHandler(async (request: Request) => {
         })
         .select("id")
         .single();
-      if (createError) throw new Error(createError.message);
+      if (createError) throw new Error("Failed to create user");
       user = newUser;
     }
 
@@ -129,7 +129,7 @@ export const POST = withApiHandler(async (request: Request) => {
         updatedAt: new Date().toISOString(),
       });
 
-    if (orderError) throw new Error(orderError.message);
+    if (orderError) throw new Error("Failed to create order");
 
     // Create order items
     const orderItems = validatedItems.map((item) => ({
@@ -143,7 +143,7 @@ export const POST = withApiHandler(async (request: Request) => {
     }));
 
     const { error: itemsError } = await supabase.from("OrderItem").insert(orderItems);
-    if (itemsError) throw new Error(itemsError.message);
+    if (itemsError) throw new Error("Failed to create order items");
 
     // 7. Initialize Stripe Client for Edge compatibility
     const context = (globalThis as any)[Symbol.for("cloudflare.request_context")] || {};

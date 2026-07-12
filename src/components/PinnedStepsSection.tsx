@@ -87,6 +87,10 @@ export default function PinnedStepsSection() {
                   <img
                     src={step.image}
                     alt={`BODYBARREL - ${step.title}`}
+                    width={600}
+                    height={600}
+                    loading="lazy"
+                    decoding="async"
                     className="w-[80%] h-[80%] object-contain transform hover:scale-105 transition-transform duration-700 ease-out"
                   />
                 </div>

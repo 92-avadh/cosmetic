@@ -127,7 +127,7 @@ export const POST = withApiHandler(async (request: Request) => {
   // 4. Create new cart items if items are provided
   if (items && items.length > 0) {
     for (const item of items) {
-      // Ensure product exists
+      // Verify product exists in catalog — reject if not
       const { data: prod } = await supabase
         .from("Product")
         .select("id")
@@ -135,17 +135,9 @@ export const POST = withApiHandler(async (request: Request) => {
         .single();
 
       if (!prod) {
-        await supabase.from("Product").insert({
-          id: item.id,
-          name: item.name || "Unknown Product",
-          subtitle: item.subtitle || "Premium Body Wash",
-          priceUSD: item.price || 0,
-          image: item.image || "",
-          description: "Korean Bio-Active Body Wash Formula.",
-          inventory: 100,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
+        const err = new Error("One or more products in your cart are no longer available.");
+        (err as any).status = 400;
+        throw err;
       }
 
       await supabase.from("CartItem").insert({

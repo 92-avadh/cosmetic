@@ -42,12 +42,16 @@ export interface SessionPayload {
   email: string;
   role?: string;
   userId?: string;
+  exp?: number;
   [key: string]: unknown;
 }
 
+const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
+
 export async function signSession(payload: SessionPayload): Promise<string> {
   const key = await getSecretKey();
-  const data = encoder.encode(JSON.stringify(payload));
+  const withExpiry = { ...payload, exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE };
+  const data = encoder.encode(JSON.stringify(withExpiry));
   const signature = await crypto.subtle.sign("HMAC", key, data);
   
   const payloadBase64 = uint8ToBase64(data);
@@ -68,9 +72,15 @@ export async function verifySession(token: string): Promise<SessionPayload | nul
     const isValid = await crypto.subtle.verify("HMAC", key, signature as Uint8Array<ArrayBuffer>, data as Uint8Array<ArrayBuffer>);
     if (!isValid) return null;
     
-    return JSON.parse(decoder.decode(data)) as SessionPayload;
-  } catch (e) {
-    console.error("verifySession Error:", e);
+    const session = JSON.parse(decoder.decode(data)) as SessionPayload;
+    
+    // Check expiry
+    if (session.exp && session.exp < Math.floor(Date.now() / 1000)) {
+      return null;
+    }
+    
+    return session;
+  } catch {
     return null;
   }
 }

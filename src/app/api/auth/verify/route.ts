@@ -5,6 +5,7 @@ import { signSession } from "@/lib/session";
 import { withApiHandler } from "@/lib/api-helper";
 import { otpVerifySchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
+import { timingSafeEqual } from "crypto";
 
 export const POST = withApiHandler(async (request: Request) => {
   let emailKey = "";
@@ -49,8 +50,17 @@ export const POST = withApiHandler(async (request: Request) => {
       throw err;
     }
 
-    // Verify code correctness
-    if (tokenRecord.code !== code) {
+    // Verify code correctness using constant-time comparison
+    const storedCode = Buffer.from(tokenRecord.code, "utf8");
+    const submittedCode = Buffer.from(code, "utf8");
+    if (storedCode.length !== submittedCode.length) {
+      const err = new Error("Invalid verification code. Please try again.");
+      (err as any).status = 400;
+      (err as any).code = "OTP_INVALID";
+      throw err;
+    }
+    const codeMatch = timingSafeEqual(storedCode, submittedCode);
+    if (!codeMatch) {
       const err = new Error("Invalid verification code. Please try again.");
       (err as any).status = 400;
       (err as any).code = "OTP_INVALID";
@@ -64,7 +74,9 @@ export const POST = withApiHandler(async (request: Request) => {
       .eq("email", emailKey);
 
     // Create the User in the DB if they don't already exist (Auto-registration)
-    const isAdmin = emailKey === "dhameliyaavadh592@gmail.com";
+    const { getEnv } = await import("@/lib/env");
+    const env = getEnv();
+    const isAdmin = env.ADMIN_EMAIL && emailKey === env.ADMIN_EMAIL.toLowerCase().trim();
 
     // Check if user exists
     const { data: existingUser } = await supabase
@@ -110,18 +122,10 @@ export const POST = withApiHandler(async (request: Request) => {
 
     const cookieStore = await cookies().catch(() => null);
     if (!cookieStore) {
-      // ponytail: Edge runtime (CF Workers) may not support cookies() — return token in body for client to set via JS
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-        },
-        sessionToken: token,
-      });
+      // ponytail: Edge runtime (CF Workers) may not support cookies() — throw instead of leaking token
+      const err = new Error("Server configuration error: cookies not supported in this runtime.");
+      (err as any).status = 500;
+      throw err;
     }
     cookieStore.set("session", token, {
       httpOnly: true,

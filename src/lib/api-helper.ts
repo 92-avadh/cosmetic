@@ -193,14 +193,22 @@ export function withApiHandler(
         }));
       } else if (error.status && typeof error.status === "number") {
         status = error.status;
-        message = error.message;
+        // Only expose message for 4xx client errors (business logic errors)
+        // 5xx errors should never expose internal details
+        if (status >= 500) {
+          message = "An unexpected error occurred on the server.";
+        } else {
+          message = error.message || "Request failed";
+        }
         code = error.code || "API_ERROR";
       } else {
+        // All uncaught errors get generic messages — never leak internals
         const errorStr = String(error.message || error);
         if (errorStr.toLowerCase().includes("database") || errorStr.toLowerCase().includes("prisma") || errorStr.toLowerCase().includes("supabase")) {
           message = "A secure database communication error occurred.";
           code = "DATABASE_ERROR";
         }
+        // Everything else: keep default generic message
       }
 
       logRequest(method, path, status, duration, clientIp, error.message || String(error));

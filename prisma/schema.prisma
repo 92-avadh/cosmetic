@@ -184,4 +184,14 @@ model RateLimit {
   blockedUntil DateTime?
 }
 
+model AnnouncementBar {
+  id              String   @id @default("default")
+  isActive        Boolean  @default(true)
+  backgroundColor String   @default("#2d1c14")
+  textColor       String   @default("#F6F4EE")
+  interval        Int      @default(4500)
+  announcements   String   @default("[\"FREE SHIPPING ON ALL ORDERS ACROSS INDIA — RESTORING RESILIENCE\",\"NEW CLIENT EXCLUSIVE: USE CODE 'RECOVER10' FOR 10% OFF YOUR BAG\",\"CELLULAR BODYCARE SCIENCE — 100% BIODEGRADABLE SURFACTANTS\"]")
+  updatedAt       DateTime @updatedAt
+}
+
 

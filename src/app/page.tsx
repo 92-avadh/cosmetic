@@ -103,7 +103,10 @@ export default function Home() {
             <div className="absolute inset-0 z-0">
               <img
                 src="/model_with_product.png"
-                alt="Campaign Loading Screen Background"
+                alt=""
+                width={1920}
+                height={982}
+                decoding="async"
                 className="w-full h-full object-cover opacity-35 filter scale-105 blur-[3px]"
               />
               <div className="absolute inset-0 bg-[#121212]/50 backdrop-blur-md" />
@@ -165,6 +168,10 @@ export default function Home() {
               <img
                 src="/model_with_product.png"
                 alt="BODYBARREL - Biological Skin Sourcing"
+                width={1920}
+                height={982}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover select-none filter contrast-[1.01] brightness-[0.98]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-ink/20 pointer-events-none" />

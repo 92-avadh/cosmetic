@@ -124,31 +124,14 @@ export const PUT = withApiHandler(async (request) => {
   }
 
   const body = await request.json();
-  const { 
-    orderId, 
-    status, 
-    shippingName, 
-    shippingStreet, 
-    shippingCity, 
-    shippingState, 
-    shippingZip, 
-    shippingCountry 
-  } = body;
-
-  if (!orderId) {
-    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
-  }
+  const { orderUpdateSchema } = await import("@/lib/schemas");
+  const validated = await orderUpdateSchema.parseAsync(body);
+  const { orderId, ...updateFields } = validated;
 
   const { data: updatedOrder, error } = await supabase
     .from("Order")
     .update({
-      status: status || undefined,
-      shippingName: shippingName || undefined,
-      shippingStreet: shippingStreet || undefined,
-      shippingCity: shippingCity || undefined,
-      shippingState: shippingState || undefined,
-      shippingZip: shippingZip || undefined,
-      shippingCountry: shippingCountry || undefined,
+      ...updateFields,
       updatedAt: new Date().toISOString(),
     })
     .eq("id", orderId)

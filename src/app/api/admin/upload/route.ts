@@ -100,7 +100,7 @@ export const POST = withApiHandler(async (request) => {
     if (uploadErr) {
       console.error("[SUPABASE UPLOAD ERROR]:", uploadErr.message);
       return NextResponse.json(
-        { error: `Failed to upload '${file.name}' to storage: ${uploadErr.message}` },
+        { error: "Failed to upload file to storage" },
         { status: 500 }
       );
     }

@@ -2,11 +2,44 @@ import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 import { supabase } from "@/lib/supabase";
 import ProductDetailClient from "./ProductDetailClient";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bodybarrel.com";
 
 // Required for @cloudflare/next-on-pages — routes without this are excluded from the Worker bundle
 export const dynamic = "force-dynamic";
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = PRODUCTS_CATALOG.find((p) => p.id === id);
+
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+
+  const productUrl = `${SITE_URL}/products/${product.id}`;
+  const imageUrl = product.image.startsWith("/") ? `${SITE_URL}${product.image}` : product.image;
+
+  return {
+    title: product.name,
+    description: product.subtitle,
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description: product.subtitle,
+      url: productUrl,
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.subtitle,
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
@@ -83,7 +116,33 @@ export default async function ProductDetailPage({ params }: PageProps) {
     updatedAt: product.updatedAt ?? null,
   };
 
+  const productUrl = `${SITE_URL}/products/${product.id}`;
+  const imageUrl = product.image.startsWith("/") ? `${SITE_URL}${product.image}` : product.image;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.subtitle || product.description || "Premium Korean skincare formula.",
+    image: imageUrl,
+    url: productUrl,
+    brand: { "@type": "Brand", name: "BODYBARREL" },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      price: product.priceUSD.toFixed(2),
+      availability: product.inventory > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: productUrl,
+    },
+  };
+
   return (
-    <ProductDetailClient product={serializedProduct} recommendations={recommendations} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailClient product={serializedProduct} recommendations={recommendations} />
+    </>
   );
 }

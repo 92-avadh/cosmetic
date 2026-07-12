@@ -135,8 +135,9 @@ function LoginForm() {
 
       // Successful login
       if (resJson.sessionToken) {
-        // ponytail: Edge runtime fallback — set session cookie via JS when cookies() is unavailable server-side
-        document.cookie = `session=${resJson.sessionToken}; path=/; max-age=${7 * 24 * 60 * 60}; samesite=lax` + (location.protocol === "https:" ? "; secure" : "");
+        // ponytail: Edge runtime fallback — session should be set via httpOnly cookie server-side.
+        // If this path executes, cookies() failed which means the server config needs fixing.
+        console.error("Session token returned in response body — this should not happen in production. Ensure cookies() works.");
       }
       login(email, resJson.user?.role);
       router.push(redirect);

@@ -303,7 +303,7 @@ export default function AdminDashboardPage() {
                 <div key={item.product.id} className="flex items-center gap-4 py-3">
                   <span className="text-[10px] font-bold text-muted w-5">{idx + 1}</span>
                   <div className="w-10 h-12 bg-card-bg border border-line rounded overflow-hidden shrink-0">
-                    <img src={item.product.image} className="w-full h-full object-cover" alt={item.product.name} />
+                    <img src={item.product.image} alt={item.product.name} width={40} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <h5 className="font-display font-bold text-[10px] uppercase text-ink truncate">{item.product.name}</h5>

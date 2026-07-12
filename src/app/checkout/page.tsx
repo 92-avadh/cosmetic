@@ -27,7 +27,16 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
+  const [country, setCountry] = useState<"IN" | "US" | "KR">("IN");
   const [phone, setPhone] = useState("+91");
+
+  const PHONE_CONFIG = {
+    IN: { prefix: "+91", pattern: /^\+91\d{10}$/, placeholder: "+91 98765 43210", digits: 10 },
+    US: { prefix: "+1", pattern: /^\+1\d{10}$/, placeholder: "+1 202 555 0123", digits: 10 },
+    KR: { prefix: "+82", pattern: /^\+82\d{9,10}$/, placeholder: "+82 10 1234 5678", digits: 9 },
+  } as const;
+
+  const phoneConfig = PHONE_CONFIG[country];
 
   // Saved address states
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
@@ -212,7 +221,7 @@ export default function CheckoutPage() {
             street: address,
             city,
             postalCode: zipCode,
-            country: "IN",
+            country,
           },
         }),
       });
@@ -263,8 +272,8 @@ export default function CheckoutPage() {
     }
 
     const cleanedPhone = phone.replace(/\s+/g, "");
-    if (!/^\+91\d{10}$/.test(cleanedPhone)) {
-      setFormError("Invalid phone number. Must be +91 followed by 10 digits.");
+    if (!phoneConfig.pattern.test(cleanedPhone)) {
+      setFormError(`Invalid phone number. Must be ${phoneConfig.prefix} followed by ${phoneConfig.digits} digits.`);
       return;
     }
     
@@ -299,7 +308,7 @@ export default function CheckoutPage() {
             city,
             zip: zipCode,
             phone: cleanedPhone,
-            country: "IN",
+            country,
           },
         }),
       });
@@ -563,25 +572,43 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
-                    <input
-                      type="text"
-                      value={phone}
-                      onChange={(e) => {
-                        let val = e.target.value;
-                        if (!val.startsWith("+91")) {
-                          val = "+91" + val.replace(/[^\d]/g, "");
-                        } else {
-                          const suffix = val.slice(3).replace(/[^\d]/g, "");
-                          val = "+91" + suffix.slice(0, 10);
-                        }
-                        setPhone(val);
-                      }}
-                      required
-                      placeholder="+91 98765 43210"
-                      className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs tracking-wider focus:outline-none focus:border-accent animate-fadeIn"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Country</label>
+                      <select
+                        value={country}
+                        onChange={(e) => {
+                          const c = e.target.value as "IN" | "US" | "KR";
+                          setCountry(c);
+                          setPhone(PHONE_CONFIG[c].prefix);
+                        }}
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs uppercase tracking-wider focus:outline-none focus:border-accent appearance-none"
+                      >
+                        <option value="IN">India (+91)</option>
+                        <option value="US">United States (+1)</option>
+                        <option value="KR">South Korea (+82)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
+                      <input
+                        type="text"
+                        value={phone}
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          if (!val.startsWith(phoneConfig.prefix)) {
+                            val = phoneConfig.prefix + val.replace(/[^\d]/g, "");
+                          } else {
+                            const suffix = val.slice(phoneConfig.prefix.length).replace(/[^\d]/g, "");
+                            val = phoneConfig.prefix + suffix.slice(0, phoneConfig.digits);
+                          }
+                          setPhone(val);
+                        }}
+                        required
+                        placeholder={phoneConfig.placeholder}
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-3 text-xs tracking-wider focus:outline-none focus:border-accent animate-fadeIn"
+                      />
+                    </div>
                   </div>
 
                   {savedAddresses.length < 3 && (
@@ -640,7 +667,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex gap-4 border-b border-line/30 pb-4 last:border-b-0 last:pb-0 items-center justify-between">
                       <div className="flex gap-3 items-center min-w-0">
                         <div className="w-12 h-14 bg-card-bg border border-line/50 rounded-lg overflow-hidden shrink-0">
-                          <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} width={48} height={56} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-display font-semibold text-xs uppercase text-ink truncate">{item.name}</h4>

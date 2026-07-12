@@ -71,7 +71,7 @@ export const orderCreateSchema = z.object({
     city: z.string().min(1, "City is required").max(100),
     state: z.string().max(100).optional().nullable(),
     zip: z.string().min(1, "ZIP / Postal code is required").max(20).regex(/^\d*$/, "Postal code must only contain numbers"),
-    phone: z.string().min(1, "Phone number is required").regex(/^\+91\s?\d{10}$/, "Invalid phone number. Must start with +91 followed by 10 digits"),
+    phone: z.string().min(1, "Phone number is required").regex(/^\+\d{1,3}\s?\d{7,12}$/, "Invalid phone number. Must start with a country code (e.g. +91, +1, +82)"),
     country: z.string().min(1, "Country is required").max(50).default("US"),
   }),
   promoCode: z.string().max(50).optional().nullable(),
@@ -140,4 +140,28 @@ export const productCreateSchema = z.object({
   description: z.string().max(1000).optional().nullable(),
   inventory: z.number().int().nonnegative().default(100),
   categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/, "Invalid category slug format").optional().nullable(),
+});
+
+export const productUpdateSchema = z.object({
+  id: z.string().uuid("Invalid product ID"),
+  name: z.string().min(1).max(100).regex(/^[a-zA-Z0-9\s\-'&]+$/, "Invalid name format").optional(),
+  subtitle: z.string().min(1).max(150).optional(),
+  priceUSD: z.number().positive().optional(),
+  image: z.string().max(5000).optional(),
+  sku: z.string().max(100).optional().nullable(),
+  hoverImage: z.string().max(5000).optional().nullable(),
+  description: z.string().max(1000).optional().nullable(),
+  inventory: z.number().int().nonnegative().optional(),
+  categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/).optional().nullable(),
+});
+
+export const orderUpdateSchema = z.object({
+  orderId: z.string().uuid("Invalid order ID"),
+  status: z.enum(["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"]).optional(),
+  shippingName: z.string().max(100).optional(),
+  shippingStreet: z.string().max(150).optional(),
+  shippingCity: z.string().max(100).optional(),
+  shippingState: z.string().max(100).optional(),
+  shippingZip: z.string().max(20).optional(),
+  shippingCountry: z.string().max(50).optional(),
 });

@@ -115,6 +115,10 @@ export default function ProductCard({
         <img
           src={primaryImage}
           alt={`BODYBARREL - ${name}`}
+          width={600}
+          height={600}
+          loading="lazy"
+          decoding="async"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-0 scale-105" : "opacity-100 scale-100"
           }`}
@@ -124,6 +128,10 @@ export default function ProductCard({
         <img
           src={hoverImageToShow}
           alt={`BODYBARREL - ${name} Texture`}
+          width={600}
+          height={600}
+          loading="lazy"
+          decoding="async"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isHovered ? "opacity-100 scale-100" : "opacity-0 scale-95"
           }`}

@@ -14,7 +14,6 @@ export const POST = withApiHandler(async (request: Request) => {
 
     // Generate a 6-digit numeric OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`\n🔑 [OTP GENERATED] Email: ${emailKey} | Code: ${otp}\n`);
 
     // Store in Supabase with 5 minutes expiration
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();

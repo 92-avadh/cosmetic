@@ -359,7 +359,7 @@ export default function AdminProductsPage() {
               {newProductImages.map((imgUrl, idx) => (
                 <div key={idx} className="flex gap-3 items-center p-2.5 bg-bg border border-line rounded-xl relative">
                   <div className="w-14 h-16 border border-line rounded overflow-hidden relative shrink-0">
-                    <img src={imgUrl} className="w-full h-full object-cover" alt={`Preview ${idx + 1}`} />
+                    <img src={imgUrl} alt={`Preview ${idx + 1}`} width={56} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   </div>
                   <div className="text-[9px] uppercase tracking-wider text-muted space-y-1">
                     <span className="font-bold text-ink block">Photo {idx + 1}</span>
@@ -424,7 +424,7 @@ export default function AdminProductsPage() {
           {filteredProducts.map((prod) => (
             <div key={prod.id} className="p-4 bg-bg/40 border border-line rounded-xl flex gap-4 hover:border-accent/40 transition-colors">
               <div className="w-16 h-20 bg-card-bg border border-line/50 rounded overflow-hidden shrink-0 select-none">
-                <img src={prod.image} className="w-full h-full object-cover" alt={prod.name} />
+                <img src={prod.image} alt={prod.name} width={40} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div className="space-y-1">

@@ -176,6 +176,10 @@ export default function ShopPage() {
           <img
             src="/face_wash.png"
             alt="BODYBARREL - Active Cleansing Campaign"
+            width={1920}
+            height={1051}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover select-none filter contrast-[1.01] brightness-[0.95]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-ink/15 pointer-events-none" />

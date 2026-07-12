@@ -150,6 +150,10 @@ export default function CartDrawer() {
                           <img
                             src={item.image.includes(",") ? item.image.split(",")[0] : item.image}
                             alt={`BODYBARREL - ${item.name}`}
+                            width={80}
+                            height={96}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -231,6 +235,10 @@ export default function CartDrawer() {
                             <img
                               src={product.image.includes(",") ? product.image.split(",")[0] : product.image}
                               alt={`BODYBARREL - ${product.name}`}
+                              width={48}
+                              height={56}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover bg-card-bg"
                             />
                           </div>

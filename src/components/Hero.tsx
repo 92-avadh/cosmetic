@@ -88,12 +88,13 @@ export default function Hero() {
       {/* Background Graphic Asset */}
       <div className="absolute inset-0 z-0 select-none">
         <video
-          src="/Create_a_cinematic_ultra_luxur (1).mp4"
+          src="/hero.mp4"
           poster="/hero-bg.png"
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           className="w-full h-full object-cover scale-105 filter brightness-[0.88] contrast-[1.02]"
         />
         {/* Editorial overlay gradient */}

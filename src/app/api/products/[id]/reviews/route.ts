@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
+import { verifySession } from "@/lib/session";
 import { withApiHandler } from "@/lib/api-helper";
 import { reviewCreateSchema } from "@/lib/schemas";
 
@@ -14,7 +16,7 @@ export const GET = withApiHandler(async (request, context) => {
     .order("createdAt", { ascending: false });
 
   if (error) {
-    throw new Error(`DB Fetch Reviews failed: ${error.message}`);
+    throw new Error("Failed to fetch reviews");
   }
 
   const reviewCount = reviews.length;
@@ -37,19 +39,42 @@ export const GET = withApiHandler(async (request, context) => {
   );
 });
 
-// POST new product review
+// POST new product review (requires authentication)
 export const POST = withApiHandler(async (request, context) => {
   const { id: productId } = await (context as { params: Promise<{ id: string }> }).params;
+
+  // Require authentication
+  const cookieStore = await cookies().catch(() => null);
+  const sessionCookie = cookieStore?.get("session")?.value;
+  if (!sessionCookie) {
+    const err = new Error("Unauthorized");
+    (err as any).status = 401;
+    throw err;
+  }
+  const payload = await verifySession(sessionCookie);
+  if (!payload || !payload.email) {
+    const err = new Error("Unauthorized");
+    (err as any).status = 401;
+    throw err;
+  }
+
+  // Get user ID from session email
+  const { data: user } = await supabase
+    .from("User")
+    .select("id")
+    .eq("email", payload.email.toLowerCase().trim())
+    .single();
+
   const body = await request.json();
   
   // 1. Zod input validation
-  const { userName, rating, comment, userId } = await reviewCreateSchema.parseAsync(body);
+  const { userName, rating, comment } = await reviewCreateSchema.parseAsync(body);
 
   // 2. Persist in database
   const newReview = {
     id: crypto.randomUUID(),
     productId,
-    userId: userId || null,
+    userId: user?.id || null,
     userName,
     rating,
     comment,
@@ -61,7 +86,7 @@ export const POST = withApiHandler(async (request, context) => {
     .insert(newReview);
 
   if (insertError) {
-    throw new Error(`DB Review insert failed: ${insertError.message}`);
+    throw new Error("Failed to submit review");
   }
 
   return {

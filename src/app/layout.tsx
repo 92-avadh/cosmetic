@@ -5,10 +5,37 @@ import CartSync from "@/components/CartSync";
 import CartDrawer from "@/components/CartDrawer";
 
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bodybarrel.com";
+
 export const metadata: Metadata = {
-  title: "BODYBARREL — Korean Skincare Science",
+  title: {
+    default: "BODYBARREL — Korean Skincare Science",
+    template: "%s | BODYBARREL",
+  },
   description:
     "Korean skincare formulas engineered for ultimate skin fitness. Advanced PDRN science developed in collaboration with Korean skin scientists.",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "BODYBARREL",
+    title: "BODYBARREL — Korean Skincare Science",
+    description:
+      "Korean skincare formulas engineered for ultimate skin fitness. Advanced PDRN science developed in collaboration with Korean skin scientists.",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "BODYBARREL Korean Skincare" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BODYBARREL — Korean Skincare Science",
+    description:
+      "Korean skincare formulas engineered for ultimate skin fitness.",
+    images: ["/og-default.png"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

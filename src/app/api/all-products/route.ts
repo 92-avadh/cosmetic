@@ -10,7 +10,7 @@ export const GET = withApiHandler(async () => {
     .select("*")
     .order("createdAt", { ascending: true });
 
-  if (error) throw new Error(`DB Fetch: ${error.message}`);
+  if (error) throw new Error("Failed to fetch products");
 
   return NextResponse.json(products, {
     headers: {

@@ -84,7 +84,7 @@ export const POST = withApiHandler(async (request: Request) => {
         .insert({ id: crypto.randomUUID(), email: emailKey, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
         .select("id")
         .single();
-      if (createError) throw new Error(createError.message);
+      if (createError) throw new Error("Failed to create user");
       userId = newUser.id;
     } else {
       userId = existingUser.id;
@@ -100,7 +100,7 @@ export const POST = withApiHandler(async (request: Request) => {
       })
       .eq("id", userId);
 
-    if (updateError) throw new Error(updateError.message);
+    if (updateError) throw new Error("Failed to update profile");
 
     // Update address details if provided
     if (addressDetails && addressDetails.street) {

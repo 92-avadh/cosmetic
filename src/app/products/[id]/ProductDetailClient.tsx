@@ -213,6 +213,21 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       <Nav />
       <main className="bg-bg text-ink min-h-screen pt-32 pb-24 font-sans">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
+          {/* Breadcrumb */}
+          <nav aria-label="Breadcrumb" className="mb-8">
+            <ol className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted">
+              <li>
+                <Link href="/" className="hover:text-accent transition-colors">Home</Link>
+              </li>
+              <li aria-hidden="true" className="text-line">/</li>
+              <li>
+                <Link href="/shop" className="hover:text-accent transition-colors">Shop</Link>
+              </li>
+              <li aria-hidden="true" className="text-line">/</li>
+              <li aria-current="page" className="text-ink">{product.name}</li>
+            </ol>
+          </nav>
+
           {/* Back button */}
           <Link
             href="/shop"
@@ -235,6 +250,9 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 <img
                   src={activeImage}
                   alt={`BODYBARREL - ${product.name}`}
+                  width={800}
+                  height={800}
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 />
 
@@ -270,7 +288,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                         activeImage === img ? "border-accent scale-105" : "border-line opacity-60 hover:opacity-100"
                       }`}
                     >
-                      <img src={img} className="w-full h-full object-cover" alt="" />
+                      <img src={img} alt={`${product.name} thumbnail`} width={48} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>

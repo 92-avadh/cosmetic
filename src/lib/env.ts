@@ -4,7 +4,8 @@ import { getSafeRequestContext } from "./cloudflare";
 const envSchema = z.object({
   SUPABASE_URL: z.string().url("SUPABASE_URL must be a valid URL"),
   SUPABASE_ANON_KEY: z.string().min(1, "SUPABASE_ANON_KEY is required"),
-  SESSION_SECRET: z.string().min(16, "SESSION_SECRET must be at least 16 characters long").default("default-secret-key-32-characters-long-bodybarrel"),
+  SESSION_SECRET: z.string().min(32, "SESSION_SECRET must be at least 32 characters long"),
+  ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email").optional(),
   GMAIL_USER: z.string().email("GMAIL_USER must be a valid email").optional(),
   GMAIL_APP_PASSWORD: z.string().optional(),
   RAZORPAY_API_KEY: z.string().optional(),
@@ -28,6 +29,7 @@ export function getEnv(): Env {
     SUPABASE_URL: cfEnv.SUPABASE_URL || process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: cfEnv.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY,
     SESSION_SECRET: cfEnv.SESSION_SECRET || process.env.SESSION_SECRET,
+    ADMIN_EMAIL: cfEnv.ADMIN_EMAIL || process.env.ADMIN_EMAIL,
     GMAIL_USER: cfEnv.GMAIL_USER || process.env.GMAIL_USER,
     GMAIL_APP_PASSWORD: cfEnv.GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD,
     RAZORPAY_API_KEY: cfEnv.RAZORPAY_API_KEY || process.env.RAZORPAY_API_KEY,
@@ -51,7 +53,7 @@ export function getEnv(): Env {
     // In dev / test, we fall back to defaults to let building / testing continue
     _env = {
       ...rawEnv,
-      SESSION_SECRET: rawEnv.SESSION_SECRET || "default-secret-key-32-characters-long-bodybarrel",
+      SESSION_SECRET: rawEnv.SESSION_SECRET || "dev-only-secret-key-change-in-production-32chars",
     } as unknown as Env;
     return _env;
   }

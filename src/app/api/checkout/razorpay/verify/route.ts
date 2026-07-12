@@ -7,6 +7,7 @@ import { withApiHandler } from "@/lib/api-helper";
 import { razorpayVerifySchema } from "@/lib/schemas";
 import { logAudit } from "@/lib/audit";
 import { getEnv } from "@/lib/env";
+import { timingSafeEqual } from "crypto";
 
 // Cryptographic signature verification using standard Web Crypto API (Edge-safe)
 async function verifyRazorpaySignature(
@@ -29,7 +30,11 @@ async function verifyRazorpaySignature(
   const calculatedSignature = hashArray
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-  return calculatedSignature === signature;
+  // Constant-time comparison to prevent timing attacks
+  const a = Buffer.from(calculatedSignature, "utf8");
+  const b = Buffer.from(signature, "utf8");
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export const POST = withApiHandler(async (request: Request) => {

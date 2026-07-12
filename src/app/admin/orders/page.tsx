@@ -143,7 +143,7 @@ export default function AdminOrdersPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 bg-bg/40 border border-line/30 rounded-lg p-2.5">
                     <div className="w-10 h-12 bg-card-bg border border-line rounded overflow-hidden shrink-0">
-                      <img src={item.product?.image || ""} className="w-full h-full object-cover" alt={item.product?.name || "Product"} />
+                        <img src={item.product?.image || ""} alt={item.product?.name || "Product"} width={40} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
                       <h5 className="text-[10px] font-bold text-ink truncate uppercase">{item.product?.name || "Unknown"}</h5>

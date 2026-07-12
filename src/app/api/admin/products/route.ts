@@ -144,16 +144,14 @@ export const PUT = withApiHandler(async (request) => {
   }
 
   const body = await request.json();
-  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, inventory, categorySlug } = body;
+  const { productUpdateSchema } = await import("@/lib/schemas");
+  const validated = await productUpdateSchema.parseAsync(body);
+  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, inventory, categorySlug } = validated;
 
   // Autogenerate SKU if empty
   let productSku = sku ? sku.trim() : "";
-  if (!productSku) {
+  if (!productSku && name) {
     productSku = `BB-${(categorySlug || "GEN").slice(0, 4).toUpperCase()}-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-  }
-
-  if (!id) {
-    return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
   }
 
   // Find or create category if categorySlug is provided
