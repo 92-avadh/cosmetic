@@ -52,7 +52,7 @@ export default function SciencePageClient() {
           <div className="lg:col-span-5 relative aspect-[4/5] bg-card-bg border border-line overflow-hidden rounded-2xl">
             <img
               src="/products/science-hero.png"
-              alt="Cosmetics Laboratory Science"
+               alt="Laboratory Science"
               className="w-full h-full object-cover filter brightness-[0.9] saturate-[0.8] hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent pointer-events-none" />

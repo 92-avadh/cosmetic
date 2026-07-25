@@ -43,26 +43,26 @@ export default function AdminDashboardPage() {
   const mockSessions = Math.round(mockProductViews * 1.6) + 340;
 
   // Dynamically calculate category sales proportions
-  let skincareSalesVal = 0;
-  let bodycareSalesVal = 0;
+  let hydraSalesVal = 0;
+  let targetedSalesVal = 0;
 
   orders.forEach(order => {
     if (order.status !== "CANCELLED") {
       order.items.forEach(item => {
         if (!item.product) return;
         const productId = item.product.id.toLowerCase();
-        if (productId.includes("hydra") || productId.includes("cleanser") || productId.includes("essence") || item.product.categoryId?.includes("skincare")) {
-          skincareSalesVal += item.pricePaid * item.quantity;
+        if (productId.includes("hydra")) {
+          hydraSalesVal += item.pricePaid * item.quantity;
         } else {
-          bodycareSalesVal += item.pricePaid * item.quantity;
+          targetedSalesVal += item.pricePaid * item.quantity;
         }
       });
     }
   });
 
-  const totalCatSales = skincareSalesVal + bodycareSalesVal;
-  const skincarePercent = totalCatSales > 0 ? (skincareSalesVal / totalCatSales) * 100 : 64.5;
-  const bodycarePercent = totalCatSales > 0 ? (bodycareSalesVal / totalCatSales) * 100 : 35.5;
+  const totalCatSales = hydraSalesVal + targetedSalesVal;
+  const hydraPercent = totalCatSales > 0 ? (hydraSalesVal / totalCatSales) * 100 : 64.5;
+  const targetedPercent = totalCatSales > 0 ? (targetedSalesVal / totalCatSales) * 100 : 35.5;
 
   // 7-day revenue trend calculations
   const last7DaysSales = Array.from({ length: 7 }).map((_, i) => {
@@ -328,7 +328,7 @@ export default function AdminDashboardPage() {
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#EDE9DF" strokeWidth="24" />
                 <circle
                   cx="100" cy="100" r="80" fill="none" stroke="var(--color-accent)" strokeWidth="24"
-                  strokeDasharray={`${skincarePercent * 5.03} ${503 - skincarePercent * 5.03}`}
+                  strokeDasharray={`${hydraPercent * 5.03} ${503 - hydraPercent * 5.03}`}
                   strokeDashoffset="126" transform="rotate(-90 100 100)"
                 />
                 <text x="100" y="88" textAnchor="middle" className="text-xl font-display font-bold" fill="var(--color-ink)">
@@ -341,20 +341,20 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="space-y-2.5 text-[9px] uppercase tracking-wider font-semibold text-left pt-2 border-t border-line/30">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-accent" />
-                  <span>Skincare System</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-accent" />
+                    <span>Hydra-Active Wash</span>
+                  </div>
+                  <span>{hydraPercent.toFixed(1)}%</span>
                 </div>
-                <span>{skincarePercent.toFixed(1)}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#EDE9DF]" />
-                  <span>Bodycare System</span>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#EDE9DF]" />
+                    <span>Targeted Body Wash</span>
+                  </div>
+                  <span>{targetedPercent.toFixed(1)}%</span>
                 </div>
-                <span>{bodycarePercent.toFixed(1)}%</span>
-              </div>
             </div>
           </div>
 

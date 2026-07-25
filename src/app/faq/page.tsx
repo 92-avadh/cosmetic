@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: "What is your return policy?",
-    a: "You may request a return within 30 days of receiving your order. Products must be unused, unopened, and in their original packaging. Contact us at info@bodybarrel.co with your order ID to initiate a return. See our full Return Policy for details.",
+    a: "You may request a Return or Exchange within 7 days of receiving your order directly from your Account Order History page. Please note that all Return & Exchange requests strictly require mandatory Admin review and acceptance prior to scheduling free reverse pickup or issuing refunds/exchanges.",
   },
   {
     q: "Are your products cruelty-free?",
@@ -63,11 +63,11 @@ const faqJsonLd = {
 export const metadata: Metadata = {
   title: "Frequently Asked Questions",
   description:
-    "Answers to common questions about BODYBARREL's Korean cellular body wash formulas, ingredients, shipping, and returns.",
+    "Answers to common questions about BODYBARREL's cellular body wash formulas, ingredients, shipping, and returns.",
   openGraph: {
     title: "FAQ | BODYBARREL",
     description:
-      "Answers to common questions about BODYBARREL's Korean cellular body wash formulas, ingredients, shipping, and returns.",
+      "Answers to common questions about BODYBARREL's cellular body wash formulas, ingredients, shipping, and returns.",
     url: `${SITE_URL}/faq`,
   },
 };
@@ -89,7 +89,7 @@ export default function FaqPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-sm text-muted mb-14 max-w-lg leading-relaxed">
-            Everything you need to know about BODYBARREL's cellular body care science, formulations, and ordering.
+            Everything you need to know about BODYBARREL's body wash science, formulations, and ordering.
           </p>
 
           <div className="space-y-0">

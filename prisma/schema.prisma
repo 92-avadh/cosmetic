@@ -94,7 +94,7 @@ model Order {
   id              String      @id @default(uuid())
   userId          String
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status          String      @default("PENDING") // PENDING | PAID | SHIPPED | DELIVERED | CANCELLED
+  status          String      @default("PENDING") // PENDING | PAID | SHIPPED | DELIVERED | RETURN_REQUESTED | RETURN_APPROVED | RETURN_REJECTED | RETURNED | CANCELLED
   totalUSD        Float
   currency        String      @default("USD")
   shippingName    String
@@ -103,6 +103,12 @@ model Order {
   shippingState   String?
   shippingZip     String
   shippingCountry String      @default("US")
+  returnStatus    String?     @default("NONE") // NONE | REQUESTED | APPROVED | REJECTED | COMPLETED
+  returnType      String?     // RETURN | EXCHANGE
+  returnReason    String?
+  returnAdminNote String?
+  returnRequestedAt DateTime?
+  returnProcessedAt DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   
@@ -160,6 +166,7 @@ model Review {
   userName  String
   rating    Int
   comment   String
+  skinType  String?  @default("Sensitive Barrier")
   createdAt DateTime @default(now())
 
   @@index([productId], name: "idx_review_productid")

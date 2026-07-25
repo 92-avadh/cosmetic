@@ -78,6 +78,7 @@ export const POST = withApiHandler(async (request, context) => {
     userName,
     rating,
     comment,
+    skinType: body.skinType || "Sensitive Barrier",
     createdAt: new Date().toISOString(),
   };
 

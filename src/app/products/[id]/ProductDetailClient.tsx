@@ -9,8 +9,9 @@ import ProductCard from "@/components/ProductCard";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
 import { getApiErrorMessage } from "@/lib/utils";
-import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
+import BackInStockModal from "@/components/BackInStockModal";
 
 interface ProductDetailClientProps {
   product: {
@@ -47,8 +48,13 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   const [newRating, setNewRating] = useState(5);
   const [newName, setNewName] = useState("");
   const [newComment, setNewComment] = useState("");
+  const [newSkinType, setNewSkinType] = useState("Sensitive Barrier");
+  const [selectedSkinFilter, setSelectedSkinFilter] = useState("ALL");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
+
+  // Back in stock waitlist state
+  const [showBackInStockModal, setShowBackInStockModal] = useState(false);
 
   const fetchReviews = async () => {
     try {
@@ -90,6 +96,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
           userName: newName,
           rating: newRating,
           comment: newComment,
+          skinType: newSkinType,
           userId: null,
         }),
       });
@@ -200,6 +207,11 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       label: "Usage Protocol",
       content:
         "Lather 2-3 pumps onto wet body skin. Massage continuously for 60 seconds, allowing the bio-active molecules to bind with cellular lipids and deposit moisture barriers. Rinse thoroughly with lukewarm water. Follow immediately with body serum to lock in recovery.",
+    },
+    {
+      id: "returns",
+      label: "Return & Exchange Policy",
+      content: "",
     },
     {
       id: "reviews",
@@ -357,19 +369,43 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                     </button>
                   </div>
 
-                  <CurtainButton
-                    onClick={handleAdd}
-                    className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
-                  >
-                    <span>ADD TO BAG</span>
-                  </CurtainButton>
+                  {product.inventory <= 0 ? (
+                    <CurtainButton
+                      onClick={() => setShowBackInStockModal(true)}
+                      className="w-full text-bg border-accent bg-accent text-[11px] font-bold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                    >
+                      <span>NOTIFY ME WHEN RE-STOCKED</span>
+                    </CurtainButton>
+                  ) : (
+                    <>
+                      <CurtainButton
+                        onClick={handleAdd}
+                        className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                      >
+                        <span>ADD TO BAG</span>
+                      </CurtainButton>
 
-                  <CurtainButton
-                    onClick={handleBuyNow}
-                    className="flex-1 text-[#2d1c14] border border-[#2d1c14] bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
-                  >
-                    <span>BUY NOW</span>
-                  </CurtainButton>
+                      <CurtainButton
+                        onClick={handleBuyNow}
+                        className="flex-1 text-[#2d1c14] border border-[#2d1c14] bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                      >
+                        <span>BUY NOW</span>
+                      </CurtainButton>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* 7-Day Return & Exchange Guarantee Badge */}
+              <div className="p-4 rounded-xl bg-card-bg/60 border border-line/50 flex items-start gap-3">
+                <RotateCcw className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                <div className="space-y-1 text-xs">
+                  <span className="font-bold text-ink uppercase tracking-wider block text-[10px]">
+                    7-Day Easy Return & Exchange (Admin Approval Required)
+                  </span>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    Not satisfied with your formulation? Request a Return or Exchange from your account within 7 days of delivery. All requests are processed after admin review & acceptance.
+                  </p>
                 </div>
               </div>
 
@@ -382,7 +418,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
               {/* Accordion Tabs */}
               <div className="pt-8 border-t border-line/45 space-y-4">
-                <div className="flex space-x-6 border-b border-line pb-2">
+                <div className="flex flex-wrap gap-4 border-b border-line pb-2">
                   {productTabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -398,11 +434,57 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   ))}
                 </div>
                 <div className="text-xs sm:text-sm text-muted leading-relaxed min-h-[80px] animate-fade-in">
-                  {activeTab === "reviews" ? (
+                  {activeTab === "returns" ? (
+                    <div className="space-y-4 py-3">
+                      <div className="p-4 bg-accent/5 border border-accent/20 rounded-xl space-y-3">
+                        <h4 className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
+                          <RotateCcw className="w-4 h-4 text-accent" />
+                          <span>Return & Exchange Protocol</span>
+                        </h4>
+                        <p className="text-xs text-muted leading-relaxed">
+                          We stand by our cellular shower formulations. If you receive a damaged product or require a formula exchange, follow our 3-step return protocol:
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                          <div className="p-3 bg-bg border border-line/60 rounded-lg space-y-1">
+                            <span className="font-mono font-bold text-accent text-xs block">01. SUBMIT REQUEST</span>
+                            <p className="text-[11px] text-muted leading-tight">Go to your Account Order History within 7 days of delivery and click "Request Return / Exchange".</p>
+                          </div>
+                          <div className="p-3 bg-bg border border-line/60 rounded-lg space-y-1">
+                            <span className="font-mono font-bold text-accent text-xs block">02. ADMIN REVIEW</span>
+                            <p className="text-[11px] text-muted leading-tight">Our service admin team reviews your reason and accepts the return/exchange request.</p>
+                          </div>
+                          <div className="p-3 bg-bg border border-line/60 rounded-lg space-y-1">
+                            <span className="font-mono font-bold text-accent text-xs block">03. FREE PICKUP</span>
+                            <p className="text-[11px] text-muted leading-tight">Upon Admin acceptance, free doorstep pickup is arranged & instant refund/replacement is issued.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : activeTab === "reviews" ? (
                     <div className="space-y-8 py-4">
+                      {/* Skin Profile Filter Bar */}
+                      <div className="flex flex-wrap items-center gap-2 border-b border-line pb-4">
+                        <span className="text-[9px] uppercase font-bold tracking-widest text-muted mr-2">Filter by Skin Profile:</span>
+                        {["ALL", "Sensitive Barrier", "Hyperkeratosis", "Barrier Depleted", "Dry & Damaged"].map((type) => (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => setSelectedSkinFilter(type)}
+                            className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border cursor-pointer transition-colors ${
+                              selectedSkinFilter === type
+                                ? "bg-accent text-bg border-accent"
+                                : "bg-card-bg text-ink border-line/60 hover:border-accent"
+                            }`}
+                          >
+                            {type === "ALL" ? "All Profiles" : type}
+                          </button>
+                        ))}
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                         {/* Left: Reviews List */}
-                        <div className="md:col-span-7 space-y-6">
+                        <div className="md:col-span-7 space-y-6 text-left">
                           <h4 className="text-xs uppercase tracking-widest font-bold text-ink mb-4">
                             Customer Reviews ({reviewsList.length})
                           </h4>
@@ -410,29 +492,44 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                           {reviewsList.length === 0 ? (
                             <p className="text-xs text-muted italic">No reviews yet for this product. Be the first to share your experience!</p>
                           ) : (
-                            <div className="space-y-5 max-h-[450px] overflow-y-auto pr-2 divide-y divide-line/35">
-                              {reviewsList.map((rev) => (
-                                <div key={rev.id} className="pt-5 first:pt-0 space-y-2">
-                                  <div className="flex items-center justify-between text-xs">
-                                    <span className="font-semibold text-ink uppercase tracking-wide">{rev.userName}</span>
-                                    <span className="text-[10px] text-muted">{new Date(rev.createdAt).toLocaleDateString()}</span>
-                                  </div>
-                                  <div className="flex text-accent text-xs">
-                                    {Array.from({ length: 5 }).map((_, i) => (
-                                      <span key={i} className="text-sm">
-                                        {i < rev.rating ? "★" : "☆"}
+                            <div className="space-y-5 max-h-[480px] overflow-y-auto pr-2 divide-y divide-line/35">
+                              {reviewsList
+                                .filter((rev) => selectedSkinFilter === "ALL" || rev.skinType === selectedSkinFilter || (!rev.skinType && selectedSkinFilter === "ALL"))
+                                .map((rev) => (
+                                  <div key={rev.id} className="pt-5 first:pt-0 space-y-2">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-semibold text-ink uppercase tracking-wide">{rev.userName}</span>
+                                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-widest">
+                                          <ShieldCheck className="w-2.5 h-2.5" /> Verified Buyer
+                                        </span>
+                                      </div>
+                                      <span className="text-[10px] text-muted">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                                    </div>
+
+                                    {/* Star Rating & Skin Tag */}
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex text-accent text-xs">
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                          <span key={i} className="text-sm">
+                                            {i < rev.rating ? "★" : "☆"}
+                                          </span>
+                                        ))}
+                                      </div>
+                                      <span className="text-[8.5px] font-semibold text-accent/90 bg-accent/10 border border-accent/25 px-2 py-0.5 rounded uppercase tracking-wider">
+                                        Profile: {rev.skinType || "Sensitive Barrier"}
                                       </span>
-                                    ))}
+                                    </div>
+
+                                    <p className="text-xs text-muted leading-relaxed whitespace-pre-wrap">{rev.comment}</p>
                                   </div>
-                                  <p className="text-xs text-muted leading-relaxed whitespace-pre-wrap">{rev.comment}</p>
-                                </div>
-                              ))}
+                                ))}
                             </div>
                           )}
                         </div>
 
                         {/* Right: Submit Review Form */}
-                        <div className="md:col-span-5 border border-line/65 rounded-xl p-5 bg-card-bg/25 space-y-5">
+                        <div className="md:col-span-5 border border-line/65 rounded-xl p-5 bg-card-bg/25 space-y-5 text-left">
                           <h4 className="text-xs uppercase tracking-widest font-bold text-ink">
                             Write a Review
                           </h4>
@@ -453,6 +550,22 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                                 placeholder="e.g. Arjun S."
                                 className="w-full bg-bg/50 border border-line rounded px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent"
                               />
+                            </div>
+
+                            {/* Skin Profile Select */}
+                            <div className="space-y-1">
+                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Your Skin Profile</label>
+                              <select
+                                value={newSkinType}
+                                onChange={(e) => setNewSkinType(e.target.value)}
+                                className="w-full bg-bg/50 border border-line rounded px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent uppercase tracking-wider"
+                              >
+                                <option value="Sensitive Barrier">Sensitive Barrier</option>
+                                <option value="Hyperkeratosis">Hyperkeratosis / Rough</option>
+                                <option value="Barrier Depleted">Barrier Depleted / Dry</option>
+                                <option value="Dry & Damaged">Dry & Damaged</option>
+                                <option value="Normal Derm">Normal Dermis</option>
+                              </select>
                             </div>
 
                             {/* Rating Stars Selection */}
@@ -527,6 +640,11 @@ export default function ProductDetailClient({ product, recommendations }: Produc
         </div>
       </main>
       <Footer />
+      <BackInStockModal
+        isOpen={showBackInStockModal}
+        onClose={() => setShowBackInStockModal(false)}
+        productName={product.name}
+      />
     </>
   );
 }

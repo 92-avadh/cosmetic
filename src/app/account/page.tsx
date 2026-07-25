@@ -310,9 +310,23 @@ export default function AccountPage() {
                                 ? order.items.map((item: any) => `${item.product?.name || "Product"} (x${item.quantity})`).join(", ")
                                 : "Items Details Processing"}
                             </p>
-                            <span className="inline-block text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full tracking-widest uppercase mt-2">
-                              {order.status}
-                            </span>
+                            {order.status === "RETURN_REQUESTED" || order.returnStatus === "REQUESTED" ? (
+                              <span className="inline-block text-[9px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full tracking-widest uppercase mt-2">
+                                Return Requested (Awaiting Admin Review)
+                              </span>
+                            ) : order.status === "RETURN_APPROVED" || order.returnStatus === "APPROVED" ? (
+                              <span className="inline-block text-[9px] font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2.5 py-0.5 rounded-full tracking-widest uppercase mt-2">
+                                Return Accepted by Admin ✓
+                              </span>
+                            ) : order.status === "RETURN_REJECTED" || order.returnStatus === "REJECTED" ? (
+                              <span className="inline-block text-[9px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full tracking-widest uppercase mt-2">
+                                Return Request Rejected
+                              </span>
+                            ) : (
+                              <span className="inline-block text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full tracking-widest uppercase mt-2">
+                                {order.status}
+                              </span>
+                            )}
                           </div>
                           <span className="text-sm font-semibold text-ink ml-4 shrink-0">${order.totalUSD.toFixed(2)}</span>
                         </div>

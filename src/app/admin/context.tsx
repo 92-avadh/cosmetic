@@ -39,6 +39,12 @@ export interface Order {
   shippingState?: string;
   shippingZip: string;
   shippingCountry: string;
+  returnStatus?: string;
+  returnType?: string;
+  returnReason?: string;
+  returnAdminNote?: string;
+  returnRequestedAt?: string;
+  returnProcessedAt?: string;
   createdAt: string;
   items: OrderItem[];
 }
@@ -78,7 +84,7 @@ interface AdminContextType {
   fetchDashboardData: () => Promise<void>;
   
   // order helpers
-  handleUpdateOrderStatus: (orderId: string, status: string) => Promise<void>;
+  handleUpdateOrderStatus: (orderId: string, status: string, returnStatus?: string, returnAdminNote?: string) => Promise<void>;
   handleUpdateOrderDetails: (orderId: string, details: {
     shippingName: string;
     shippingStreet: string;
@@ -231,7 +237,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }, [mounted, isLoggedIn, user?.email]);
 
   // Order status update
-  const handleUpdateOrderStatus = async (orderId: string, status: string) => {
+  const handleUpdateOrderStatus = async (
+    orderId: string,
+    status: string,
+    returnStatus?: string,
+    returnAdminNote?: string
+  ) => {
     if (!user?.email) return;
     setIsActionLoading(true);
     setToastMessage(null);
@@ -242,14 +253,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           "Content-Type": "application/json",
           "x-admin-email": user.email,
         },
-        body: JSON.stringify({ orderId, status }),
+        body: JSON.stringify({ orderId, status, returnStatus, returnAdminNote }),
       });
 
       const resJson = await res.json();
       if (!res.ok) throw new Error(getApiErrorMessage(resJson, "Failed to update order status."));
 
       showToast(`Order status updated to ${status} successfully.`);
-      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? {
+                ...o,
+                status,
+                ...(returnStatus ? { returnStatus } : {}),
+                ...(returnAdminNote ? { returnAdminNote } : {}),
+              }
+            : o
+        )
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showToast(`Error: ${msg}`);

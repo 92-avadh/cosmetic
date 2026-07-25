@@ -46,13 +46,21 @@ export default function AdminOrdersPage() {
   const [editShippingZip, setEditShippingZip] = useState("");
   const [editShippingCountry, setEditShippingCountry] = useState("");
 
+  // Admin notes for return approvals/rejections
+  const [adminNotes, setAdminNotes] = useState<Record<string, string>>({});
+
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(orderSearch.toLowerCase()) ||
       order.user?.email?.toLowerCase().includes(orderSearch.toLowerCase()) ||
       order.shippingName.toLowerCase().includes(orderSearch.toLowerCase());
 
-    const matchesStatus = orderStatusFilter === "ALL" || order.status === orderStatusFilter;
+    const matchesStatus =
+      orderStatusFilter === "ALL"
+        ? true
+        : orderStatusFilter === "RETURN_REQUESTED"
+        ? order.status === "RETURN_REQUESTED" || order.returnStatus === "REQUESTED"
+        : order.status === orderStatusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -68,13 +76,21 @@ export default function AdminOrdersPage() {
     setEditingOrderId(null);
   };
 
+  const handleApproveReturn = async (orderId: string) => {
+    const note = adminNotes[orderId] || "Return request accepted by Admin. Reverse pickup scheduled.";
+    await handleUpdateOrderStatus(orderId, "RETURN_APPROVED", "APPROVED", note);
+  };
 
+  const handleRejectReturn = async (orderId: string) => {
+    const note = adminNotes[orderId] || "Return request rejected by Admin.";
+    await handleUpdateOrderStatus(orderId, "RETURN_REJECTED", "REJECTED", note);
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="border-b border-line pb-4 text-left">
         <h3 className="font-display font-semibold text-base uppercase text-ink">Order Management Console</h3>
-        <p className="text-[11px] text-muted mt-0.5">Manage active orders, track fulfillments, and update delivery status.</p>
+        <p className="text-[11px] text-muted mt-0.5">Manage active orders, track fulfillments, review return requests & issue approvals.</p>
       </div>
 
       {/* Filters */}
@@ -93,12 +109,15 @@ export default function AdminOrdersPage() {
               <ChevronRight className="w-3 h-3 rotate-90" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44">
+          <DropdownMenuContent className="w-48">
             <DropdownMenuItem onClick={() => setOrderStatusFilter("ALL")}>All Statuses</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOrderStatusFilter("PENDING")}>Pending</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOrderStatusFilter("PAID")}>Paid</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOrderStatusFilter("SHIPPED")}>Shipped</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOrderStatusFilter("DELIVERED")}>Delivered</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setOrderStatusFilter("RETURN_REQUESTED")}>⚠️ Return Requested</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setOrderStatusFilter("RETURN_APPROVED")}>✓ Return Approved</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setOrderStatusFilter("RETURN_REJECTED")}>✕ Return Rejected</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOrderStatusFilter("CANCELLED")}>Cancelled</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -119,6 +138,9 @@ export default function AdminOrdersPage() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" disabled={isActionLoading} className={`border rounded-lg px-2.5 py-1 text-[9px] font-bold tracking-widest uppercase h-auto cursor-pointer gap-1.5 ${
                         order.status === "DELIVERED" ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
+                        order.status === "RETURN_REQUESTED" ? "bg-amber-50 text-amber-700 border-amber-300 animate-pulse" :
+                        order.status === "RETURN_APPROVED" ? "bg-purple-50 text-purple-700 border-purple-200" :
+                        order.status === "RETURN_REJECTED" ? "bg-red-50 text-red-600 border-red-200" :
                         order.status === "CANCELLED" ? "bg-red-50 text-red-500 border-red-200" :
                         order.status === "SHIPPED" ? "bg-blue-50 text-blue-500 border-blue-200" :
                         "bg-accent/15 text-accent border-accent/30"
@@ -127,16 +149,75 @@ export default function AdminOrdersPage() {
                         <ChevronRight className="w-2.5 h-2.5 rotate-90" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40">
+                    <DropdownMenuContent className="w-48">
                       <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "PENDING")}>Pending</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "PAID")}>Paid</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "SHIPPED")}>Shipped</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "DELIVERED")}>Delivered</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "RETURN_REQUESTED", "REQUESTED")}>Mark Return Requested</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "RETURN_APPROVED", "APPROVED")}>Approve Return/Exchange</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "RETURN_REJECTED", "REJECTED")}>Reject Return Request</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleUpdateOrderStatus(order.id, "CANCELLED")}>Cancelled</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
+
+              {/* Return Request Banner & Admin Controls */}
+              {(order.returnStatus && order.returnStatus !== "NONE") || order.status.includes("RETURN") ? (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 space-y-3 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
+                      Return / Exchange Request Details
+                    </span>
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-amber-500/20 text-amber-700">
+                      {order.returnType || "RETURN"} — Status: {order.returnStatus || "REQUESTED"}
+                    </span>
+                  </div>
+
+                  {order.returnReason && (
+                    <div className="text-xs text-ink/90 bg-bg/60 p-2.5 rounded border border-line/40">
+                      <span className="text-[9px] text-muted uppercase font-bold block mb-0.5">Customer Reason:</span>
+                      "{order.returnReason}"
+                    </div>
+                  )}
+
+                  {order.returnAdminNote && (
+                    <div className="text-[11px] text-accent bg-accent/5 p-2 rounded border border-accent/20">
+                      <span className="text-[9px] text-accent/80 uppercase font-bold block mb-0.5">Admin Response Note:</span>
+                      {order.returnAdminNote}
+                    </div>
+                  )}
+
+                  {/* Admin Accept/Reject action buttons */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                    <input
+                      type="text"
+                      placeholder="Add note for customer (e.g. Pickup scheduled for Monday)..."
+                      value={adminNotes[order.id] || ""}
+                      onChange={(e) => setAdminNotes({ ...adminNotes, [order.id]: e.target.value })}
+                      className="flex-1 bg-bg border border-line rounded px-2.5 py-1.5 text-[11px] text-ink focus:outline-none focus:border-accent"
+                    />
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={() => handleApproveReturn(order.id)}
+                        disabled={isActionLoading}
+                        className="px-3 py-1.5 bg-emerald-600 text-white rounded text-[9.5px] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors cursor-pointer border-none"
+                      >
+                        Accept Request
+                      </button>
+                      <button
+                        onClick={() => handleRejectReturn(order.id)}
+                        disabled={isActionLoading}
+                        className="px-3 py-1.5 bg-red-600 text-white rounded text-[9.5px] font-bold uppercase tracking-wider hover:bg-red-700 transition-colors cursor-pointer border-none"
+                      >
+                        Reject Request
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               {/* Order items */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

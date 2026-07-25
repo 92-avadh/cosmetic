@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { Menu, X, Globe, Heart } from "lucide-react";
+import { Menu, X, Globe, Heart, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import ShoppingBagIcon from "./ShoppingBagIcon";
 import WishlistDrawer from "./WishlistDrawer";
+import SearchModal from "./SearchModal";
 
 interface AnnouncementSettings {
   isActive: boolean;
@@ -106,8 +107,21 @@ export default function Nav() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Keyboard shortcut Cmd+K / Ctrl+K for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
   
   const { cart, setCartOpen, currency } = useCartStore();
   const { items: wishlistItems, setWishlistOpen } = useWishlistStore();
@@ -268,6 +282,27 @@ export default function Nav() {
 
           {/* Right Side Action Links */}
           <div className="hidden md:flex items-center space-x-12 flex-1 justify-end">
+            <div
+              onClick={() => setIsSearchOpen(true)}
+              className="group relative overflow-hidden block py-1 cursor-pointer select-none"
+            >
+              <div className="relative flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+                <Search className="w-3.5 h-3.5 text-ink" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">
+                  SEARCH
+                </span>
+                <span className="text-[8px] font-mono text-muted/80 bg-card-bg border border-line px-1 rounded ml-0.5">⌘K</span>
+              </div>
+              <div className="absolute top-full left-0 flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+                <Search className="w-3.5 h-3.5 text-accent" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+                  SEARCH
+                </span>
+                <span className="text-[8px] font-mono text-accent bg-accent/10 border border-accent/30 px-1 rounded ml-0.5">⌘K</span>
+              </div>
+              <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+            </div>
+
             <Link
               href="/account"
               className="group relative overflow-hidden block py-1 cursor-pointer"
@@ -436,6 +471,7 @@ export default function Nav() {
         )}
       </AnimatePresence>
       <WishlistDrawer />
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

@@ -112,9 +112,6 @@ export default function Home() {
               <div className="absolute inset-0 bg-[#121212]/50 backdrop-blur-md" />
             </div>
 
-            {/* WebGL Refractive Soap Bubble in loading screen */}
-            <GlassBubble scale={2.5} position={[0, 0, 0]} className="w-full h-full absolute inset-0 z-5" />
-
             {/* Centered organic brand logo preloader container */}
             <div className="relative z-10 w-[85vw] h-[85vw] max-w-[380px] max-h-[380px] flex items-center justify-center border border-bg/15 rounded-full bg-bg/5 backdrop-blur-xl animate-[pulse_3.5s_ease-in-out_infinite]">
               {/* Brand Logo */}

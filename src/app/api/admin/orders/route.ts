@@ -18,7 +18,9 @@ async function checkAdminAuth() {
 
 const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid("Invalid order ID format"),
-  status: z.enum(["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"]),
+  status: z.string().min(1, "Status required"),
+  returnStatus: z.string().optional(),
+  returnAdminNote: z.string().optional(),
 });
 
 // GET: Fetch all orders
@@ -75,11 +77,26 @@ export const POST = withApiHandler(async (request) => {
   }
 
   const body = await request.json();
-  const { orderId, status } = await updateOrderStatusSchema.parseAsync(body);
+  const { orderId, status, returnStatus, returnAdminNote } = await updateOrderStatusSchema.parseAsync(body);
+
+  const updateData: Record<string, any> = {
+    status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (returnStatus !== undefined) {
+    updateData.returnStatus = returnStatus;
+  }
+  if (returnAdminNote !== undefined) {
+    updateData.returnAdminNote = returnAdminNote;
+  }
+  if (returnStatus === "APPROVED" || returnStatus === "REJECTED" || returnStatus === "COMPLETED") {
+    updateData.returnProcessedAt = new Date().toISOString();
+  }
 
   const { data: updatedOrder, error } = await supabase
     .from("Order")
-    .update({ status, updatedAt: new Date().toISOString() })
+    .update(updateData)
     .eq("id", orderId)
     .select(`
       *,

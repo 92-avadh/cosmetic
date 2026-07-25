@@ -48,7 +48,7 @@ export default function ProductRow() {
             </h2>
           </div>
           <p className="text-sm md:text-base text-muted max-w-md">
-            Biocompatible formulas engineered in collaboration with Korean clinical skin scientists
+            Biocompatible formulas engineered in collaboration with clinical skin scientists
             to restore active resilience, cellular speed, and structural integrity.
           </p>
         </div>

@@ -96,7 +96,7 @@ export const POST = withApiHandler(async () => {
         </div>
 
         <p style="font-size: 13px; line-height: 1.6; color: #121212; margin-bottom: 25px;">
-          You left some items in your bag. BODYBARREL body wash formulations are engineered in clinical Korean skin labs to train biological resilience and seal post-shower hydration.
+          You left some items in your bag. BODYBARREL body wash formulations are engineered in clinical labs to train biological resilience and seal post-shower hydration.
         </p>
 
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
@@ -119,7 +119,7 @@ export const POST = withApiHandler(async () => {
         </div>
 
         <div style="text-align: center; margin-bottom: 30px;">
-          <a href="https://cosmetic-web.pages.dev/cart" style="display: inline-block; background-color: #2d1c14; color: #F6F4EE; text-decoration: none; padding: 16px 36px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; border-radius: 3px; border: 1px solid #2d1c14;">
+          <a href="https://bodybarrel.com/cart" style="display: inline-block; background-color: #2d1c14; color: #F6F4EE; text-decoration: none; padding: 16px 36px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; border-radius: 3px; border: 1px solid #2d1c14;">
             Return to Bag
           </a>
         </div>

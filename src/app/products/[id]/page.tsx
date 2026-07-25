@@ -123,7 +123,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.subtitle || product.description || "Premium Korean skincare formula.",
+    description: product.subtitle || product.description || "Premium body wash formula.",
     image: imageUrl,
     url: productUrl,
     brand: { "@type": "Brand", name: "BODYBARREL" },

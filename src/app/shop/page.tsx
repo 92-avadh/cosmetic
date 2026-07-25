@@ -38,17 +38,17 @@ export default function ShopPage() {
 
   const categories = [
     { id: "all", label: "All Products" },
-    { id: "skincare", label: "Hydra-Active Wash" },
-    { id: "bodycare", label: "Targeted Body Wash" },
+    { id: "hydrating", label: "Hydra-Active Wash" },
+    { id: "targeted", label: "Targeted Body Wash" },
   ];
 
   // Category filtering based on product category
   const filteredProducts = displayProducts.filter((product) => {
     if (activeCategory === "all") return true;
-    if (activeCategory === "skincare") {
+    if (activeCategory === "hydrating") {
       return product.id.includes("hydra");
     }
-    if (activeCategory === "bodycare") {
+    if (activeCategory === "targeted") {
       return product.id.includes("wash");
     }
     return true;
@@ -131,10 +131,10 @@ export default function ShopPage() {
               </h2>
               <div className="space-y-4 text-xs sm:text-sm text-muted leading-relaxed max-w-sm">
                 <p>
-                  Korean formulation science emphasises how skin behaves, not how it appears.
+                  Body wash formulation science emphasises how skin behaves, not how it appears.
                 </p>
                 <p>
-                  This is why Korean formulas lead in barrier-first design, advanced delivery systems, and recovery-focused body care.
+                  That is why we lead in barrier-first design, advanced delivery systems, and recovery-focused body care.
                 </p>
               </div>
             </div>

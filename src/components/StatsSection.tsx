@@ -21,7 +21,7 @@ const STATS: Stat[] = [
 /**
  * Clinical-results band. Numbers count up from zero when the section
  * scrolls into view, and each column staggers in from below — the kind
- * of "proof point" strip a science-led skincare brand leans on.
+ * of "proof point" strip a science-led body care brand leans on.
  */
 export default function StatsSection() {
   const containerRef = useRef<HTMLDivElement>(null);

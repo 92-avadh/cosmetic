@@ -50,7 +50,7 @@ export default function AdminProductsPage() {
   const [newProductPrice, setNewProductPrice] = useState("");
   const [newProductInventory, setNewProductInventory] = useState("100");
   const [newProductDescription, setNewProductDescription] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("skincare");
+  const [newProductCategory, setNewProductCategory] = useState("hydrating");
   const [newProductImage, setNewProductImage] = useState("");
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
@@ -199,7 +199,7 @@ export default function AdminProductsPage() {
       setNewProductPrice("");
       setNewProductInventory("100");
       setNewProductDescription("");
-      setNewProductCategory("skincare");
+                    setNewProductCategory("hydrating");
       setNewProductImages([]);
       setUploadedFileMetadata([]);
     } catch {
@@ -214,7 +214,7 @@ export default function AdminProductsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-4 gap-3 text-left">
         <div>
           <h3 className="font-display font-semibold text-base uppercase text-ink">Catalog & Inventory</h3>
-          <p className="text-[11px] text-muted mt-0.5">Manage skincare formulas and add new custom products.</p>
+          <p className="text-[11px] text-muted mt-0.5">Manage body wash formulas and add new custom products.</p>
         </div>
         <input
           type="text"
@@ -299,12 +299,12 @@ export default function AdminProductsPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs uppercase tracking-wider h-10 justify-between items-center cursor-pointer">
-                    <span>{newProductCategory === "skincare" ? "Skincare System" : "Bodycare System"}</span>
+                    <span>{newProductCategory === "hydrating" ? "Hydrating Wash" : "Targeted Wash"}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-full">
-                  <DropdownMenuItem onClick={() => setNewProductCategory("skincare")}>Skincare System</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setNewProductCategory("bodycare")}>Bodycare System</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("hydrating")}>Hydrating Wash</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("targeted")}>Targeted Wash</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -393,7 +393,7 @@ export default function AdminProductsPage() {
                   setNewProductDescription("");
                   setNewProductImages([]);
                   setUploadedFileMetadata([]);
-                  setNewProductCategory("skincare");
+      setNewProductCategory("hydrating");
                 }}
                 className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
               >
@@ -459,7 +459,7 @@ export default function AdminProductsPage() {
                       const imgs = prod.image ? prod.image.split(",") : [];
                       setNewProductImages(imgs);
                       setUploadedFileMetadata([]);
-                      setNewProductCategory(prod.Category?.slug || "skincare");
+                      setNewProductCategory(prod.Category?.slug || "hydrating");
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="px-3 py-1 bg-bg border border-line rounded text-[8px] font-bold tracking-wider hover:border-accent hover:text-accent transition-colors cursor-pointer"

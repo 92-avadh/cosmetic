@@ -9,26 +9,26 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bodybarrel.com";
 
 export const metadata: Metadata = {
   title: {
-    default: "BODYBARREL — Korean Skincare Science",
+    default: "BODYBARREL — Body Wash Science",
     template: "%s | BODYBARREL",
   },
   description:
-    "Korean skincare formulas engineered for ultimate skin fitness. Advanced PDRN science developed in collaboration with Korean skin scientists.",
+    "Advanced body wash formulations engineered for whole-body skin fitness. Wild marine PDRN, micro-ceramides, and biomimetic lipids.",
   metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "BODYBARREL",
-    title: "BODYBARREL — Korean Skincare Science",
+    title: "BODYBARREL — Body Wash Science",
     description:
-      "Korean skincare formulas engineered for ultimate skin fitness. Advanced PDRN science developed in collaboration with Korean skin scientists.",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "BODYBARREL Korean Skincare" }],
+      "Advanced body wash formulations engineered for whole-body skin fitness. Wild marine PDRN, micro-ceramides, and biomimetic lipids.",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "BODYBARREL Body Wash" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BODYBARREL — Korean Skincare Science",
+    title: "BODYBARREL — Body Wash Science",
     description:
-      "Korean skincare formulas engineered for ultimate skin fitness.",
+      "Advanced body wash formulations engineered for whole-body skin fitness.",
     images: ["/og-default.png"],
   },
   icons: {

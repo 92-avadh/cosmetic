@@ -61,7 +61,7 @@ export default function PhilosophySection() {
     {
       num: "01",
       title: "Cellular Strength",
-      desc: "Targeting skin restoration at a nuclear level rather than masking cosmetic surface imperfections.",
+      desc: "Targeting skin restoration at a cellular level rather than masking surface imperfections.",
     },
     {
       num: "02",

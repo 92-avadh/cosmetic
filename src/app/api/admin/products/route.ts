@@ -123,7 +123,7 @@ export const POST = withApiHandler(async (request) => {
       priceUSD,
       image,
       hoverImage: hoverImage || "/products/texture-gel.png",
-      description: description || "Premium cellular skincare formula.",
+      description: description || "Premium body wash formula.",
       inventory,
       categoryId,
       createdAt: new Date().toISOString(),

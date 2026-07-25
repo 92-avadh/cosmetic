@@ -6,18 +6,18 @@ async function main() {
   console.log("🌱 Starting database seeding...");
 
   // 1. Create or ensure default category exists
-  const skincareCategory = await prisma.category.upsert({
-    where: { slug: "skincare" },
+  const bodycareCategory = await prisma.category.upsert({
+    where: { slug: "bodycare" },
     update: {
       name: "Shower & Body Care",
     },
     create: {
       name: "Shower & Body Care",
-      slug: "skincare",
+      slug: "bodycare",
     },
   });
 
-  console.log(`✓ Category ensured: ${skincareCategory.name} (${skincareCategory.slug})`);
+  console.log(`✓ Category ensured: ${bodycareCategory.name} (${bodycareCategory.slug})`);
 
   // 2. Define core product catalog matching standard store items
   const initialProducts = [
@@ -30,7 +30,7 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "With 0.5% Microspherized PDRN, hyaluronic acid, and pure botanical extracts, it lifts sweat, dirt, and impurities while deeply hydrating, leaving your body skin fresh, supple, and reinforced.",
       inventory: 100,
-      categoryId: skincareCategory.id,
+      categoryId: bodycareCategory.id,
     },
     {
       id: "hydra-nutrition-essence",
@@ -41,7 +41,7 @@ async function main() {
       hoverImage: "/products/cream-texture.png",
       description: "Advanced cellular recovery shower oil formulated with pure salmon-derived PDRN DNA and bio-active amino acids to lock in moisture and restore dry body skin elasticity during your daily shower.",
       inventory: 80,
-      categoryId: skincareCategory.id,
+      categoryId: bodycareCategory.id,
     },
     {
       id: "men-body-wash",
@@ -52,7 +52,7 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "Advanced lipid barrier recovery body wash formulated specifically for men's thicker skin to cleanse deeply without dryness.",
       inventory: 120,
-      categoryId: skincareCategory.id,
+      categoryId: bodycareCategory.id,
     },
     {
       id: "women-body-wash",
@@ -63,7 +63,7 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "Premium pH-balanced body wash infused with micro-nutrients to repair and deeply hydrate women's delicate skin.",
       inventory: 90,
-      categoryId: skincareCategory.id,
+      categoryId: bodycareCategory.id,
     },
     {
       id: "unisex-body-wash",
@@ -85,7 +85,7 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "A dual-action exfoliating body wash containing biological fruit enzymes and marine minerals to reveal smooth, hydrated skin.",
       inventory: 200,
-      categoryId: skincareCategory.id,
+      categoryId: bodycareCategory.id,
     },
   ];
 
