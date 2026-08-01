@@ -53,7 +53,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
     setZoomPos(null);
   };
 
-  // Parse specifications JSON if present
+  // Parse specifications JSON if present or generate Amazon-style default product details
   let parsedSpecifications: { key: string; value: string }[] = [];
   if (product.specifications) {
     try {
@@ -65,6 +65,29 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       parsedSpecifications = [];
     }
   }
+
+  const effectiveSpecifications: { key: string; value: string }[] =
+    parsedSpecifications.length > 0
+      ? parsedSpecifications
+      : [
+          { key: "Brand", value: "BODYBARREL" },
+          { key: "Product Type", value: "Premium Body Wash" },
+          { key: "Volume", value: getVolumeText(product.id) },
+          {
+            key: "Target Audience",
+            value: product.id.includes("men")
+              ? "Men"
+              : product.id.includes("women")
+              ? "Women"
+              : "Unisex / All Genders",
+          },
+          { key: "Skin Type", value: "All Skin Types" },
+          { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Lipid Barrier Repair" },
+          { key: "Texture", value: "Rich Foaming Gel" },
+          { key: "Fragrance", value: "Botanical & Hydro-Notes" },
+          { key: "Recommended Use", value: "Daily" },
+          { key: "Free From", value: "Parabens, Mineral Oil, Sulfates" },
+        ];
 
   // Reviews Integration
   const { user, isLoggedIn } = useUserStore();
@@ -158,7 +181,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
     }
   };
 
-  const getVolumeText = (id: string) => {
+  function getVolumeText(id: string) {
     switch (id) {
       case "hydra-foam-cleanser":
         return "3.38 Fl.Oz / 100 ml";
@@ -470,29 +493,26 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 </p>
               </div>
 
-              {/* Product Specifications List (Amazon & Flipkart E-Commerce Specifications) */}
-              {parsedSpecifications.length > 0 && (
-                <div className="pt-6 border-t border-line/45 space-y-4">
-                  <h3 className="font-display font-semibold text-base sm:text-lg uppercase tracking-tight text-ink flex items-center gap-2">
-                    <span className="text-accent">•</span> Product Specifications
-                  </h3>
-                  <div className="bg-card-bg/60 border border-line/60 rounded-2xl p-5 md:p-6 space-y-3">
-                    <ul className="space-y-2.5 text-xs sm:text-sm text-ink">
-                      {parsedSpecifications.map((spec, index) => (
-                        <li key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-line/25 pb-2.5 last:border-b-0 last:pb-0">
-                          <span className="font-bold text-ink min-w-[160px] shrink-0 uppercase tracking-wider text-[11px] flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
-                            {spec.key}:
-                          </span>
-                          <span className="text-muted leading-relaxed font-medium">
-                            {spec.value}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {/* Product Details Section (Amazon Style matching Screenshot 1) */}
+              <div className="pt-8 border-t border-line/45 space-y-4">
+                <h2 className="font-display font-semibold text-lg md:text-xl uppercase tracking-tight text-ink">
+                  Product details
+                </h2>
+                <div className="bg-card-bg/40 border border-line/50 rounded-2xl p-5 md:p-6">
+                  <ul className="space-y-2.5 text-xs sm:text-sm text-ink/90 font-sans">
+                    {effectiveSpecifications.map((spec, index) => (
+                      <li key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                        <span className="font-bold text-ink min-w-[170px] shrink-0 font-sans">
+                          {spec.key} :
+                        </span>
+                        <span className="text-muted leading-relaxed font-normal">
+                          {spec.value}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              )}
+              </div>
 
               {/* Accordion Tabs */}
               <div className="pt-8 border-t border-line/45 space-y-4">
