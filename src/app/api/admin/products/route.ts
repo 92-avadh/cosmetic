@@ -92,7 +92,7 @@ export const POST = withApiHandler(async (request) => {
       .from("Category")
       .select("id")
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (existingCategory) {
       categoryId = existingCategory.id;
@@ -114,33 +114,55 @@ export const POST = withApiHandler(async (request) => {
           updatedAt: new Date().toISOString(),
         })
         .select("id")
-        .single();
-      if (catError) throw new Error(catError.message);
-      categoryId = newCategory.id;
+        .maybeSingle();
+      if (catError && !newCategory) {
+        // Fall back to querying created category
+        const { data: fallbackCat } = await supabase.from("Category").select("id").eq("slug", slug).maybeSingle();
+        categoryId = fallbackCat?.id || null;
+      } else {
+        categoryId = newCategory?.id || null;
+      }
     }
   }
 
-  const { data: product, error: productError } = await supabase
-    .from("Product")
-    .insert({
-      id: cleanId,
-      sku: productSku,
-      name,
-      subtitle,
-      priceUSD,
-      image,
-      hoverImage: hoverImage || "/products/texture-gel.png",
-      description: description || "Premium body wash formula.",
-      specifications: specifications || undefined,
-      inventory,
-      categoryId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })
-    .select()
-    .single();
+  const insertData: Record<string, any> = {
+    id: cleanId,
+    sku: productSku,
+    name,
+    subtitle,
+    priceUSD,
+    image,
+    hoverImage: hoverImage || "/products/texture-gel.png",
+    description: description || "Premium body wash formula.",
+    inventory,
+    categoryId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 
-  if (productError) throw new Error(productError.message);
+  if (specifications) {
+    insertData.specifications = specifications;
+  }
+
+  let { data: product, error: productError } = await supabase
+    .from("Product")
+    .insert(insertData)
+    .select()
+    .maybeSingle();
+
+  // If column specifications does not exist on Supabase DB schema yet, retry without specifications column
+  if (productError && insertData.specifications) {
+    delete insertData.specifications;
+    const retry = await supabase
+      .from("Product")
+      .insert(insertData)
+      .select()
+      .maybeSingle();
+    product = retry.data;
+    productError = retry.error;
+  }
+
+  if (productError && !product) throw new Error(productError.message);
 
   return { success: true, product };
 });
@@ -170,7 +192,7 @@ export const PUT = withApiHandler(async (request) => {
       .from("Category")
       .select("id")
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (existingCategory) {
       categoryId = existingCategory.id;
@@ -192,32 +214,52 @@ export const PUT = withApiHandler(async (request) => {
           updatedAt: new Date().toISOString(),
         })
         .select("id")
-        .single();
-      if (catError) throw new Error(catError.message);
-      categoryId = newCategory.id;
+        .maybeSingle();
+      if (catError && !newCategory) {
+        const { data: fallbackCat } = await supabase.from("Category").select("id").eq("slug", slug).maybeSingle();
+        categoryId = fallbackCat?.id || null;
+      } else {
+        categoryId = newCategory?.id || null;
+      }
     }
   }
 
-  const { data: updatedProduct, error: productError } = await supabase
+  const updateData: Record<string, any> = {
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (name !== undefined) updateData.name = name;
+  if (productSku) updateData.sku = productSku;
+  if (subtitle !== undefined) updateData.subtitle = subtitle;
+  if (priceUSD !== undefined) updateData.priceUSD = priceUSD;
+  if (image !== undefined) updateData.image = image;
+  if (hoverImage !== undefined) updateData.hoverImage = hoverImage;
+  if (description !== undefined) updateData.description = description;
+  if (inventory !== undefined) updateData.inventory = inventory;
+  if (categoryId !== null) updateData.categoryId = categoryId;
+  if (specifications !== undefined) updateData.specifications = specifications;
+
+  let { data: updatedProduct, error: productError } = await supabase
     .from("Product")
-    .update({
-      name,
-      sku: productSku,
-      subtitle,
-      priceUSD,
-      image,
-      hoverImage: hoverImage || undefined,
-      description: description || undefined,
-      specifications: specifications || undefined,
-      inventory,
-      categoryId,
-      updatedAt: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq("id", id)
     .select()
-    .single();
+    .maybeSingle();
 
-  if (productError) throw new Error(productError.message);
+  // If column specifications does not exist on Supabase DB schema yet, retry without specifications column
+  if (productError && updateData.specifications) {
+    delete updateData.specifications;
+    const retry = await supabase
+      .from("Product")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+    updatedProduct = retry.data;
+    productError = retry.error;
+  }
+
+  if (productError && !updatedProduct) throw new Error(productError.message);
 
   return { success: true, product: updatedProduct };
 });

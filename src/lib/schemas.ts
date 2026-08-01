@@ -131,30 +131,30 @@ export const reviewCreateSchema = z.object({
 });
 
 export const productCreateSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100).regex(/^[a-zA-Z0-9\s\-'&]+$/, "Invalid name format"),
-  subtitle: z.string().min(1, "Subtitle is required").max(150),
+  name: z.string().min(1, "Name is required").max(200),
+  subtitle: z.string().min(1, "Subtitle is required").max(300),
   priceUSD: z.number().positive("Price must be a positive number"),
   image: z.string().min(1, "Image is required").max(5000),
   sku: z.string().max(100).optional().nullable(),
   hoverImage: z.string().max(5000).optional().nullable(),
-  description: z.string().max(1000).optional().nullable(),
+  description: z.string().max(5000).optional().nullable(),
   specifications: z.string().max(10000).optional().nullable(),
-  inventory: z.number().int().nonnegative().default(100),
-  categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/, "Invalid category slug format").optional().nullable(),
+  inventory: z.number().int().nonnegative().default(0),
+  categorySlug: z.string().max(100).optional().nullable(),
 });
 
 export const productUpdateSchema = z.object({
   id: z.string().min(1, "Product ID is required"),
-  name: z.string().min(1).max(100).regex(/^[a-zA-Z0-9\s\-'&]+$/, "Invalid name format").optional(),
-  subtitle: z.string().min(1).max(150).optional(),
+  name: z.string().min(1).max(200).optional(),
+  subtitle: z.string().min(1).max(300).optional(),
   priceUSD: z.number().positive().optional(),
   image: z.string().max(5000).optional(),
   sku: z.string().max(100).optional().nullable(),
   hoverImage: z.string().max(5000).optional().nullable(),
-  description: z.string().max(1000).optional().nullable(),
+  description: z.string().max(5000).optional().nullable(),
   specifications: z.string().max(10000).optional().nullable(),
   inventory: z.number().int().nonnegative().optional(),
-  categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/).optional().nullable(),
+  categorySlug: z.string().max(100).optional().nullable(),
 });
 
 export const orderUpdateSchema = z.object({
