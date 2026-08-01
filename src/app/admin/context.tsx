@@ -13,6 +13,7 @@ export interface Product {
   image: string;
   hoverImage?: string;
   description?: string;
+  specifications?: string;
   inventory: number;
   categoryId?: string;
   category?: { name: string };

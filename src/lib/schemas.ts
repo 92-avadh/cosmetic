@@ -138,12 +138,13 @@ export const productCreateSchema = z.object({
   sku: z.string().max(100).optional().nullable(),
   hoverImage: z.string().max(5000).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
+  specifications: z.string().max(10000).optional().nullable(),
   inventory: z.number().int().nonnegative().default(100),
   categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/, "Invalid category slug format").optional().nullable(),
 });
 
 export const productUpdateSchema = z.object({
-  id: z.string().uuid("Invalid product ID"),
+  id: z.string().min(1, "Product ID is required"),
   name: z.string().min(1).max(100).regex(/^[a-zA-Z0-9\s\-'&]+$/, "Invalid name format").optional(),
   subtitle: z.string().min(1).max(150).optional(),
   priceUSD: z.number().positive().optional(),
@@ -151,6 +152,7 @@ export const productUpdateSchema = z.object({
   sku: z.string().max(100).optional().nullable(),
   hoverImage: z.string().max(5000).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
+  specifications: z.string().max(10000).optional().nullable(),
   inventory: z.number().int().nonnegative().optional(),
   categorySlug: z.string().max(50).regex(/^[a-z0-9\-]+$/).optional().nullable(),
 });

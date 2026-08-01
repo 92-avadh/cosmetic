@@ -48,7 +48,7 @@ export default function AdminProductsPage() {
   const [newProductName, setNewProductName] = useState("");
   const [newProductSubtitle, setNewProductSubtitle] = useState("");
   const [newProductPrice, setNewProductPrice] = useState("");
-  const [newProductInventory, setNewProductInventory] = useState("100");
+  const [newProductInventory, setNewProductInventory] = useState("0");
   const [newProductDescription, setNewProductDescription] = useState("");
   const [newProductCategory, setNewProductCategory] = useState("men");
   const [newProductImage, setNewProductImage] = useState("");
@@ -56,6 +56,38 @@ export default function AdminProductsPage() {
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
   const [uploadedFileMetadata, setUploadedFileMetadata] = useState<{ name: string; size: number }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [specsList, setSpecsList] = useState<{ key: string; value: string }[]>([]);
+
+  const handleMoveImage = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= newProductImages.length) return;
+    const updatedImgs = [...newProductImages];
+    const updatedMeta = [...uploadedFileMetadata];
+
+    const [movedImg] = updatedImgs.splice(fromIndex, 1);
+    updatedImgs.splice(toIndex, 0, movedImg);
+
+    if (updatedMeta.length === newProductImages.length) {
+      const [movedMeta] = updatedMeta.splice(fromIndex, 1);
+      updatedMeta.splice(toIndex, 0, movedMeta);
+      setUploadedFileMetadata(updatedMeta);
+    }
+
+    setNewProductImages(updatedImgs);
+  };
+
+  const STANDARD_PRESETS = [
+    { key: "Brand", value: "BODYBARREL" },
+    { key: "Product Type", value: "Premium Body Wash" },
+    { key: "Volume", value: "300 ml (10.14 fl. oz.)" },
+    { key: "Target Audience", value: "Men / Women" },
+    { key: "Skin Type", value: "All Skin Types" },
+    { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Anti-Tan Care" },
+    { key: "Texture", value: "Rich Foaming Gel" },
+    { key: "Fragrance", value: "Warm Amber & Woody Notes" },
+    { key: "Usage", value: "Apply to wet skin, massage into a rich lather, then rinse thoroughly." },
+    { key: "Recommended Use", value: "Daily" },
+    { key: "Free From", value: "Parabens, Mineral Oil, Sulfates" },
+  ];
 
   // Sync image and hoverImage whenever newProductImages changes
   useEffect(() => {
@@ -170,6 +202,9 @@ export default function AdminProductsPage() {
     }
 
     try {
+      const validSpecs = specsList.filter((s) => s.key.trim().length > 0 && s.value.trim().length > 0);
+      const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : undefined;
+
       const payload = {
         sku: newProductSku,
         name: newProductName,
@@ -177,6 +212,7 @@ export default function AdminProductsPage() {
         priceUSD: parseFloat(newProductPrice),
         inventory: parseInt(newProductInventory),
         description: newProductDescription,
+        specifications: specsJson,
         image: newProductImage,
         hoverImage: newProductHoverImage,
         categorySlug: newProductCategory,
@@ -197,11 +233,12 @@ export default function AdminProductsPage() {
       setNewProductName("");
       setNewProductSubtitle("");
       setNewProductPrice("");
-      setNewProductInventory("100");
+      setNewProductInventory("0");
       setNewProductDescription("");
-                    setNewProductCategory("men");
+      setNewProductCategory("men");
       setNewProductImages([]);
       setUploadedFileMetadata([]);
+      setSpecsList([]);
     } catch {
       // toast is already displayed inside context helpers
     }
@@ -260,14 +297,14 @@ export default function AdminProductsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-5">
             <div className="space-y-2">
-              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Price (USD)</label>
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Price (INR ₹)</label>
               <input
                 type="number"
                 step="0.01"
                 required
                 value={newProductPrice}
                 onChange={(e) => setNewProductPrice(e.target.value)}
-                placeholder="45.00"
+                placeholder="1000"
                 className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
               />
             </div>
@@ -365,29 +402,181 @@ export default function AdminProductsPage() {
             />
           </div>
 
-          {/* Image Previews Box */}
-          {newProductImages.length > 0 && (
-            <div className="flex flex-wrap gap-4 items-center p-3 bg-bg border border-line rounded-xl w-full">
-              {newProductImages.map((imgUrl, idx) => (
-                <div key={idx} className="flex gap-3 items-center p-2.5 bg-bg border border-line rounded-xl relative">
-                  <div className="w-14 h-16 border border-line rounded overflow-hidden relative shrink-0">
-                    <img src={imgUrl} alt={`Preview ${idx + 1}`} width={56} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="text-[9px] uppercase tracking-wider text-muted space-y-1">
-                    <span className="font-bold text-ink block">Photo {idx + 1}</span>
+          {/* Product Specifications Section (Amazon / Flipkart Style) */}
+          <div className="space-y-3 border-t border-line/35 pt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label className="text-[9px] uppercase tracking-widest font-bold text-ink block">
+                  Product Specifications & Features (Amazon / Flipkart Style)
+                </label>
+                <p className="text-[10px] text-muted">
+                  Add custom key-value features (e.g. Brand, Skin Type, Fragrance, Primary Benefits, Usage).
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSpecsList(STANDARD_PRESETS)}
+                  className="px-3 py-1.5 bg-accent/10 border border-accent/30 text-accent text-[9px] font-bold uppercase tracking-wider rounded-lg hover:bg-accent/20 transition-colors cursor-pointer"
+                >
+                  Load E-Commerce Presets
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSpecsList((prev) => [...prev, { key: "", value: "" }])}
+                  className="px-3 py-1.5 bg-bg border border-line text-ink text-[9px] font-bold uppercase tracking-wider rounded-lg hover:border-accent hover:text-accent transition-colors cursor-pointer"
+                >
+                  + Add Feature Row
+                </button>
+                {specsList.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSpecsList([])}
+                    className="px-2.5 py-1.5 bg-red-50/30 border border-red-200 text-red-500 text-[9px] font-bold uppercase tracking-wider rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {specsList.length === 0 ? (
+              <div className="p-4 bg-bg border border-line/40 rounded-xl text-center">
+                <span className="text-[10px] text-muted uppercase tracking-wider block mb-2">
+                  No product specifications added yet.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSpecsList(STANDARD_PRESETS)}
+                  className="text-[10px] text-accent font-bold uppercase tracking-widest hover:underline cursor-pointer"
+                >
+                  Click here to load standard E-Commerce specifications preset
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                {specsList.map((spec, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row gap-2 items-center bg-bg/80 border border-line p-2 rounded-xl">
+                    <input
+                      type="text"
+                      placeholder="Feature Name (e.g. Fragrance)"
+                      value={spec.key}
+                      onChange={(e) => {
+                        const updated = [...specsList];
+                        updated[index].key = e.target.value;
+                        setSpecsList(updated);
+                      }}
+                      className="w-full sm:w-1/3 bg-bg border border-line rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider focus:outline-none focus:border-accent"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Feature Details (e.g. Warm Amber & Woody Notes)"
+                      value={spec.value}
+                      onChange={(e) => {
+                        const updated = [...specsList];
+                        updated[index].value = e.target.value;
+                        setSpecsList(updated);
+                      }}
+                      className="w-full sm:w-2/3 bg-bg border border-line rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-accent"
+                    />
                     <button
                       type="button"
-                      onClick={() => {
-                        setNewProductImages((prev) => prev.filter((_, i) => i !== idx));
-                        setUploadedFileMetadata((prev) => prev.filter((_, i) => i !== idx));
-                      }}
-                      className="text-red-500 hover:text-red-600 font-bold block cursor-pointer transition-colors"
+                      onClick={() => setSpecsList(specsList.filter((_, i) => i !== index))}
+                      className="px-2 py-1 text-red-500 hover:text-red-600 font-bold text-xs shrink-0 cursor-pointer"
+                      title="Remove Row"
                     >
-                      Delete
+                      ✕
                     </button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Image Previews Box with Re-ordering Controls */}
+          {newProductImages.length > 0 && (
+            <div className="space-y-3 p-4 bg-bg border border-line rounded-xl w-full">
+              <div className="flex items-center justify-between border-b border-line/30 pb-2">
+                <span className="text-[9px] uppercase tracking-widest font-bold text-ink">
+                  Product Image Order ({newProductImages.length}/5)
+                </span>
+                <span className="text-[9px] text-muted">
+                  Photo 1 is automatically used as the primary main cover image.
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                {newProductImages.map((imgUrl, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex flex-col p-2.5 bg-bg border rounded-xl relative transition-all ${
+                      idx === 0 ? "border-accent ring-1 ring-accent/30 bg-accent/5" : "border-line"
+                    }`}
+                  >
+                    <div className="relative aspect-[3/4] w-full border border-line rounded overflow-hidden mb-2 bg-card-bg">
+                      <img
+                        src={imgUrl}
+                        alt={`Photo ${idx + 1}`}
+                        width={120}
+                        height={160}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                      <span
+                        className={`absolute top-1 left-1 text-[7.5px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                          idx === 0 ? "bg-accent text-bg" : "bg-bg/90 text-ink border border-line"
+                        }`}
+                      >
+                        {idx === 0 ? "★ 1st (Main)" : `#${idx + 1} Photo`}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 mt-auto text-[8.5px] uppercase font-bold tracking-wider">
+                      <div className="flex items-center justify-between gap-1">
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => handleMoveImage(idx, idx - 1)}
+                          className="px-2 py-1 bg-bg border border-line rounded hover:border-accent hover:text-accent disabled:opacity-30 cursor-pointer flex-1 text-center"
+                          title="Move Left"
+                        >
+                          ← Left
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === newProductImages.length - 1}
+                          onClick={() => handleMoveImage(idx, idx + 1)}
+                          className="px-2 py-1 bg-bg border border-line rounded hover:border-accent hover:text-accent disabled:opacity-30 cursor-pointer flex-1 text-center"
+                          title="Move Right"
+                        >
+                          Right →
+                        </button>
+                      </div>
+
+                      {idx > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleMoveImage(idx, 0)}
+                          className="w-full px-2 py-1 bg-accent/10 border border-accent/30 text-accent rounded hover:bg-accent/20 cursor-pointer text-center text-[7.5px]"
+                        >
+                          Set as 1st (Main)
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewProductImages((prev) => prev.filter((_, i) => i !== idx));
+                          setUploadedFileMetadata((prev) => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="w-full px-2 py-1 text-red-500 hover:text-red-600 font-bold border border-red-200/50 bg-red-50/20 rounded cursor-pointer transition-colors text-center mt-0.5"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -472,6 +661,20 @@ export default function AdminProductsPage() {
                       setNewProductImages(imgs);
                       setUploadedFileMetadata([]);
                       setNewProductCategory(prod.Category?.slug || "men");
+                      try {
+                        if (prod.specifications) {
+                          const parsed = typeof prod.specifications === "string" ? JSON.parse(prod.specifications) : prod.specifications;
+                          if (Array.isArray(parsed)) {
+                            setSpecsList(parsed);
+                          } else {
+                            setSpecsList([]);
+                          }
+                        } else {
+                          setSpecsList([]);
+                        }
+                      } catch {
+                        setSpecsList([]);
+                      }
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="px-3 py-1 bg-bg border border-line rounded text-[8px] font-bold tracking-wider hover:border-accent hover:text-accent transition-colors cursor-pointer"

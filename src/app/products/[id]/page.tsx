@@ -92,6 +92,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       image: staticProduct.image,
       hoverImage: staticProduct.hoverImage ?? null,
       description: null,
+      specifications: staticProduct.specifications ?? null,
       inventory: 99,
     };
 

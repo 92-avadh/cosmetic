@@ -41,9 +41,10 @@ model Product {
   image       String
   hoverImage  String?
   description String?     @default("Premium cellular skincare formula.")
-  inventory   Int         @default(100)
+  inventory   Int         @default(0)
   categoryId  String?
   category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  specifications String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   

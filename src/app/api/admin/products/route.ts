@@ -55,6 +55,7 @@ export const POST = withApiHandler(async (request) => {
     sku,
     hoverImage,
     description,
+    specifications,
     inventory,
     categorySlug,
   } = await productCreateSchema.parseAsync(body);
@@ -130,6 +131,7 @@ export const POST = withApiHandler(async (request) => {
       image,
       hoverImage: hoverImage || "/products/texture-gel.png",
       description: description || "Premium body wash formula.",
+      specifications: specifications || undefined,
       inventory,
       categoryId,
       createdAt: new Date().toISOString(),
@@ -152,7 +154,7 @@ export const PUT = withApiHandler(async (request) => {
   const body = await request.json();
   const { productUpdateSchema } = await import("@/lib/schemas");
   const validated = await productUpdateSchema.parseAsync(body);
-  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, inventory, categorySlug } = validated;
+  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, specifications, inventory, categorySlug } = validated;
 
   // Autogenerate SKU if empty
   let productSku = sku ? sku.trim() : "";
@@ -206,6 +208,7 @@ export const PUT = withApiHandler(async (request) => {
       image,
       hoverImage: hoverImage || undefined,
       description: description || undefined,
+      specifications: specifications || undefined,
       inventory,
       categoryId,
       updatedAt: new Date().toISOString(),

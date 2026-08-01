@@ -16,7 +16,7 @@ export const CURRENCY_SYMBOLS: Record<Currency, string> = {
   USD: "$",
   EUR: "€",
   KRW: "₩",
-  INR: "RS. ",
+  INR: "₹",
 };
 
 export const CURRENCY_RATES: Record<Currency, number> = {

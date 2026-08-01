@@ -22,6 +22,7 @@ interface ProductDetailClientProps {
     image: string;
     hoverImage?: string | null;
     description?: string | null;
+    specifications?: string | null;
     inventory: number;
   };
   recommendations: any[];
@@ -39,6 +40,31 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string>(images[0] || product.image);
   const [activeTab, setActiveTab] = useState<string>("science");
+  const [zoomPos, setZoomPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomPos(null);
+  };
+
+  // Parse specifications JSON if present
+  let parsedSpecifications: { key: string; value: string }[] = [];
+  if (product.specifications) {
+    try {
+      const parsed = typeof product.specifications === "string" ? JSON.parse(product.specifications) : product.specifications;
+      if (Array.isArray(parsed)) {
+        parsedSpecifications = parsed.filter((s: any) => s && s.key && s.value);
+      }
+    } catch {
+      parsedSpecifications = [];
+    }
+  }
 
   // Reviews Integration
   const { user, isLoggedIn } = useUserStore();
@@ -261,10 +287,19 @@ export default function ProductDetailClient({ product, recommendations }: Produc
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             {/* Gallery Column */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="relative aspect-[3/4] w-full overflow-hidden bg-card-bg border border-line rounded-2xl flex items-center justify-center p-8 select-none">
+              <div
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="relative aspect-[3/4] w-full overflow-hidden bg-card-bg border border-line rounded-2xl flex items-center justify-center select-none cursor-crosshair group"
+              >
                 {/* Brand Overlay Badge */}
-                <div className="absolute top-4 left-4 bg-bg/90 backdrop-blur-sm px-3 py-1 border border-line/45 text-[8px] md:text-[9px] tracking-[0.25em] font-bold text-ink uppercase z-10 rounded-[2px]">
+                <div className="absolute top-4 left-4 bg-bg/90 backdrop-blur-sm px-3 py-1 border border-line/45 text-[8px] md:text-[9px] tracking-[0.25em] font-bold text-ink uppercase z-20 rounded-[2px] pointer-events-none">
                   BODYBARREL
+                </div>
+
+                {/* Hover to Zoom Hint Badge */}
+                <div className="absolute bottom-4 left-4 bg-bg/85 backdrop-blur-sm px-2.5 py-1 border border-line/45 text-[8px] tracking-widest font-bold text-muted uppercase z-20 rounded opacity-80 group-hover:opacity-0 transition-opacity pointer-events-none">
+                  🔍 Hover to Zoom
                 </div>
 
                 <img
@@ -273,22 +308,26 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   width={800}
                   height={800}
                   decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  style={{
+                    transformOrigin: zoomPos ? `${zoomPos.x}% ${zoomPos.y}%` : "center center",
+                    transform: zoomPos ? "scale(2.2)" : "scale(1)",
+                  }}
+                  className="w-full h-full object-cover transition-transform duration-200 ease-out pointer-events-none"
                 />
 
-                {/* Navigation Chevrons Overlay (Image 2 design) */}
+                {/* Navigation Chevrons Overlay */}
                 {images.length > 1 && (
                   <>
                     <button
                       onClick={handlePrevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-bg/75 border border-line rounded-[3px] hover:bg-bg transition-colors cursor-pointer"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-bg/75 border border-line rounded-[3px] hover:bg-bg transition-colors cursor-pointer z-20"
                       aria-label="Previous Image"
                     >
                       <ChevronLeft className="w-4 h-4 text-ink" />
                     </button>
                     <button
                       onClick={handleNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-bg/75 border border-line rounded-[3px] hover:bg-bg transition-colors cursor-pointer"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-bg/75 border border-line rounded-[3px] hover:bg-bg transition-colors cursor-pointer z-20"
                       aria-label="Next Image"
                     >
                       <ChevronRight className="w-4 h-4 text-ink" />
@@ -423,6 +462,30 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   {product.description || "With 0.5% Microspherized PDRN, hyaluronic acid, and natural plant based ingredients, it lifts sweat, oil, and buildup while calming, hydrating, and supporting the skin barrier."}
                 </p>
               </div>
+
+              {/* Product Specifications List (Amazon & Flipkart E-Commerce Specifications) */}
+              {parsedSpecifications.length > 0 && (
+                <div className="pt-6 border-t border-line/45 space-y-4">
+                  <h3 className="font-display font-semibold text-base sm:text-lg uppercase tracking-tight text-ink flex items-center gap-2">
+                    <span className="text-accent">•</span> Product Specifications
+                  </h3>
+                  <div className="bg-card-bg/60 border border-line/60 rounded-2xl p-5 md:p-6 space-y-3">
+                    <ul className="space-y-2.5 text-xs sm:text-sm text-ink">
+                      {parsedSpecifications.map((spec, index) => (
+                        <li key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3 border-b border-line/25 pb-2.5 last:border-b-0 last:pb-0">
+                          <span className="font-bold text-ink min-w-[160px] shrink-0 uppercase tracking-wider text-[11px] flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
+                            {spec.key}:
+                          </span>
+                          <span className="text-muted leading-relaxed font-medium">
+                            {spec.value}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
 
               {/* Accordion Tabs */}
               <div className="pt-8 border-t border-line/45 space-y-4">
