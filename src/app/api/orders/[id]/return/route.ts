@@ -56,7 +56,18 @@ export const POST = withApiHandler(async (request, context) => {
     .single();
 
   if (!order) {
-    return NextResponse.json({ error: "Order not found or unauthorized." }, { status: 404 });
+    return NextResponse.json({ error: "Order not found or you are not authorized to request a return for this purchase." }, { status: 404 });
+  }
+
+  // 7-Day Return Eligibility Calculation
+  const orderDate = new Date(order.createdAt);
+  const now = new Date();
+  const diffInDays = (now.getTime() - orderDate.getTime()) / (1000 * 3600 * 24);
+
+  if (diffInDays > 7) {
+    const err = new Error("Return window expired. Return and exchange requests must be submitted within 7 days of order placement.");
+    (err as any).status = 400;
+    throw err;
   }
 
   if (order.returnStatus && order.returnStatus !== "NONE") {

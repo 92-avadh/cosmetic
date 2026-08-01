@@ -65,7 +65,7 @@ function AnnouncementBar({ show, settings }: { show: boolean; settings: Announce
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -12, opacity: 0 }}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="text-[9px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
+            className="text-[10px] md:text-[9.5px] font-semibold uppercase tracking-[0.12em] md:tracking-[0.25em] block whitespace-normal md:whitespace-nowrap max-w-xs md:max-w-none mx-auto leading-normal"
           >
             {list[index]}
           </motion.span>
@@ -275,7 +275,7 @@ export default function Nav() {
                 alt="BODYBARREL Logo"
                 width={200}
                 height={56}
-                className="h-10 md:h-14 w-auto object-contain"
+                className="h-8 md:h-14 w-auto object-contain"
               />
             </Link>
           </div>
@@ -354,7 +354,7 @@ export default function Nav() {
           </div>
 
           {/* Mobile Actions: Hamburger + Cart */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
             <button
               onClick={() => setWishlistOpen(true)}
               className="relative p-2 text-ink hover:text-accent transition-colors cursor-pointer border-none bg-transparent"

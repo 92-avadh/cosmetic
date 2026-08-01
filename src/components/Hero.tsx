@@ -126,7 +126,7 @@ export default function Hero() {
         <div ref={ctaRef} className="opacity-0">
           <Link href="/shop">
             <CurtainButton
-              className="bg-transparent text-bg px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase border border-bg/40 rounded-full"
+              className="bg-transparent text-bg px-8 sm:px-10 py-4 text-xs font-semibold tracking-[0.2em] uppercase border border-bg/40 rounded-full"
             >
               DISCOVER THE COLLECTION
             </CurtainButton>

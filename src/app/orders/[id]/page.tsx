@@ -278,17 +278,49 @@ export default function OrderTrackingPage() {
                 </span>
               )}
 
-              {/* Show Request Return / Exchange button if delivered and no return currently pending/approved */}
-              {order.status === "DELIVERED" && (!order.returnStatus || order.returnStatus === "NONE") && (
-                <CurtainButton
-                  onClick={() => setShowReturnModal(true)}
-                  className="px-5 py-2 text-bg border-accent bg-accent text-[10px] font-bold tracking-widest uppercase rounded-[3px]"
-                >
-                  Request Return / Exchange
-                </CurtainButton>
-              )}
+              {/* Return Window Eligibility Calculation (7-Day Policy Limit) */}
+              {(() => {
+                const orderDate = new Date(order.createdAt);
+                const now = new Date();
+                const diffInDays = (now.getTime() - orderDate.getTime()) / (1000 * 3600 * 24);
+                const isWithin7Days = diffInDays <= 7;
+
+                if (order.status === "DELIVERED" && (!order.returnStatus || order.returnStatus === "NONE")) {
+                  if (isWithin7Days) {
+                    return (
+                      <CurtainButton
+                        onClick={() => setShowReturnModal(true)}
+                        className="px-5 py-2 text-bg border-accent bg-accent text-[10px] font-bold tracking-widest uppercase rounded-[3px]"
+                      >
+                        Request Return / Exchange
+                      </CurtainButton>
+                    );
+                  } else {
+                    return (
+                      <span className="inline-block text-[10px] font-bold text-muted bg-card-bg/80 px-3 py-1.5 border border-line/60 rounded uppercase tracking-wider">
+                        Return Window Expired (7-Day Policy Limit Exceeded)
+                      </span>
+                    );
+                  }
+                }
+                return null;
+              })()}
             </div>
           </div>
+
+          {/* Admin Note Banner if Return Status is Approved or Rejected */}
+          {order.returnAdminNote && (
+            <div className={`mb-8 p-4 rounded-xl border text-xs text-left ${
+              order.returnStatus === "REJECTED" || order.status === "RETURN_REJECTED"
+                ? "bg-red-50/40 border-red-200 text-red-700"
+                : "bg-emerald-50/40 border-emerald-200 text-emerald-700"
+            }`}>
+              <span className="font-bold uppercase tracking-wider block mb-1">
+                {order.returnStatus === "REJECTED" || order.status === "RETURN_REJECTED" ? "✕ Return Request Rejection Reason:" : "✓ Admin Approval Note:"}
+              </span>
+              <p className="font-medium text-ink/90">"{order.returnAdminNote}"</p>
+            </div>
+          )}
 
           {/* Stepper Tracking Visualizer (Horizontal) */}
           {!isCancelled && (

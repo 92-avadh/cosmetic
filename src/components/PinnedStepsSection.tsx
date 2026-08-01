@@ -116,7 +116,7 @@ export default function PinnedStepsSection() {
                   </p>
 
                   {/* Quantitative Scientific Stat Footer */}
-                  <div className="border-t border-line/40 pt-4 flex items-center justify-between text-[10px] tracking-widest uppercase text-muted/75">
+                  <div className="border-t border-line/40 pt-4 flex flex-col gap-1 items-start md:flex-row md:items-center md:justify-between text-[10px] tracking-widest uppercase text-muted/75">
                     <span>Clinical Protocol Certified</span>
                     <span className="font-mono text-accent font-semibold">{step.clinicalStat}</span>
                   </div>

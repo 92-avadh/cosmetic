@@ -77,12 +77,16 @@ export default function AdminOrdersPage() {
   };
 
   const handleApproveReturn = async (orderId: string) => {
-    const note = adminNotes[orderId] || "Return request accepted by Admin. Reverse pickup scheduled.";
+    const note = adminNotes[orderId]?.trim() || "Return request accepted by Admin. Reverse courier pickup scheduled.";
     await handleUpdateOrderStatus(orderId, "RETURN_APPROVED", "APPROVED", note);
   };
 
   const handleRejectReturn = async (orderId: string) => {
-    const note = adminNotes[orderId] || "Return request rejected by Admin.";
+    const note = adminNotes[orderId]?.trim();
+    if (!note) {
+      alert("Please enter a rejection reason in the input field before rejecting the return request.");
+      return;
+    }
     await handleUpdateOrderStatus(orderId, "RETURN_REJECTED", "REJECTED", note);
   };
 

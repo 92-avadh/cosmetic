@@ -101,7 +101,7 @@ export default function ProductCard({
       {/* Images container */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-card-bg border border-line/50 transition-all duration-500">
         {/* Brand Overlay Badge */}
-        <div className="absolute top-3 left-3 bg-bg/90 backdrop-blur-sm px-2 py-0.5 border border-line/40 text-[7px] tracking-[0.22em] font-bold text-ink uppercase z-10 select-none rounded-[2px]">
+        <div className="absolute top-3 left-3 bg-bg/90 backdrop-blur-sm px-2 py-0.5 border border-line/40 text-[9px] tracking-[0.22em] font-bold text-ink uppercase z-10 select-none rounded-[2px]">
           BODYBARREL
         </div>
 
@@ -162,14 +162,14 @@ export default function ProductCard({
         >
           <CurtainButton
             onClick={handleQuickAdd}
-            className="w-full text-ink border-ink/40 bg-transparent text-[8px] md:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
+            className="w-full text-ink border-ink/40 bg-transparent text-[9px] sm:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
           >
             <Plus className="w-3 h-3" />
             <span>Add</span>
           </CurtainButton>
           <CurtainButton
             onClick={handleBuyNow}
-            className="w-full text-[#2d1c14] border-[#2d1c14]/40 bg-transparent text-[8px] md:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
+            className="w-full text-[#2d1c14] border-[#2d1c14]/40 bg-transparent text-[9px] sm:text-[9.5px] font-bold py-2.5 px-2 tracking-wider uppercase flex items-center justify-center space-x-1"
           >
             <span>Buy Now</span>
           </CurtainButton>
@@ -178,7 +178,7 @@ export default function ProductCard({
 
       {/* Metadata */}
       <div className="mt-4 flex flex-col space-y-1">
-        <span className="text-[10px] uppercase tracking-[0.15em] text-muted font-medium">
+        <span className="text-[11px] uppercase tracking-[0.15em] text-muted font-medium">
           {subtitle}
         </span>
         <div className="flex items-baseline justify-between">

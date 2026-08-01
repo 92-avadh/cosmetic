@@ -25,7 +25,7 @@ export default function CurtainButton({
       whileHover="hover"
       initial="rest"
       animate="rest"
-      className={`relative overflow-hidden cursor-pointer select-none transition-colors duration-300 border border-line group ${className}`}
+      className={`relative overflow-hidden cursor-pointer select-none transition-colors duration-300 border border-line group max-w-full ${className}`}
       style={{ isolation: "isolate" }}
     >
       {/* Layer 1: Pink curtain (#e8c5c1) */}
