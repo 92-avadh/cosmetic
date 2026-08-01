@@ -30,22 +30,6 @@ export async function sendEmail({
   }
 
   try {
-    if (process.env.NEXT_RUNTIME === "edge") {
-      console.warn("SMTP email sending is not supported in Edge runtime. Email was mocked.");
-      console.log("\n");
-      console.log("┌────────────────────────────────────────────────────────┐");
-      console.log("│ ⚠️ [MOCK EMAIL] EDGE RUNTIME - EMAIL WAS MOCKED         │");
-      console.log("├────────────────────────────────────────────────────────┤");
-      console.log(`│ To:      ${to.padEnd(46)} │`);
-      console.log(`│ Subject: ${subject.padEnd(46)} │`);
-      console.log(`│ Body Preview:                                          │`);
-      const plainText = html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-      console.log(`│ ${plainText.slice(0, 50).padEnd(52)} │`);
-      console.log("└────────────────────────────────────────────────────────┘");
-      console.log("\n");
-      return { success: true, mocked: true };
-    }
-
     // Indirect require to bypass Next.js compilation warnings in Edge runtime
     const dynamicRequire = typeof require !== "undefined" ? require : undefined;
     const nodemailer = dynamicRequire ? dynamicRequire("nodemailer") : null;
@@ -55,8 +39,12 @@ export async function sendEmail({
       return { success: true, mocked: true };
     }
 
+    // ponytail: explicit SMTP config (not `service: "gmail"`) so nodemailer builds
+    // the connection from raw host/port and works under nodejs_socket outbound TCP.
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: gmailUser,
         pass: gmailPass,

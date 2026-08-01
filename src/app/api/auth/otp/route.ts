@@ -50,13 +50,13 @@ export const POST = withApiHandler(async (request: Request) => {
       </div>
     `;
 
-    // Dispatch the verification email in background non-blockingly
-    sendEmail({
+    // Send the verification email before responding. On Cloudflare Workers,
+    // unawaited background tasks are killed when the response returns, so the
+    // email must complete inline or it will never arrive.
+    await sendEmail({
       to: emailKey,
       subject: `Your BODYBARREL Verification Code: ${otp}`,
       html: emailHtml,
-    }).catch((err) => {
-      console.error(`[BACKGROUND EMAIL FAILED] Error sending OTP to ${emailKey}:`, err);
     });
 
     await logAudit({

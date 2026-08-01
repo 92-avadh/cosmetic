@@ -171,9 +171,11 @@ export const POST = withApiHandler(async (request) => {
           </div>
         `;
 
-        sendEmail({ to: recipientEmail, subject, html }).catch((e) => {
+        try {
+          await sendEmail({ to: recipientEmail, subject, html });
+        } catch (e) {
           console.error("[RETURN EMAIL ERROR]:", e);
-        });
+        }
       }
     } catch (emailErr) {
       console.error("[RETURN EMAIL DISPATCH ERROR]:", emailErr);
