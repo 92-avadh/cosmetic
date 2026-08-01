@@ -174,8 +174,11 @@ export default function AdminProductsPage() {
 
       if (!res.ok) throw new Error(getApiErrorMessage(resJson, "File upload failed"));
 
-      const data = resJson.data;
-      const uploadedUrls = data.urls || [data.url];
+      const data = resJson.data || resJson;
+      const uploadedUrls = data.urls || (data.url ? [data.url] : []);
+      if (uploadedUrls.length === 0) {
+        throw new Error(getApiErrorMessage(resJson, "No valid image URL returned from upload."));
+      }
       
       // Append new uploaded images and track their metadata
       setNewProductImages((prev) => [...prev, ...uploadedUrls]);
@@ -205,11 +208,15 @@ export default function AdminProductsPage() {
       const validSpecs = specsList.filter((s) => s.key.trim().length > 0 && s.value.trim().length > 0);
       const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : undefined;
 
+      // Convert input price in INR (₹) to base USD price for database storage
+      const inputPriceINR = parseFloat(newProductPrice);
+      const priceUSD = inputPriceINR / CURRENCY_RATES["INR"];
+
       const payload = {
         sku: newProductSku,
         name: newProductName,
         subtitle: newProductSubtitle,
-        priceUSD: parseFloat(newProductPrice),
+        priceUSD,
         inventory: parseInt(newProductInventory),
         description: newProductDescription,
         specifications: specsJson,
@@ -654,7 +661,8 @@ export default function AdminProductsPage() {
                       setNewProductSku(prod.sku || "");
                       setNewProductName(prod.name);
                       setNewProductSubtitle(prod.subtitle);
-                      setNewProductPrice(String(prod.priceUSD));
+                      const priceInINR = Math.round(prod.priceUSD * CURRENCY_RATES["INR"]);
+                      setNewProductPrice(String(priceInINR));
                       setNewProductInventory(String(prod.inventory));
                       setNewProductDescription(prod.description || "");
                       const imgs = prod.image ? prod.image.split(",") : [];

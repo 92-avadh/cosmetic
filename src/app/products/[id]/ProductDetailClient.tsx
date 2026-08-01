@@ -217,18 +217,22 @@ export default function ProductDetailClient({ product, recommendations }: Produc
     }
   };
 
+  const formulaScienceFallback =
+    product.id === "men-body-wash"
+      ? "Formulated specifically for the structural thickness and higher sebum indices of male skin. Contains activated charcoal minerals and lipid-replenishing ceramides that lock in moisture post-exercise. Accelerates surface restoration while neutralizing stress parameters."
+      : product.id === "women-body-wash"
+      ? "Designed for delicate barrier membranes prone to thermal moisture loss. Infused with micro-nutrients, rose hydrosol, and Phyto-Stem Cells to stimulate collagen recovery and cellular density. Repairs moisture depletion within 14 days."
+      : product.id === "exfoliating-body-wash"
+      ? "A biochemical dual-action exfoliating wash. Utilizes non-abrasive fruit enzymes and fine volcanic mineral dust to dissolve keratin bonds, smooth roughness, and trigger cellular speed. Perfect for hyperkeratosis and textured skin profiles."
+      : "A universal pH-balanced skin recovery formula. Contains high-potency marine PDRN, amino acids, and centella extract. Operates at a molecular level to calm inflammation and secure the cellular structure of dry and sensitive skin.";
+
   const productTabs = [
     {
       id: "science",
       label: "Formula Science",
-      content:
-        product.id === "men-body-wash"
-          ? "Formulated specifically for the structural thickness and higher sebum indices of male skin. Contains activated charcoal minerals and lipid-replenishing ceramides that lock in moisture post-exercise. Accelerates surface restoration while neutralizing stress parameters."
-          : product.id === "women-body-wash"
-          ? "Designed for delicate barrier membranes prone to thermal moisture loss. Infused with micro-nutrients, rose hydrosol, and Phyto-Stem Cells to stimulate collagen recovery and cellular density. Repairs moisture depletion within 14 days."
-          : product.id === "exfoliating-body-wash"
-          ? "A biochemical dual-action exfoliating wash. Utilizes non-abrasive fruit enzymes and fine volcanic mineral dust to dissolve keratin bonds, smooth roughness, and trigger cellular speed. Perfect for hyperkeratosis and textured skin profiles."
-          : "A universal pH-balanced skin recovery formula. Contains high-potency marine PDRN, amino acids, and centella extract. Operates at a molecular level to calm inflammation and secure the cellular structure of dry and sensitive skin.",
+      content: product.description
+        ? `${product.description}\n\n${formulaScienceFallback}`
+        : formulaScienceFallback,
     },
     {
       id: "ingredients",
@@ -457,8 +461,11 @@ export default function ProductDetailClient({ product, recommendations }: Produc
               </div>
 
               {/* Product Sourcing Description (below actions) */}
-              <div className="pt-6 border-t border-line/45 space-y-4">
-                <p className="text-xs sm:text-sm text-muted leading-relaxed max-w-xl">
+              <div className="pt-6 border-t border-line/45 space-y-3">
+                <h3 className="font-display font-semibold text-xs sm:text-sm uppercase tracking-widest text-ink flex items-center gap-2">
+                  <span className="text-accent">•</span> Product Description
+                </h3>
+                <p className="text-xs sm:text-sm text-ink/90 leading-relaxed max-w-xl font-normal whitespace-pre-wrap">
                   {product.description || "With 0.5% Microspherized PDRN, hyaluronic acid, and natural plant based ingredients, it lifts sweat, oil, and buildup while calming, hydrating, and supporting the skin barrier."}
                 </p>
               </div>
