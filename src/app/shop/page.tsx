@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { PRODUCTS_CATALOG } from "@/lib/products-catalog";
 import { useCartStore } from "@/store/useCartStore";
-import { Sparkles, HelpCircle, Layers, Droplet } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 
 const ProductCardSkeleton = () => (
@@ -70,33 +70,6 @@ export default function ShopPage() {
     }
     return catSlug === activeCategory;
   });
-
-  const skinTypes = [
-    {
-      title: "Dry & Damaged",
-      recommendation: "Aura-Glow / Bio-Fit",
-      details: "Requires rich micro-ceramides and amino acids to seal moisture. Avoid high-temperature water.",
-      ph: "5.5 Balanced",
-    },
-    {
-      title: "Sensitive & Reacting",
-      recommendation: "Bio-Fit Unisex",
-      details: "Formulated with soothing marine PDRN and centella extract to reduce epidermal stress and micro-redness.",
-      ph: "5.4 Low-Acid",
-    },
-    {
-      title: "Thick Dermis / Oily",
-      recommendation: "Derm-Restore Men's",
-      details: "Specifically designed for active lipid control and charcoal-depth cleansing without stripping surface barrier.",
-      ph: "5.6 Restorative",
-    },
-    {
-      title: "Uneven Texture",
-      recommendation: "Dermal-Micro Exfoliating",
-      details: "Biological enzymes dissolve keratin bonds gently. Recommended 2-3 times per week.",
-      ph: "5.2 Micro-Peel",
-    },
-  ];
 
   const faqs = [
     {
@@ -211,42 +184,6 @@ export default function ShopPage() {
         </section>
 
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          {/* Skin Type Guide Section */}
-          <section className="mt-28 border-t border-line/60 pt-20">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 space-y-4 md:space-y-0">
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-[0.2em] font-semibold text-accent flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5" /> Skin System Guide
-                </span>
-                <h2 className="font-display font-semibold text-2xl md:text-4xl uppercase tracking-tight text-ink">
-                  FIND YOUR RESILIENCE FORMULA
-                </h2>
-              </div>
-              <p className="text-xs md:text-sm text-muted max-w-sm">
-                Matches developed by biological research to align formulation chemistry with specific epidermal types.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {skinTypes.map((type) => (
-                <div key={type.title} className="p-6 bg-card-bg/40 border border-line/40 rounded-xl space-y-4 flex flex-col justify-between hover:border-accent/40 transition-colors duration-300">
-                  <div className="space-y-3">
-                    <h3 className="font-display font-semibold text-sm tracking-wide uppercase text-ink">
-                      {type.title}
-                    </h3>
-                    <p className="text-xs text-muted leading-relaxed">
-                      {type.details}
-                    </p>
-                  </div>
-                  <div className="border-t border-line/30 pt-3 flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-widest font-semibold">
-                    <span className="text-accent">{type.recommendation}</span>
-                    <span className="text-muted/75 font-mono">{type.ph}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* FAQ & Protocol Section */}
           <section className="mt-28 border-t border-line/60 pt-20">
             <div className="max-w-3xl mb-16 space-y-3">

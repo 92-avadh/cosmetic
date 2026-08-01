@@ -674,7 +674,7 @@ export default function AdminProductsPage() {
           {filteredProducts.map((prod) => (
             <div key={prod.id} className="p-4 bg-bg/40 border border-line rounded-xl flex gap-4 hover:border-accent/40 transition-colors">
               <div className="w-16 h-20 bg-card-bg border border-line/50 rounded overflow-hidden shrink-0 select-none">
-                <img src={prod.image} alt={prod.name} width={40} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                <img src={(prod.image || "").split(",")[0].trim()} alt={prod.name} width={40} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div className="space-y-1">

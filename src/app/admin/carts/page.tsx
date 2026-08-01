@@ -57,7 +57,7 @@ export default function AdminCartsPage() {
                     <div key={item.id} className="flex items-center justify-between gap-3 text-[10px] uppercase font-semibold text-ink/80">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="w-7 h-8 bg-card-bg border border-line rounded overflow-hidden shrink-0">
-                          <img src={item.image} alt={item.name} width={28} height={32} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                          <img src={(item.image || "").split(",")[0].trim()} alt={item.name} width={28} height={32} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <span className="text-ink truncate block">{item.name}</span>

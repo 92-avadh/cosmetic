@@ -147,7 +147,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         className="flex items-center gap-4 py-3 hover:bg-card-bg/60 rounded-xl px-3 transition-colors group"
                       >
                         <div className="w-14 h-16 bg-card-bg border border-line/50 rounded overflow-hidden shrink-0">
-                          <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          <img src={(p.image || "").split(",")[0].trim()} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                           <h4 className="font-display font-semibold text-xs uppercase text-ink group-hover:text-accent transition-colors truncate">

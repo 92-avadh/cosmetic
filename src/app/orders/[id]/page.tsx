@@ -405,7 +405,7 @@ export default function OrderTrackingPage() {
                         <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                           <div className="w-16 h-20 bg-card-bg border border-line/40 rounded overflow-hidden flex-shrink-0 select-none">
                             <img
-                              src={item.product?.image || "/fallback_wash.png"}
+                              src={(item.product?.image || "").split(",")[0].trim() || "/products/texture-gel.png"}
                               alt={item.product?.name || "Product"}
                               className="w-full h-full object-cover"
                             />
