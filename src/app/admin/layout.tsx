@@ -85,7 +85,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="bg-bg text-ink min-h-screen lg:h-screen flex flex-col lg:flex-row font-sans overflow-x-hidden overflow-y-auto lg:overflow-hidden">
+    <div className="bg-bg text-ink min-h-screen lg:h-screen flex flex-col lg:flex-row font-sans overflow-x-hidden lg:overflow-hidden">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-ink text-bg border border-accent/30 rounded-xl px-5 py-3.5 shadow-2xl flex items-center gap-3 text-xs tracking-wider uppercase animate-fadeIn">

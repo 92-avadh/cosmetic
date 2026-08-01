@@ -153,7 +153,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="no-reveal w-full max-w-md bg-card-bg/40 backdrop-blur-md border border-line/60 rounded-3xl p-8 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.03)] relative overflow-hidden">
+    <div className="no-reveal w-full max-w-md bg-card-bg/40 backdrop-blur-md border border-line/60 rounded-3xl p-6 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.03)] relative overflow-hidden">
       {/* Decorative top accent line */}
       <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
 

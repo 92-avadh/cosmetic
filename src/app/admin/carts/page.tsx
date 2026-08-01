@@ -28,20 +28,20 @@ export default function AdminCartsPage() {
                   <span className="text-muted">Last Active:</span>
                   <span className="text-ink">{new Date(cart.updatedAt).toLocaleString()}</span>
                 </div>
-                <span className="text-[8.5px] bg-red-50 text-red-500 border border-red-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest w-fit">
+                <span className="text-[9px] bg-red-50 text-red-500 border border-red-100 px-2 py-0.5 rounded font-bold uppercase tracking-widest w-fit">
                   Abandoned Checkout
                 </span>
               </div>
 
               {/* Customer email details */}
-              <div className="text-[10px] text-muted uppercase tracking-wider flex items-center justify-between">
-                <div>
+              <div className="text-[10px] text-muted uppercase tracking-wider flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="min-w-0">
                   <span className="font-bold text-ink block mb-0.5">Customer Email Code</span>
-                  <span className="text-ink font-semibold">{cart.userEmail}</span>
+                  <span className="text-ink font-semibold break-all">{cart.userEmail}</span>
                 </div>
                 <button
                   onClick={() => handleSimulateRecoveryEmail(cart)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-bg border border-line rounded-lg text-[9px] font-bold tracking-widest hover:border-accent hover:text-accent transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-bg border border-line rounded-lg text-[10px] font-bold tracking-widest hover:border-accent hover:text-accent transition-all cursor-pointer shrink-0"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Dispatch Recovery Promo</span>
@@ -50,21 +50,21 @@ export default function AdminCartsPage() {
 
               {/* Items in Cart */}
               <div className="border-t border-line/30 pt-3">
-                <span className="text-[9px] font-bold text-ink uppercase tracking-wider block mb-2">Cart Contents</span>
+                <span className="text-[10px] font-bold text-ink uppercase tracking-wider block mb-2">Cart Contents</span>
 
                 <div className="space-y-2">
                   {cart.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between text-[10px] uppercase font-semibold text-ink/80">
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-8 bg-card-bg border border-line rounded overflow-hidden">
+                    <div key={item.id} className="flex items-center justify-between gap-3 text-[10px] uppercase font-semibold text-ink/80">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-7 h-8 bg-card-bg border border-line rounded overflow-hidden shrink-0">
                           <img src={item.image} alt={item.name} width={28} height={32} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
-                        <div>
-                          <span className="text-ink">{item.name}</span>
-                          <span className="text-muted block text-[8px] tracking-normal lowercase">{item.subtitle}</span>
+                        <div className="min-w-0">
+                          <span className="text-ink truncate block">{item.name}</span>
+                          <span className="text-muted block text-[9px] tracking-normal lowercase truncate">{item.subtitle}</span>
                         </div>
                       </div>
-                      <div className="flex gap-8 items-baseline">
+                      <div className="flex gap-3 sm:gap-8 items-baseline shrink-0">
                         <span>Qty: {item.quantity}</span>
                         <span className="font-bold text-ink">
                           {CURRENCY_SYMBOLS[currency]}

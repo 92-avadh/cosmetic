@@ -238,7 +238,7 @@ export default function ShopPage() {
                       {type.details}
                     </p>
                   </div>
-                  <div className="border-t border-line/30 pt-3 flex items-center justify-between text-[9px] uppercase tracking-widest font-semibold">
+                  <div className="border-t border-line/30 pt-3 flex flex-wrap items-center justify-between gap-2 text-[10px] uppercase tracking-widest font-semibold">
                     <span className="text-accent">{type.recommendation}</span>
                     <span className="text-muted/75 font-mono">{type.ph}</span>
                   </div>

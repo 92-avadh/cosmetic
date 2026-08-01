@@ -249,7 +249,7 @@ export default function AccountPage() {
           </div>
 
           {/* Account Detail Display Panels */}
-          <div className="lg:col-span-8 bg-card-bg/35 backdrop-blur border border-line/50 rounded-2xl p-8 min-h-[480px] relative">
+          <div className="lg:col-span-8 bg-card-bg/35 backdrop-blur border border-line/50 rounded-2xl p-5 md:p-8 min-h-[480px] relative">
             {isLoading && (
               <div className="absolute inset-0 bg-bg/40 backdrop-blur-xs flex items-center justify-center z-20 rounded-2xl">
                 <Loader2 className="w-8 h-8 text-accent animate-spin" />
@@ -291,13 +291,13 @@ export default function AccountPage() {
                   <div className="space-y-6">
                     {dbUser.orders.map((order: any) => (
                       <div key={order.id} className="border border-line/70 rounded-xl p-5 bg-bg/50 space-y-4 hover:border-accent/40 transition-colors">
-                        <div className="flex items-center justify-between text-xs border-b border-line/45 pb-3">
-                          <span className="font-bold text-ink uppercase tracking-wider">Order #{order.id.slice(0, 8)}</span>
-                          <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 text-xs border-b border-line/45 pb-3">
+                          <span className="font-bold text-ink uppercase tracking-wider min-w-0 break-words">Order #{order.id.slice(0, 8)}</span>
+                          <div className="flex items-center gap-3">
                             <span className="text-muted">{new Date(order.createdAt).toLocaleDateString()}</span>
                             <Link
                               href={`/orders/${order.id}`}
-                              className="text-accent hover:underline font-bold uppercase tracking-widest text-[9px]"
+                              className="text-accent hover:underline font-bold uppercase tracking-widest text-[10px]"
                             >
                               Track Details &rarr;
                             </Link>
@@ -333,7 +333,7 @@ export default function AccountPage() {
 
                         {/* Visual Tracking Stepper */}
                         {order.status !== "CANCELLED" ? (
-                          <div className="mt-6 pt-5 border-t border-line/35 flex items-center justify-between max-w-lg text-[9px] uppercase tracking-wider font-semibold text-muted/75 relative">
+                          <div className="mt-6 pt-5 border-t border-line/35 flex items-center justify-between max-w-lg text-[8px] sm:text-[9px] uppercase tracking-normal sm:tracking-wider font-semibold text-muted/75 relative">
                             {/* Connector Line Background */}
                             <div className="absolute top-[27px] left-[12%] right-[12%] h-[1.5px] bg-line/35 z-0" />
                             

@@ -41,7 +41,7 @@ export default function SciencePageClient() {
             <span className="text-xs uppercase tracking-[0.25em] font-semibold text-accent block">
               CELLULAR BODY RESTORATION
             </span>
-            <h1 className="font-display font-semibold text-4xl sm:text-6xl md:text-7xl leading-[1.05] tracking-tight uppercase text-ink">
+            <h1 className="font-display font-semibold text-3xl sm:text-6xl md:text-7xl leading-[1.05] tracking-tight uppercase text-ink">
               PHYSIOLOGICAL <br />
               <span className="text-accent">BODY SCIENCE</span>
             </h1>

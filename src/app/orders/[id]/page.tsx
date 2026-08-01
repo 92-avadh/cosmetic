@@ -685,12 +685,12 @@ export default function OrderTrackingPage() {
         <div className="fixed inset-0 bg-ink/75 backdrop-blur-md z-50 overflow-y-auto p-4 md:p-8 flex justify-center">
           <div className="bg-white text-black max-w-3xl w-full rounded-xl shadow-2xl p-6 md:p-10 space-y-8 my-auto relative print:m-0 print:p-0 print:shadow-none print:w-full print:max-w-none">
             {/* Header controls (Hidden during print) */}
-            <div className="flex items-center justify-between border-b border-gray-200 pb-4 print:hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-4 print:hidden">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-[#2d1c14]" />
                 <span className="font-bold text-sm uppercase tracking-wider text-[#2d1c14]">Tax Invoice Preview</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => window.print()}
                   className="px-4 py-2 bg-[#2d1c14] text-white hover:bg-black rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer border-none"
@@ -710,10 +710,10 @@ export default function OrderTrackingPage() {
             {/* Print Document Root */}
             <div id="tax-invoice-document" className="space-y-8 font-sans">
               {/* Document Brand Header */}
-              <div className="flex justify-between items-start border-b border-gray-300 pb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-gray-300 pb-6">
                 <div className="space-y-2">
                   <img src="/logo.png" alt="BODYBARREL Logo" width={180} height={50} className="h-10 w-auto object-contain" />
-                  <p className="text-[10px] text-gray-500 font-mono">
+                  <p className="text-[10px] text-gray-500 font-mono break-words">
                     BODYBARREL CELLULAR BOTANICALS INC.<br />
                     TAX REG / GSTIN: 27AAACB0981C1Z4<br />
                     Compliance Office: Bandra Kurla Complex, Mumbai / Seoul Gangnam-gu
@@ -733,7 +733,7 @@ export default function OrderTrackingPage() {
               </div>
 
               {/* Billed To / Shipped To Grid */}
-              <div className="grid grid-cols-2 gap-8 text-xs border-b border-gray-200 pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 text-xs border-b border-gray-200 pb-6">
                 <div>
                   <h4 className="font-bold text-[10px] uppercase tracking-widest text-gray-400 mb-1">Billed & Shipped To:</h4>
                   <p className="font-bold text-gray-900 uppercase">{order.shippingName || "Valued Customer"}</p>
@@ -741,16 +741,16 @@ export default function OrderTrackingPage() {
                   <p className="text-gray-600">{order.shippingCity}, {order.shippingZip}</p>
                   <p className="text-gray-600 font-semibold uppercase">{order.shippingCountry}</p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <h4 className="font-bold text-[10px] uppercase tracking-widest text-gray-400 mb-1">Payment Reference:</h4>
                   <p className="font-bold text-emerald-700 uppercase">Payment Captured (Paid)</p>
-                  <p className="text-gray-600 font-mono">Order ID: {order.id}</p>
+                  <p className="text-gray-600 font-mono break-all">Order ID: {order.id}</p>
                   <p className="text-gray-600">Currency: {order.currency || "USD"}</p>
                 </div>
               </div>
 
               {/* Itemized Table */}
-              <div className="space-y-2">
+              <div className="space-y-2 overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="border-b-2 border-gray-900 text-[10px] uppercase tracking-wider font-bold text-gray-700">
@@ -790,7 +790,7 @@ export default function OrderTrackingPage() {
               </div>
 
               {/* Total Calculation Summary */}
-              <div className="flex justify-between items-end border-t-2 border-gray-900 pt-6">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-t-2 border-gray-900 pt-6">
                 <div className="space-y-1">
                   <span className="text-[9px] uppercase font-bold text-gray-400 block tracking-widest">Authentication Seal</span>
                   <div className="inline-flex items-center gap-2 border border-emerald-300 bg-emerald-50 px-3 py-1.5 rounded text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
@@ -798,7 +798,7 @@ export default function OrderTrackingPage() {
                     <span>Verified E-Commerce Invoice</span>
                   </div>
                 </div>
-                <div className="w-64 space-y-2 text-xs font-semibold text-gray-700 text-right">
+                <div className="w-full sm:w-64 space-y-2 text-xs font-semibold text-gray-700 text-right">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
                     <span className="font-mono">{symbol}{displaySubtotal.toFixed(2)}</span>
