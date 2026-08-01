@@ -89,25 +89,30 @@ export const POST = withApiHandler(async (request) => {
     const uniqueSuffix = crypto.randomUUID();
     const filename = `${uniqueSuffix}.${extension}`;
 
-    // 4. Upload file to Supabase Storage
-    const { data: uploadData, error: uploadErr } = await supabase.storage
-      .from("uploads")
-      .upload(filename, new Uint8Array(buffer), {
-        contentType,
-        upsert: true,
-      });
+    // Convert binary buffer to Base64 Data URI string for storage and instant image preview decoding
+    const base64Bytes = Buffer.from(buffer).toString("base64");
+    const base64DataUri = `data:${contentType};base64,${base64Bytes}`;
 
-    if (uploadErr) {
-      console.error("[SUPABASE UPLOAD ERROR]:", uploadErr.message);
-      return NextResponse.json(
-        { error: "Failed to upload file to storage" },
-        { status: 500 }
-      );
+    // 4. Attempt upload to Supabase Storage
+    try {
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from("uploads")
+        .upload(filename, new Uint8Array(buffer), {
+          contentType,
+          upsert: true,
+        });
+
+      if (!uploadErr && uploadData) {
+        const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(filename);
+        uploadedUrls.push(urlData.publicUrl);
+      } else {
+        console.warn("[SUPABASE STORAGE FALLBACK]: Storage error or bucket unconfigured, using Base64 URI:", uploadErr?.message);
+        uploadedUrls.push(base64DataUri);
+      }
+    } catch (err) {
+      console.warn("[SUPABASE STORAGE EXCEPTION]: Using Base64 URI fallback:", err);
+      uploadedUrls.push(base64DataUri);
     }
-
-    const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(filename);
-    const publicUrl = urlData.publicUrl;
-    uploadedUrls.push(publicUrl);
   }
 
   // If only 1 file was uploaded, return singular "url" for backwards compatibility, otherwise return all

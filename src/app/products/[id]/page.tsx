@@ -14,29 +14,49 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = PRODUCTS_CATALOG.find((p) => p.id === id);
+  
+  let product: any = null;
+  try {
+    const { data } = await supabase
+      .from("Product")
+      .select("id, name, subtitle, image")
+      .eq("id", id)
+      .maybeSingle();
+    if (data) {
+      product = data;
+    }
+  } catch {
+    // Ignore DB failure in metadata generation
+  }
 
   if (!product) {
-    return { title: "Product Not Found" };
+    const staticItem = PRODUCTS_CATALOG.find((p) => p.id === id);
+    if (staticItem) {
+      product = staticItem;
+    }
+  }
+
+  if (!product) {
+    return { title: "Product | BODYBARREL" };
   }
 
   const productUrl = `${SITE_URL}/products/${product.id}`;
   const imageUrl = product.image.startsWith("/") ? `${SITE_URL}${product.image}` : product.image;
 
   return {
-    title: product.name,
-    description: product.subtitle,
+    title: `${product.name} | BODYBARREL`,
+    description: product.subtitle || "BODYBARREL Premium Body Wash & Skincare Formulation",
     openGraph: {
       type: "website",
-      title: product.name,
-      description: product.subtitle,
+      title: `${product.name} | BODYBARREL`,
+      description: product.subtitle || "BODYBARREL Premium Body Wash & Skincare Formulation",
       url: productUrl,
       images: [{ url: imageUrl, width: 1200, height: 630, alt: product.name }],
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.subtitle,
+      title: `${product.name} | BODYBARREL`,
+      description: product.subtitle || "BODYBARREL Premium Body Wash & Skincare Formulation",
       images: [imageUrl],
     },
   };
