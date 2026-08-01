@@ -231,7 +231,7 @@ export default function AdminProductsPage() {
 
     try {
       const validSpecs = specsList.filter((s) => s.key.trim().length > 0 && s.value.trim().length > 0);
-      const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : undefined;
+      const specsJson = JSON.stringify(validSpecs.length > 0 ? validSpecs : STANDARD_PRESETS);
 
       // Convert input price in INR (₹) to base USD price for database storage
       const inputPriceINR = parseFloat(newProductPrice);
@@ -439,7 +439,7 @@ export default function AdminProductsPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <label className="text-[9px] uppercase tracking-widest font-bold text-ink block">
-                  Product Specifications & Features (Amazon / Flipkart Style)
+                  Product Specifications & Features
                 </label>
                 <p className="text-[10px] text-muted">
                   Add custom key-value features (e.g. Brand, Skin Type, Fragrance, Primary Benefits, Usage).
@@ -698,16 +698,16 @@ export default function AdminProductsPage() {
                       try {
                         if (prod.specifications) {
                           const parsed = typeof prod.specifications === "string" ? JSON.parse(prod.specifications) : prod.specifications;
-                          if (Array.isArray(parsed)) {
+                          if (Array.isArray(parsed) && parsed.length > 0) {
                             setSpecsList(parsed);
                           } else {
-                            setSpecsList([]);
+                            setSpecsList(STANDARD_PRESETS);
                           }
                         } else {
-                          setSpecsList([]);
+                          setSpecsList(STANDARD_PRESETS);
                         }
                       } catch {
-                        setSpecsList([]);
+                        setSpecsList(STANDARD_PRESETS);
                       }
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
