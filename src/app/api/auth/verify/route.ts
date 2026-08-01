@@ -15,13 +15,14 @@ export const POST = withApiHandler(async (request: Request) => {
     emailKey = email;
 
     // Query the database for the active token
-    const { data: tokenRecord, error: tokenError } = await supabase
+    const { data: tokens, error: tokenError } = await supabase
       .from("VerificationToken")
       .select("*")
       .eq("email", emailKey)
       .order("createdAt", { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
+
+    const tokenRecord = tokens?.[0];
 
     if (tokenError || !tokenRecord) {
       const err = new Error("Verification code not found. Please request a new OTP.");
@@ -32,13 +33,13 @@ export const POST = withApiHandler(async (request: Request) => {
 
     // Verify expiration time
     const expiresAtRaw = tokenRecord.expiresAt;
-    const expiresDate = new Date(
-      typeof expiresAtRaw === "string"
-        ? (expiresAtRaw.endsWith("Z") ? expiresAtRaw : expiresAtRaw + "Z")
-        : expiresAtRaw
-    );
+    let parseStr = typeof expiresAtRaw === "string" ? expiresAtRaw.trim().replace(" ", "T") : String(expiresAtRaw);
+    if (!parseStr.endsWith("Z") && !/[+-]\d{2}:?\d{2}$/.test(parseStr)) {
+      parseStr += "Z";
+    }
+    const expiresDate = new Date(parseStr);
 
-    if (new Date() > expiresDate) {
+    if (isNaN(expiresDate.getTime()) || new Date() > expiresDate) {
       await supabase
         .from("VerificationToken")
         .delete()
@@ -51,16 +52,11 @@ export const POST = withApiHandler(async (request: Request) => {
     }
 
     // Verify code correctness using constant-time comparison
-    const storedCode = Buffer.from(tokenRecord.code, "utf8");
-    const submittedCode = Buffer.from(code, "utf8");
-    if (storedCode.length !== submittedCode.length) {
-      const err = new Error("Invalid verification code. Please try again.");
-      (err as any).status = 400;
-      (err as any).code = "OTP_INVALID";
-      throw err;
-    }
-    const codeMatch = timingSafeEqual(storedCode, submittedCode);
-    if (!codeMatch) {
+    const storedCodeStr = String(tokenRecord.code).trim();
+    const submittedCodeStr = String(code).trim();
+    const storedCode = Buffer.from(storedCodeStr, "utf8");
+    const submittedCode = Buffer.from(submittedCodeStr, "utf8");
+    if (storedCode.length !== submittedCode.length || !timingSafeEqual(storedCode, submittedCode)) {
       const err = new Error("Invalid verification code. Please try again.");
       (err as any).status = 400;
       (err as any).code = "OTP_INVALID";
@@ -83,7 +79,7 @@ export const POST = withApiHandler(async (request: Request) => {
       .from("User")
       .select("*")
       .eq("email", emailKey)
-      .single();
+      .maybeSingle();
 
     let user;
     if (existingUser) {

@@ -248,15 +248,20 @@ export default function CartDrawer() {
                             </h5>
                             <span className="text-[9px] text-muted font-medium">{priceStr}</span>
                             <button
-                              onClick={() =>
+                              onClick={() => {
                                 addItem({
                                   id: product.id,
                                   name: product.name,
                                   price: product.priceUSD,
                                   image: product.image,
                                   subtitle: product.subtitle,
-                                })
-                              }
+                                });
+                                if (!isLoggedIn) {
+                                  setCartOpen(false);
+                                  const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+                                  router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+                                }
+                              }}
                               className="text-[9px] text-accent hover:underline block mt-1 uppercase font-bold tracking-widest"
                             >
                               Add

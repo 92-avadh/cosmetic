@@ -37,21 +37,38 @@ export default function ShopPage() {
   const displayProducts = products.length > 0 ? products : PRODUCTS_CATALOG;
 
   const categories = [
-    { id: "all", label: "All Products" },
-    { id: "hydrating", label: "Hydra-Active Wash" },
-    { id: "targeted", label: "Targeted Body Wash" },
+    { id: "all", label: "All Formulations" },
+    { id: "men", label: "Men's Collection" },
+    { id: "women", label: "Women's Collection" },
+    { id: "unisex", label: "Unisex / Universal" },
+    { id: "facial", label: "Facial Care" },
   ];
 
-  // Category filtering based on product category
+  // Category filtering based on product category, slug, or ID/name keywords
   const filteredProducts = displayProducts.filter((product) => {
     if (activeCategory === "all") return true;
-    if (activeCategory === "hydrating") {
-      return product.id.includes("hydra");
+    const catSlug = (
+      product.categorySlug ||
+      product.category?.slug ||
+      product.Category?.slug ||
+      ""
+    ).toLowerCase();
+    const pid = (product.id || "").toLowerCase();
+    const pname = (product.name || "").toLowerCase();
+
+    if (activeCategory === "men") {
+      return catSlug === "men" || pid.includes("men") || pname.includes("men");
     }
-    if (activeCategory === "targeted") {
-      return product.id.includes("wash");
+    if (activeCategory === "women") {
+      return catSlug === "women" || pid.includes("women") || pname.includes("women");
     }
-    return true;
+    if (activeCategory === "unisex") {
+      return catSlug === "unisex" || pid.includes("unisex") || pname.includes("unisex") || pid.includes("exfoliating");
+    }
+    if (activeCategory === "facial") {
+      return catSlug === "facial" || pid.includes("hydra") || pid.includes("cleanser") || pid.includes("essence");
+    }
+    return catSlug === activeCategory;
   });
 
   const skinTypes = [

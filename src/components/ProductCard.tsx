@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useUserStore } from "@/store/useUserStore";
 import { Plus, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -27,6 +28,7 @@ export default function ProductCard({
   hoverImage,
 }: ProductCardProps) {
   const router = useRouter();
+  const { isLoggedIn } = useUserStore();
   const { addItem, currency } = useCartStore();
   const { toggleItem, isWishlisted } = useWishlistStore();
   const [isHovered, setIsHovered] = useState(false);
@@ -54,6 +56,10 @@ export default function ProductCard({
       image,
       subtitle,
     });
+    if (!isLoggedIn) {
+      const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    }
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
@@ -67,7 +73,22 @@ export default function ProductCard({
       subtitle,
     });
     useCartStore.setState({ isCartOpen: false });
-    router.push("/checkout");
+    if (!isLoggedIn) {
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
+    } else {
+      router.push("/checkout");
+    }
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const wasWishlisted = wishlisted;
+    toggleItem({ id, name, subtitle, priceUSD, image, hoverImage });
+    if (!isLoggedIn && !wasWishlisted) {
+      const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    }
   };
 
   return (
@@ -86,11 +107,7 @@ export default function ProductCard({
 
         {/* Wishlist Heart Toggle */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleItem({ id, name, subtitle, priceUSD, image, hoverImage });
-          }}
+          onClick={handleWishlistToggle}
           className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-bg/80 backdrop-blur-sm border border-line/30 rounded-full cursor-pointer hover:bg-bg transition-colors"
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >

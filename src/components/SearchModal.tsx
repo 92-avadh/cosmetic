@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, ShoppingBag, ArrowRight, Tag, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useUserStore } from "@/store/useUserStore";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -13,6 +15,8 @@ interface SearchModalProps {
 const POPULAR_TAGS = ["PDRN", "Ceramide", "Exfoliating", "Sensitive Barrier", "Hyperkeratosis", "Phyto-Stem"];
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+  const router = useRouter();
+  const { isLoggedIn } = useUserStore();
   const { products, currency, addItem, setCartOpen } = useCartStore();
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -73,7 +77,12 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     e.stopPropagation();
     addItem(product);
     onClose();
-    setCartOpen(true);
+    if (!isLoggedIn) {
+      const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    } else {
+      setCartOpen(true);
+    }
   };
 
   return (

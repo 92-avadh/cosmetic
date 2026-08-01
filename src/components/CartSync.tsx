@@ -33,6 +33,11 @@ export default function CartSync() {
 
       try {
         const res = await fetch("/api/cart/sync");
+        if (res.status === 401) {
+          useUserStore.getState().logout();
+          setHasFetchedCart(false);
+          return;
+        }
         if (res.ok) {
           const resJson = await res.json();
           const dbItems = resJson.data;

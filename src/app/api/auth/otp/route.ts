@@ -50,11 +50,13 @@ export const POST = withApiHandler(async (request: Request) => {
       </div>
     `;
 
-    // Dispatch the verification email
-    await sendEmail({
+    // Dispatch the verification email in background non-blockingly
+    sendEmail({
       to: emailKey,
       subject: `Your BODYBARREL Verification Code: ${otp}`,
       html: emailHtml,
+    }).catch((err) => {
+      console.error(`[BACKGROUND EMAIL FAILED] Error sending OTP to ${emailKey}:`, err);
     });
 
     await logAudit({

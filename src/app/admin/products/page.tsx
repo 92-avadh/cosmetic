@@ -50,7 +50,7 @@ export default function AdminProductsPage() {
   const [newProductPrice, setNewProductPrice] = useState("");
   const [newProductInventory, setNewProductInventory] = useState("100");
   const [newProductDescription, setNewProductDescription] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("hydrating");
+  const [newProductCategory, setNewProductCategory] = useState("men");
   const [newProductImage, setNewProductImage] = useState("");
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
@@ -199,7 +199,7 @@ export default function AdminProductsPage() {
       setNewProductPrice("");
       setNewProductInventory("100");
       setNewProductDescription("");
-                    setNewProductCategory("hydrating");
+                    setNewProductCategory("men");
       setNewProductImages([]);
       setUploadedFileMetadata([]);
     } catch {
@@ -295,16 +295,28 @@ export default function AdminProductsPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">System category</label>
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product Category</label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs uppercase tracking-wider h-10 justify-between items-center cursor-pointer">
-                    <span>{newProductCategory === "hydrating" ? "Hydrating Wash" : "Targeted Wash"}</span>
+                    <span>
+                      {newProductCategory === "men"
+                        ? "Men's Collection"
+                        : newProductCategory === "women"
+                        ? "Women's Collection"
+                        : newProductCategory === "unisex"
+                        ? "Unisex / Universal"
+                        : newProductCategory === "facial"
+                        ? "Facial Care"
+                        : newProductCategory}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-full">
-                  <DropdownMenuItem onClick={() => setNewProductCategory("hydrating")}>Hydrating Wash</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setNewProductCategory("targeted")}>Targeted Wash</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("men")}>Men&apos;s Collection</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("women")}>Women&apos;s Collection</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("unisex")}>Unisex / Universal</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setNewProductCategory("facial")}>Facial Care</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -459,7 +471,7 @@ export default function AdminProductsPage() {
                       const imgs = prod.image ? prod.image.split(",") : [];
                       setNewProductImages(imgs);
                       setUploadedFileMetadata([]);
-                      setNewProductCategory(prod.Category?.slug || "hydrating");
+                      setNewProductCategory(prod.Category?.slug || "men");
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="px-3 py-1 bg-bg border border-line rounded text-[8px] font-bold tracking-wider hover:border-accent hover:text-accent transition-colors cursor-pointer"

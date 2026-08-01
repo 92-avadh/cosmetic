@@ -224,39 +224,39 @@ export default function Nav() {
         >
           <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
           {/* Left Side Desktop Nav Links */}
-          <nav className="hidden md:flex items-center space-x-12 flex-1 justify-start">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-10 xl:space-x-12 flex-1 justify-start">
             <Link
               href="/science"
-              className="group relative overflow-hidden block py-1 cursor-pointer"
+              className="group relative overflow-hidden block py-1 cursor-pointer whitespace-nowrap"
             >
-              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 SCIENCE
               </span>
-              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 SCIENCE
               </span>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
             </Link>
             <Link
               href="/us"
-              className="group relative overflow-hidden block py-1 cursor-pointer"
+              className="group relative overflow-hidden block py-1 cursor-pointer whitespace-nowrap"
             >
-              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 US
               </span>
-              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 US
               </span>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
             </Link>
             <Link
               href="/shop"
-              className="group relative overflow-hidden block py-1 cursor-pointer"
+              className="group relative overflow-hidden block py-1 cursor-pointer whitespace-nowrap"
             >
-              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 SHOP
               </span>
-              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 SHOP
               </span>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
@@ -281,51 +281,51 @@ export default function Nav() {
           </div>
 
           {/* Right Side Action Links */}
-          <div className="hidden md:flex items-center space-x-12 flex-1 justify-end">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-10 xl:space-x-12 flex-1 justify-end">
             <div
               onClick={() => setIsSearchOpen(true)}
-              className="group relative overflow-hidden block py-1 cursor-pointer select-none"
+              className="group relative overflow-hidden block py-1 cursor-pointer select-none whitespace-nowrap"
             >
-              <div className="relative flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
-                <Search className="w-3.5 h-3.5 text-ink" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">
+              <div className="relative flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
+                <Search className="w-3.5 h-3.5 text-ink shrink-0" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink whitespace-nowrap">
                   SEARCH
                 </span>
-                <span className="text-[8px] font-mono text-muted/80 bg-card-bg border border-line px-1 rounded ml-0.5">⌘K</span>
+                <span className="text-[8px] font-mono text-muted/80 bg-card-bg border border-line px-1 rounded ml-0.5 whitespace-nowrap">⌘K</span>
               </div>
-              <div className="absolute top-full left-0 flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
-                <Search className="w-3.5 h-3.5 text-accent" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+              <div className="absolute top-full left-0 flex items-center gap-1.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
+                <Search className="w-3.5 h-3.5 text-accent shrink-0" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent whitespace-nowrap">
                   SEARCH
                 </span>
-                <span className="text-[8px] font-mono text-accent bg-accent/10 border border-accent/30 px-1 rounded ml-0.5">⌘K</span>
+                <span className="text-[8px] font-mono text-accent bg-accent/10 border border-accent/30 px-1 rounded ml-0.5 whitespace-nowrap">⌘K</span>
               </div>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
             </div>
 
             <Link
               href="/account"
-              className="group relative overflow-hidden block py-1 cursor-pointer"
+              className="group relative overflow-hidden block py-1 cursor-pointer whitespace-nowrap"
             >
-              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="relative block text-[11px] font-semibold uppercase tracking-[0.2em] text-ink transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 ACCOUNT
               </span>
-              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
+              <span className="absolute top-full left-0 block text-[11px] font-semibold uppercase tracking-[0.2em] text-accent transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
                 ACCOUNT
               </span>
               <span className="absolute bottom-0 left-0 w-full h-[1px] bg-accent transform scale-x-0 origin-left transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
             </Link>
             <div
               onClick={() => setWishlistOpen(true)}
-              className="group relative overflow-hidden block py-1 cursor-pointer select-none"
+              className="group relative overflow-hidden block py-1 cursor-pointer select-none whitespace-nowrap"
             >
-              <div className="relative block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">
+              <div className="relative block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink whitespace-nowrap">
                   WISHLIST {wishlistItemsCount > 0 && `(${wishlistItemsCount})`}
                 </span>
               </div>
-              <div className="absolute top-full left-0 block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+              <div className="absolute top-full left-0 block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent whitespace-nowrap">
                   WISHLIST {wishlistItemsCount > 0 && `(${wishlistItemsCount})`}
                 </span>
               </div>
@@ -333,19 +333,19 @@ export default function Nav() {
             </div>
             <div
               onClick={() => setCartOpen(true)}
-              className="group relative overflow-hidden block py-1 cursor-pointer select-none"
+              className="group relative overflow-hidden block py-1 cursor-pointer select-none whitespace-nowrap"
             >
               <motion.div
                 animate={shouldAnimateCart ? { scale: [1, 1.12, 1], color: ["#121212", "#C97A5E", "#121212"] } : {}}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="relative block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full"
+                className="relative block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap"
               >
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink whitespace-nowrap">
                   SHOPPING BAG {cartItemsCount > 0 && `(${cartItemsCount})`}
                 </span>
               </motion.div>
-              <div className="absolute top-full left-0 block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">
+              <div className="absolute top-full left-0 block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-full whitespace-nowrap">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent whitespace-nowrap">
                   SHOPPING BAG {cartItemsCount > 0 && `(${cartItemsCount})`}
                 </span>
               </div>

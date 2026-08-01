@@ -43,26 +43,35 @@ export default function AdminDashboardPage() {
   const mockSessions = Math.round(mockProductViews * 1.6) + 340;
 
   // Dynamically calculate category sales proportions
-  let hydraSalesVal = 0;
-  let targetedSalesVal = 0;
+  let menSalesVal = 0;
+  let womenSalesVal = 0;
+  let unisexSalesVal = 0;
+  let facialSalesVal = 0;
 
   orders.forEach(order => {
     if (order.status !== "CANCELLED") {
       order.items.forEach(item => {
         if (!item.product) return;
         const productId = item.product.id.toLowerCase();
-        if (productId.includes("hydra")) {
-          hydraSalesVal += item.pricePaid * item.quantity;
+        const productName = item.product.name.toLowerCase();
+        if (productId.includes("men") || productName.includes("men")) {
+          menSalesVal += item.pricePaid * item.quantity;
+        } else if (productId.includes("women") || productName.includes("women")) {
+          womenSalesVal += item.pricePaid * item.quantity;
+        } else if (productId.includes("hydra") || productName.includes("cleanser") || productName.includes("essence")) {
+          facialSalesVal += item.pricePaid * item.quantity;
         } else {
-          targetedSalesVal += item.pricePaid * item.quantity;
+          unisexSalesVal += item.pricePaid * item.quantity;
         }
       });
     }
   });
 
-  const totalCatSales = hydraSalesVal + targetedSalesVal;
-  const hydraPercent = totalCatSales > 0 ? (hydraSalesVal / totalCatSales) * 100 : 64.5;
-  const targetedPercent = totalCatSales > 0 ? (targetedSalesVal / totalCatSales) * 100 : 35.5;
+  const totalCatSales = menSalesVal + womenSalesVal + unisexSalesVal + facialSalesVal;
+  const menPercent = totalCatSales > 0 ? (menSalesVal / totalCatSales) * 100 : 30;
+  const womenPercent = totalCatSales > 0 ? (womenSalesVal / totalCatSales) * 100 : 35;
+  const unisexPercent = totalCatSales > 0 ? (unisexSalesVal / totalCatSales) * 100 : 20;
+  const facialPercent = totalCatSales > 0 ? (facialSalesVal / totalCatSales) * 100 : 15;
 
   // 7-day revenue trend calculations
   const last7DaysSales = Array.from({ length: 7 }).map((_, i) => {
@@ -328,7 +337,7 @@ export default function AdminDashboardPage() {
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#EDE9DF" strokeWidth="24" />
                 <circle
                   cx="100" cy="100" r="80" fill="none" stroke="var(--color-accent)" strokeWidth="24"
-                  strokeDasharray={`${hydraPercent * 5.03} ${503 - hydraPercent * 5.03}`}
+                  strokeDasharray={`${womenPercent * 5.03} ${503 - womenPercent * 5.03}`}
                   strokeDashoffset="126" transform="rotate(-90 100 100)"
                 />
                 <text x="100" y="88" textAnchor="middle" className="text-xl font-display font-bold" fill="var(--color-ink)">
@@ -344,16 +353,30 @@ export default function AdminDashboardPage() {
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-accent" />
-                    <span>Hydra-Active Wash</span>
+                    <span>Women&apos;s Collection</span>
                   </div>
-                  <span>{hydraPercent.toFixed(1)}%</span>
+                  <span>{womenPercent.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#2D2622]" />
+                    <span>Men&apos;s Collection</span>
+                  </div>
+                  <span>{menPercent.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#A89078]" />
+                    <span>Unisex / Universal</span>
+                  </div>
+                  <span>{unisexPercent.toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#EDE9DF]" />
-                    <span>Targeted Body Wash</span>
+                    <span>Facial Care</span>
                   </div>
-                  <span>{targetedPercent.toFixed(1)}%</span>
+                  <span>{facialPercent.toFixed(1)}%</span>
                 </div>
             </div>
           </div>

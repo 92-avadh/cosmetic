@@ -167,6 +167,10 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       });
     }
     setQuantity(1);
+    if (!isLoggedIn) {
+      const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    }
   };
 
   const handleBuyNow = () => {
@@ -180,7 +184,11 @@ export default function ProductDetailClient({ product, recommendations }: Produc
       });
     }
     useCartStore.setState({ isCartOpen: false });
-    router.push("/checkout");
+    if (!isLoggedIn) {
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
+    } else {
+      router.push("/checkout");
+    }
   };
 
   const productTabs = [

@@ -96,7 +96,13 @@ export const POST = withApiHandler(async (request) => {
     if (existingCategory) {
       categoryId = existingCategory.id;
     } else {
-      const readableName = slug.charAt(0).toUpperCase() + slug.slice(1) + " System";
+      const CATEGORY_NAMES: Record<string, string> = {
+        men: "Men's Collection",
+        women: "Women's Collection",
+        unisex: "Unisex / Universal",
+        facial: "Facial Care",
+      };
+      const readableName = CATEGORY_NAMES[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1) + " Collection");
       const { data: newCategory, error: catError } = await supabase
         .from("Category")
         .insert({
@@ -167,7 +173,13 @@ export const PUT = withApiHandler(async (request) => {
     if (existingCategory) {
       categoryId = existingCategory.id;
     } else {
-      const readableName = slug.charAt(0).toUpperCase() + slug.slice(1) + " System";
+      const CATEGORY_NAMES: Record<string, string> = {
+        men: "Men's Collection",
+        women: "Women's Collection",
+        unisex: "Unisex / Universal",
+        facial: "Facial Care",
+      };
+      const readableName = CATEGORY_NAMES[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1) + " Collection");
       const { data: newCategory, error: catError } = await supabase
         .from("Category")
         .insert({

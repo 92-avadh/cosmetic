@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useUserStore } from "@/store/useUserStore";
+import { useRouter } from "next/navigation";
 import { X, Trash2, Heart, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,6 +17,8 @@ export default function WishlistDrawer() {
   } = useWishlistStore();
 
   const { addItem, currency, setCartOpen } = useCartStore();
+  const { isLoggedIn } = useUserStore();
+  const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Close drawer on Escape key press
@@ -45,9 +49,14 @@ export default function WishlistDrawer() {
     });
     // Remove from wishlist
     removeItem(item.id);
-    // Close wishlist and open cart for animation feedback
+    // Close wishlist
     setWishlistOpen(false);
-    setCartOpen(true);
+    if (!isLoggedIn) {
+      const redirectUrl = typeof window !== "undefined" ? window.location.pathname : "/shop";
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    } else {
+      setCartOpen(true);
+    }
   };
 
   return (

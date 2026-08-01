@@ -46,20 +46,25 @@ function LoginForm() {
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes("@")) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
       setError("Please enter a valid email address.");
       return;
     }
 
-    setIsLoading(true);
     setError(null);
-    setMessage(null);
+    // Immediately advance to OTP verification step so user is not blocked
+    setStep("otp");
+    setTimer(30);
+    setResendCount(0);
+    setMessage("Sending security code... Please check your email inbox.");
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/auth/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: cleanEmail }),
       });
 
       const resJson = await res.json();
@@ -68,9 +73,6 @@ function LoginForm() {
         throw new Error(getApiErrorMessage(resJson, "Failed to send verification code."));
       }
 
-      setStep("otp");
-      setTimer(30);
-      setResendCount(0);
       setMessage("Security code sent. Please check your email inbox.");
     } catch (err: any) {
       setError(err.message || "Failed to initiate login request.");
@@ -82,6 +84,7 @@ function LoginForm() {
   const handleResendOtp = async () => {
     if (resendCount >= 2 || timer > 0 || isLoading) return;
 
+    const cleanEmail = email.trim().toLowerCase();
     setIsLoading(true);
     setError(null);
     setMessage(null);
@@ -90,7 +93,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: cleanEmail }),
       });
 
       const resJson = await res.json();
@@ -111,6 +114,7 @@ function LoginForm() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanOtp = otp.trim();
     if (!cleanOtp || cleanOtp.length !== 6) {
       setError("Verification code must be exactly 6 digits.");
@@ -124,7 +128,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: cleanOtp }),
+        body: JSON.stringify({ email: cleanEmail, code: cleanOtp }),
       });
 
       const resJson = await res.json();
