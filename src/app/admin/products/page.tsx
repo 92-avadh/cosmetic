@@ -56,7 +56,21 @@ export default function AdminProductsPage() {
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
   const [uploadedFileMetadata, setUploadedFileMetadata] = useState<{ name: string; size: number }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [specsList, setSpecsList] = useState<{ key: string; value: string }[]>([]);
+  const STANDARD_PRESETS = [
+    { key: "Brand", value: "BODYBARREL" },
+    { key: "Product Type", value: "Premium Body Wash" },
+    { key: "Volume", value: "300 ml (10.14 fl. oz.)" },
+    { key: "Target Audience", value: "Men / Women" },
+    { key: "Skin Type", value: "All Skin Types" },
+    { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Anti-Tan Care" },
+    { key: "Texture", value: "Rich Foaming Gel" },
+    { key: "Fragrance", value: "Warm Amber & Woody Notes" },
+    { key: "Usage", value: "Apply to wet skin, massage into a rich lather, then rinse thoroughly." },
+    { key: "Recommended Use", value: "Daily" },
+    { key: "Free From", value: "Parabens, Mineral Oil, Sulfates" },
+  ];
+
+  const [specsList, setSpecsList] = useState<{ key: string; value: string }[]>(STANDARD_PRESETS);
 
   const handleMoveImage = (fromIndex: number, toIndex: number) => {
     if (toIndex < 0 || toIndex >= newProductImages.length) return;
@@ -74,20 +88,6 @@ export default function AdminProductsPage() {
 
     setNewProductImages(updatedImgs);
   };
-
-  const STANDARD_PRESETS = [
-    { key: "Brand", value: "BODYBARREL" },
-    { key: "Product Type", value: "Premium Body Wash" },
-    { key: "Volume", value: "300 ml (10.14 fl. oz.)" },
-    { key: "Target Audience", value: "Men / Women" },
-    { key: "Skin Type", value: "All Skin Types" },
-    { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Anti-Tan Care" },
-    { key: "Texture", value: "Rich Foaming Gel" },
-    { key: "Fragrance", value: "Warm Amber & Woody Notes" },
-    { key: "Usage", value: "Apply to wet skin, massage into a rich lather, then rinse thoroughly." },
-    { key: "Recommended Use", value: "Daily" },
-    { key: "Free From", value: "Parabens, Mineral Oil, Sulfates" },
-  ];
 
   // Sync image and hoverImage whenever newProductImages changes
   useEffect(() => {
@@ -245,7 +245,7 @@ export default function AdminProductsPage() {
       setNewProductCategory("men");
       setNewProductImages([]);
       setUploadedFileMetadata([]);
-      setSpecsList([]);
+      setSpecsList(STANDARD_PRESETS);
     } catch {
       // toast is already displayed inside context helpers
     }
@@ -597,11 +597,12 @@ export default function AdminProductsPage() {
                   setNewProductName("");
                   setNewProductSubtitle("");
                   setNewProductPrice("");
-                  setNewProductInventory("100");
+                  setNewProductInventory("0");
                   setNewProductDescription("");
                   setNewProductImages([]);
                   setUploadedFileMetadata([]);
-      setNewProductCategory("hydrating");
+                  setNewProductCategory("men");
+                  setSpecsList(STANDARD_PRESETS);
                 }}
                 className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
               >
