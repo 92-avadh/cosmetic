@@ -85,7 +85,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="bg-bg text-ink min-h-screen h-screen flex font-sans overflow-hidden">
+    <div className="bg-bg text-ink min-h-screen lg:h-screen flex flex-col lg:flex-row font-sans overflow-x-hidden overflow-y-auto lg:overflow-hidden">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-ink text-bg border border-accent/30 rounded-xl px-5 py-3.5 shadow-2xl flex items-center gap-3 text-xs tracking-wider uppercase animate-fadeIn">
@@ -95,8 +95,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Sidebar Nav */}
-      <aside className="w-72 bg-card-bg/40 border-r border-line flex flex-col h-full shrink-0 justify-between p-6">
-        <div className="space-y-8 flex flex-col h-full">
+      <aside className="w-full lg:w-72 bg-card-bg/40 border-r-0 lg:border-r border-b lg:border-b-0 flex flex-col justify-between p-4 lg:p-6 lg:h-full shrink-0">
+        <div className="space-y-8 flex flex-col lg:h-full">
           {/* Logo Brand Header */}
           <div className="flex items-center justify-between py-2 border-b border-line pb-4 relative">
             <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               >
                 <Bell className="w-3.5 h-3.5" />
                 {unreadOrders.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-bg text-[7px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-accent text-bg text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                     {unreadOrders.length}
                   </span>
                 )}
@@ -130,7 +130,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute left-0 top-full mt-2 w-80 bg-bg border border-line rounded-xl shadow-2xl p-4 z-50 space-y-3 cursor-default"
+                    className="absolute left-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-bg border border-line rounded-xl shadow-2xl p-4 z-50 space-y-3 cursor-default"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-between border-b border-line/60 pb-2">
@@ -140,7 +140,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       {unreadOrders.length > 0 && (
                         <button
                           onClick={markAllAsRead}
-                          className="text-[8px] uppercase tracking-widest text-accent hover:text-ink font-semibold cursor-pointer border-none bg-transparent"
+                          className="text-[9px] uppercase tracking-widest text-accent hover:text-ink font-semibold cursor-pointer border-none bg-transparent"
                         >
                           Clear All
                         </button>
@@ -158,20 +158,20 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                               <span className="text-[9px] font-mono text-ink/80 truncate font-bold">
                                 #{order.id.slice(-6).toUpperCase()}
                               </span>
-                              <span className="text-[8px] text-muted shrink-0">
+                              <span className="text-[9px] text-muted shrink-0">
                                 {new Date(order.createdAt).toLocaleTimeString([], {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 })}
                               </span>
                             </div>
-                            <div className="flex justify-between items-center text-[8px] text-muted uppercase tracking-wider">
+                            <div className="flex justify-between items-center text-[9px] text-muted uppercase tracking-wider">
                               <span className="truncate max-w-[150px]">{order.shippingName}</span>
                               <span className="font-semibold text-ink">${order.totalUSD.toFixed(2)}</span>
                             </div>
                             <button
                               onClick={() => markAsRead(order.id)}
-                              className="w-full mt-1 py-1 text-center bg-ink text-bg text-[7px] font-semibold tracking-widest uppercase hover:bg-accent hover:text-bg transition-colors duration-250 rounded-lg cursor-pointer border-none"
+                              className="w-full mt-1 py-1 text-center bg-ink text-bg text-[8px] font-semibold tracking-widest uppercase hover:bg-accent hover:text-bg transition-colors duration-250 rounded-lg cursor-pointer border-none"
                             >
                               Mark as Read
                             </button>
@@ -198,7 +198,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto pr-1">
-            <span className="text-[8px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2 text-left">General</span>
+            <span className="text-[9px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2 text-left">General</span>
             
             <Link href="/admin/dashboard" className={getNavLinkClass("/admin/dashboard")}>
               <div className="flex items-center gap-3">
@@ -246,7 +246,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <ChevronRight className="w-3.5 h-3.5 text-muted/60" />
             </Link>
 
-            <span className="text-[8px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2 text-left mt-2">Marketing & Styling</span>
+            <span className="text-[9px] tracking-[0.2em] font-bold text-muted/60 uppercase block px-4 py-2 text-left mt-2">Marketing & Styling</span>
 
             <Link href="/admin/announcement" className={getNavLinkClass("/admin/announcement")}>
               <div className="flex items-center gap-3">
@@ -276,7 +276,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 relative">
+      <main className="flex-1 lg:overflow-y-auto p-6 md:p-8 relative">
         {isLoading && (
           <div className="absolute inset-0 bg-bg/40 backdrop-blur-xs flex items-center justify-center z-40">
             <Loader2 className="w-8 h-8 text-accent animate-spin" />

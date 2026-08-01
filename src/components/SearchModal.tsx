@@ -129,7 +129,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   Results ({filteredProducts.length})
                 </span>
                 {filteredProducts.length > 0 && (
-                  <span className="text-[9px] uppercase tracking-wider text-accent font-semibold flex items-center gap-1">
+                  <span className="text-[10px] uppercase tracking-wider text-accent font-semibold flex items-center gap-1">
                     <Sparkles className="w-3 h-3" /> Live Catalog Search
                   </span>
                 )}
@@ -162,7 +162,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         </div>
                         <button
                           onClick={(e) => handleAddToCart(e, p)}
-                          className="px-3.5 py-2 bg-ink text-bg border border-ink rounded text-[9px] font-bold tracking-widest uppercase hover:bg-accent hover:border-accent transition-colors shrink-0 flex items-center gap-1.5"
+                          className="px-3.5 py-2 bg-ink text-bg border border-ink rounded text-[10px] font-bold tracking-widest uppercase hover:bg-accent hover:border-accent transition-colors shrink-0 flex items-center gap-1.5"
                         >
                           <ShoppingBag className="w-3 h-3" />
                           <span>Add</span>
@@ -182,7 +182,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="space-y-6 text-left">
               {/* Popular Tags */}
               <div className="space-y-2">
-                <span className="text-[9px] uppercase font-bold tracking-widest text-muted block flex items-center gap-1.5">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-muted block flex items-center gap-1.5">
                   <Tag className="w-3 h-3 text-accent" /> Popular Formulations & Active Actives
                 </span>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -202,13 +202,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               {recentSearches.length > 0 && (
                 <div className="space-y-2 border-t border-line/40 pt-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-[9px] uppercase font-bold tracking-widest text-muted">Recent Searches</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-muted">Recent Searches</span>
                     <button
                       onClick={() => {
                         setRecentSearches([]);
                         localStorage.removeItem("bodybarrel-recent-searches");
                       }}
-                      className="text-[8px] uppercase tracking-wider text-muted hover:text-ink border-none bg-transparent cursor-pointer"
+                      className="text-[10px] uppercase tracking-wider text-muted hover:text-ink border-none bg-transparent cursor-pointer"
                     >
                       Clear Recent
                     </button>
@@ -231,8 +231,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         {/* Footer command prompt hint */}
-        <div className="px-6 py-2.5 bg-card-bg/70 border-t border-line/45 flex items-center justify-between text-[9px] uppercase tracking-widest text-muted">
-          <span>Press <kbd className="px-1.5 py-0.5 bg-bg border border-line rounded font-mono text-[9px] text-ink">ESC</kbd> to close</span>
+        <div className="px-6 py-2.5 bg-card-bg/70 border-t border-line/45 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[10px] uppercase tracking-widest text-muted">
+          <span>Press <kbd className="px-1.5 py-0.5 bg-bg border border-line rounded font-mono text-[10px] text-ink">ESC</kbd> to close</span>
           <span>CELLULAR SEARCH ENGINE</span>
         </div>
       </div>

@@ -97,7 +97,7 @@ export const DropdownMenuContent = React.forwardRef<
               exit="exit"
               variants={contentVariants}
               className={cn(
-                "z-50 min-w-[8rem] overflow-hidden rounded-2xl border border-line bg-bg/90 backdrop-blur-md p-1.5 text-ink shadow-xl origin-top-left",
+                "z-50 min-w-[8rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-line bg-bg/90 backdrop-blur-md p-1.5 text-ink shadow-xl origin-top-left",
                 className
               )}
             >
@@ -132,7 +132,7 @@ export const DropdownMenuSubContent = React.forwardRef<
             exit="exit"
             variants={contentVariants}
             className={cn(
-              "z-50 min-w-[8rem] overflow-hidden rounded-xl border border-line bg-bg/95 backdrop-blur-xs p-1.5 text-ink shadow-lg origin-top-left",
+              "z-50 min-w-[8rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-line bg-bg/95 backdrop-blur-xs p-1.5 text-ink shadow-lg origin-top-left",
               className
             )}
           >
@@ -155,7 +155,7 @@ export const DropdownMenuItem = React.forwardRef<
     <DropdownMenuPrimitive.Item
       ref={ref}
       className={cn(
-        "group relative flex cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2 text-[10px] uppercase tracking-widest font-semibold text-ink outline-hidden transition-all duration-150 focus:bg-ink focus:text-bg data-disabled:pointer-events-none data-disabled:opacity-50",
+        "group relative flex cursor-pointer select-none items-center justify-between rounded-xl px-3 py-3 text-xs uppercase tracking-widest font-semibold text-ink outline-hidden transition-all duration-150 focus:bg-ink focus:text-bg data-disabled:pointer-events-none data-disabled:opacity-50 sm:py-2 sm:text-[10px]",
         {
           "text-red-500 focus:bg-red-500 focus:text-white": variant === "destructive",
         },
@@ -175,7 +175,7 @@ export const DropdownMenuSubTrigger = React.forwardRef<
     <DropdownMenuPrimitive.SubTrigger
       ref={ref}
       className={cn(
-        "group flex cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2 text-[10px] uppercase tracking-widest font-semibold text-ink outline-hidden transition-all duration-150 focus:bg-ink focus:text-bg data-[state=open]:bg-ink data-[state=open]:text-bg",
+        "group flex cursor-pointer select-none items-center justify-between rounded-xl px-3 py-3 text-xs uppercase tracking-widest font-semibold text-ink outline-hidden transition-all duration-150 focus:bg-ink focus:text-bg data-[state=open]:bg-ink data-[state=open]:text-bg sm:py-2 sm:text-[10px]",
         className
       )}
       {...props}
@@ -195,7 +195,7 @@ export const DropdownMenuLabel = React.forwardRef<
     <DropdownMenuPrimitive.Label
       ref={ref}
       className={cn(
-        "px-3 py-1.5 text-[9px] font-bold tracking-[0.2em] uppercase text-muted/80",
+        "px-3 py-1.5 text-xs font-bold tracking-[0.2em] uppercase text-muted/80 sm:text-[9px]",
         className
       )}
       {...props}
@@ -225,7 +225,7 @@ export const DropdownMenuShortcut = ({
   return (
     <span
       className={cn(
-        "ml-auto text-[8px] tracking-widest font-medium text-muted/60 uppercase transition-colors group-focus:text-bg/75",
+        "ml-auto text-xs tracking-widest font-medium text-muted/60 uppercase transition-colors group-focus:text-bg/75 sm:text-[8px]",
         className
       )}
       {...props}

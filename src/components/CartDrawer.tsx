@@ -144,7 +144,7 @@ export default function CartDrawer() {
                         className="flex space-x-4 border-b border-line/30 pb-6 last:border-b-0"
                       >
                         <div className="relative w-20 h-24 bg-card-bg border border-line/50 overflow-hidden select-none shrink-0">
-                          <div className="absolute top-1 left-1 bg-bg/95 backdrop-blur-sm px-1 py-0.2 text-[5px] tracking-[0.2em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
+                          <div className="absolute top-1 left-1 bg-bg/95 backdrop-blur-sm px-1 py-0.2 text-[7px] tracking-[0.2em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
                             BODYBARREL
                           </div>
                           <img
@@ -229,7 +229,7 @@ export default function CartDrawer() {
                           className="flex items-center space-x-3 p-2 bg-card-bg/60 border border-line/30 rounded relative"
                         >
                           <div className="relative w-12 h-14 shrink-0 overflow-hidden border border-line/20 rounded-[2px]">
-                            <div className="absolute top-0.5 left-0.5 bg-bg/95 px-0.5 py-0.1 text-[4px] tracking-[0.18em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
+                            <div className="absolute top-0.5 left-0.5 bg-bg/95 px-0.5 py-0.1 text-[7px] tracking-[0.18em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
                               BODYBARREL
                             </div>
                             <img

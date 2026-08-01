@@ -181,7 +181,7 @@ export const AlertDialogCancel = ({
     <button
       type="button"
       className={cn(
-        "inline-flex h-9 cursor-pointer items-center justify-center rounded-xl border border-line bg-bg px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-ink transition-colors hover:bg-card-bg focus-visible:outline-hidden",
+        "inline-flex h-11 cursor-pointer items-center justify-center rounded-xl border border-line bg-bg px-4 py-2 text-xs font-semibold uppercase tracking-widest text-ink transition-colors hover:bg-card-bg focus-visible:outline-hidden sm:h-9 sm:text-[10px]",
         className
       )}
       onClick={() => context.setOpen(false)}
@@ -205,7 +205,7 @@ export const AlertDialogAction = ({
     <button
       type="button"
       className={cn(
-        "inline-flex h-9 cursor-pointer items-center justify-center rounded-xl bg-ink px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-bg transition-colors hover:opacity-90 focus-visible:outline-hidden",
+        "inline-flex h-11 cursor-pointer items-center justify-center rounded-xl bg-ink px-4 py-2 text-xs font-semibold uppercase tracking-widest text-bg transition-colors hover:opacity-90 focus-visible:outline-hidden sm:h-9 sm:text-[10px]",
         className
       )}
       onClick={(e) => {

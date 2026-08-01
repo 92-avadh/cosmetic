@@ -58,16 +58,16 @@ export default function AdminProductsPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const STANDARD_PRESETS = [
     { key: "Brand", value: "BODYBARREL" },
-    { key: "Product Type", value: "Premium Body Wash" },
-    { key: "Volume", value: "300 ml (10.14 fl. oz.)" },
-    { key: "Target Audience", value: "Men / Women" },
-    { key: "Skin Type", value: "All Skin Types" },
-    { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Anti-Tan Care" },
-    { key: "Texture", value: "Rich Foaming Gel" },
-    { key: "Fragrance", value: "Warm Amber & Woody Notes" },
-    { key: "Usage", value: "Apply to wet skin, massage into a rich lather, then rinse thoroughly." },
-    { key: "Recommended Use", value: "Daily" },
-    { key: "Free From", value: "Parabens, Mineral Oil, Sulfates" },
+    { key: "Product Type", value: "" },
+    { key: "Volume", value: "" },
+    { key: "Target Audience", value: "" },
+    { key: "Skin Type", value: "" },
+    { key: "Primary Benefits", value: "" },
+    { key: "Texture", value: "" },
+    { key: "Fragrance", value: "" },
+    { key: "Usage", value: "" },
+    { key: "Recommended Use", value: "" },
+    { key: "Free From", value: "" },
   ];
 
   const [specsList, setSpecsList] = useState<{ key: string; value: string }[]>(STANDARD_PRESETS);
@@ -229,9 +229,25 @@ export default function AdminProductsPage() {
       return;
     }
 
+    // Validate that all feature rows have values filled or deleted
+    for (let i = 0; i < specsList.length; i++) {
+      const s = specsList[i];
+      const hasKey = s.key && s.key.trim().length > 0;
+      const hasVal = s.value && s.value.trim().length > 0;
+
+      if (hasKey && !hasVal) {
+        showToast(`Error: Please enter a detail/value for specification '${s.key}' or delete the row before saving.`);
+        return;
+      }
+      if (!hasKey && hasVal) {
+        showToast(`Error: Specification row ${i + 1} has a value but no feature name. Please add a feature name or delete the row.`);
+        return;
+      }
+    }
+
     try {
       const validSpecs = specsList.filter((s) => s.key.trim().length > 0 && s.value.trim().length > 0);
-      const specsJson = JSON.stringify(validSpecs.length > 0 ? validSpecs : STANDARD_PRESETS);
+      const specsJson = validSpecs.length > 0 ? JSON.stringify(validSpecs) : undefined;
 
       // Convert input price in INR (₹) to base USD price for database storage
       const inputPriceINR = parseFloat(newProductPrice);

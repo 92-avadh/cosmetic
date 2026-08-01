@@ -133,7 +133,7 @@ export default function WishlistDrawer() {
                         className="flex space-x-4 border-b border-line/30 pb-6 last:border-b-0"
                       >
                         <div className="relative w-20 h-24 bg-card-bg border border-line/50 overflow-hidden select-none shrink-0">
-                          <div className="absolute top-1 left-1 bg-bg/95 px-1 py-0.2 text-[5px] tracking-[0.2em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
+                          <div className="absolute top-1 left-1 bg-bg/95 px-1 py-0.2 text-[7px] tracking-[0.2em] font-bold text-ink uppercase z-10 select-none rounded-[1px]">
                             BODYBARREL
                           </div>
                           <img
@@ -156,7 +156,7 @@ export default function WishlistDrawer() {
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
-                            <p className="text-[9px] uppercase tracking-wider text-muted mt-1">
+                            <p className="text-[10px] uppercase tracking-wider text-muted mt-1">
                               {item.subtitle}
                             </p>
                           </div>
@@ -165,7 +165,7 @@ export default function WishlistDrawer() {
                             <span className="text-xs font-semibold text-ink/80">{priceStr}</span>
                             <button
                               onClick={() => handleMoveToBag(item)}
-                              className="flex items-center space-x-1 px-3 py-1.5 bg-ink text-bg text-[9px] font-semibold tracking-wider uppercase hover:bg-accent hover:text-bg transition-colors duration-250 rounded-sm"
+                              className="flex items-center space-x-1 px-3 py-2 bg-ink text-bg text-[10px] font-semibold tracking-wider uppercase hover:bg-accent hover:text-bg transition-colors duration-250 rounded-sm"
                             >
                               <ShoppingBag className="w-3 h-3" />
                               <span>Add to bag</span>

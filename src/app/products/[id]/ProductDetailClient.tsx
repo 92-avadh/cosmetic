@@ -288,7 +288,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-8">
-            <ol className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted">
+            <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] uppercase tracking-[0.2em] font-semibold text-muted">
               <li>
                 <Link href="/" className="hover:text-accent transition-colors">Home</Link>
               </li>
@@ -297,7 +297,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 <Link href="/shop" className="hover:text-accent transition-colors">Shop</Link>
               </li>
               <li aria-hidden="true" className="text-line">/</li>
-              <li aria-current="page" className="text-ink">{product.name}</li>
+              <li aria-current="page" className="text-ink min-w-0 break-words">{product.name}</li>
             </ol>
           </nav>
 
@@ -320,12 +320,12 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 className="relative aspect-[3/4] w-full overflow-hidden bg-card-bg border border-line rounded-2xl flex items-center justify-center select-none cursor-crosshair group"
               >
                 {/* Brand Overlay Badge */}
-                <div className="absolute top-4 left-4 bg-bg/90 backdrop-blur-sm px-3 py-1 border border-line/45 text-[8px] md:text-[9px] tracking-[0.25em] font-bold text-ink uppercase z-20 rounded-[2px] pointer-events-none">
+                <div className="absolute top-4 left-4 bg-bg/90 backdrop-blur-sm px-3 py-1 border border-line/45 text-[9px] tracking-[0.25em] font-bold text-ink uppercase z-20 rounded-[2px] pointer-events-none">
                   BODYBARREL
                 </div>
 
                 {/* Hover to Zoom Hint Badge */}
-                <div className="absolute bottom-4 left-4 bg-bg/85 backdrop-blur-sm px-2.5 py-1 border border-line/45 text-[8px] tracking-widest font-bold text-muted uppercase z-20 rounded opacity-80 group-hover:opacity-0 transition-opacity pointer-events-none">
+                <div className="absolute bottom-4 left-4 bg-bg/85 backdrop-blur-sm px-2.5 py-1 border border-line/45 text-[9px] tracking-widest font-bold text-muted uppercase z-20 rounded opacity-80 group-hover:opacity-0 transition-opacity pointer-events-none">
                   🔍 Hover to Zoom
                 </div>
 
@@ -413,7 +413,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
               {/* Volume Selection Pill */}
               <div className="space-y-2">
-                <span className="text-[9px] text-muted uppercase tracking-widest font-semibold block">Volume:</span>
+                <span className="text-[10px] text-muted uppercase tracking-widest font-semibold block">Volume:</span>
                 <span className="inline-block text-[10px] font-semibold px-4 py-2 bg-[#e8c5c1]/10 text-accent border border-[#e8c5c1]/35 rounded-[3px] select-none uppercase tracking-widest">
                   {volumeText}
                 </span>
@@ -421,9 +421,9 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
               {/* Stepper and Add to Cart Action Row */}
               <div className="pt-6 border-t border-line/45">
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                   {/* Rectangular Stepper matching screenshot */}
-                  <div className="flex items-center border border-line rounded-[3px] overflow-hidden bg-transparent h-[46px]">
+                  <div className="flex items-center border border-line rounded-[3px] overflow-hidden bg-transparent h-[46px] w-full sm:w-auto sm:shrink-0">
                     <button
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                       className="px-4 text-ink hover:text-accent font-semibold transition-colors h-full flex items-center justify-center cursor-pointer border-r border-line bg-transparent"
@@ -446,7 +446,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   {product.inventory <= 0 ? (
                     <CurtainButton
                       onClick={() => setShowBackInStockModal(true)}
-                      className="w-full text-bg border-accent bg-accent text-[11px] font-bold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                      className="w-full sm:flex-1 text-bg border-accent bg-accent text-[11px] font-bold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
                     >
                       <span>NOTIFY ME WHEN RE-STOCKED</span>
                     </CurtainButton>
@@ -454,14 +454,14 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                     <>
                       <CurtainButton
                         onClick={handleAdd}
-                        className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                        className="flex-1 min-w-0 text-ink border border-ink bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
                       >
                         <span>ADD TO BAG</span>
                       </CurtainButton>
 
                       <CurtainButton
                         onClick={handleBuyNow}
-                        className="flex-1 text-[#2d1c14] border border-[#2d1c14] bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
+                        className="flex-1 min-w-0 text-[#2d1c14] border border-[#2d1c14] bg-transparent text-[11px] font-semibold py-4.5 px-4 rounded-[3px] uppercase tracking-[0.2em] h-[46px] flex items-center justify-center cursor-pointer"
                       >
                         <span>BUY NOW</span>
                       </CurtainButton>
@@ -502,7 +502,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                   <ul className="space-y-2.5 text-xs sm:text-sm text-ink/90 font-sans">
                     {effectiveSpecifications.map((spec, index) => (
                       <li key={index} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
-                        <span className="font-bold text-ink min-w-[170px] shrink-0 font-sans">
+                        <span className="font-bold text-ink sm:min-w-[170px] sm:shrink-0 font-sans">
                           {spec.key} :
                         </span>
                         <span className="text-muted leading-relaxed font-normal">
@@ -563,13 +563,13 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                     <div className="space-y-8 py-4">
                       {/* Skin Profile Filter Bar */}
                       <div className="flex flex-wrap items-center gap-2 border-b border-line pb-4">
-                        <span className="text-[9px] uppercase font-bold tracking-widest text-muted mr-2">Filter by Skin Profile:</span>
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-muted mr-2">Filter by Skin Profile:</span>
                         {["ALL", "Sensitive Barrier", "Hyperkeratosis", "Barrier Depleted", "Dry & Damaged"].map((type) => (
                           <button
                             key={type}
                             type="button"
                             onClick={() => setSelectedSkinFilter(type)}
-                            className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border cursor-pointer transition-colors ${
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border cursor-pointer transition-colors ${
                               selectedSkinFilter === type
                                 ? "bg-accent text-bg border-accent"
                                 : "bg-card-bg text-ink border-line/60 hover:border-accent"
@@ -595,10 +595,10 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                                 .filter((rev) => selectedSkinFilter === "ALL" || rev.skinType === selectedSkinFilter || (!rev.skinType && selectedSkinFilter === "ALL"))
                                 .map((rev) => (
                                   <div key={rev.id} className="pt-5 first:pt-0 space-y-2">
-                                    <div className="flex items-center justify-between text-xs">
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-semibold text-ink uppercase tracking-wide">{rev.userName}</span>
-                                        <span className="inline-flex items-center gap-1 text-[8px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-widest">
+                <div className="flex items-center justify-between text-xs">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-ink uppercase tracking-wide min-w-0 break-words">{rev.userName}</span>
+                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-widest">
                                           <ShieldCheck className="w-2.5 h-2.5" /> Verified Buyer
                                         </span>
                                       </div>
@@ -614,7 +614,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                                           </span>
                                         ))}
                                       </div>
-                                      <span className="text-[8.5px] font-semibold text-accent/90 bg-accent/10 border border-accent/25 px-2 py-0.5 rounded uppercase tracking-wider">
+                                      <span className="text-[9px] font-semibold text-accent/90 bg-accent/10 border border-accent/25 px-2 py-0.5 rounded uppercase tracking-wider">
                                         Profile: {rev.skinType || "Sensitive Barrier"}
                                       </span>
                                     </div>
@@ -639,7 +639,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                             {/* Name */}
                             <div className="space-y-1">
-                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Your Name</label>
+                              <label className="text-[10px] uppercase tracking-widest font-semibold text-muted block">Your Name</label>
                               <input
                                 type="text"
                                 required
@@ -652,7 +652,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                             {/* Skin Profile Select */}
                             <div className="space-y-1">
-                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Your Skin Profile</label>
+                              <label className="text-[10px] uppercase tracking-widest font-semibold text-muted block">Your Skin Profile</label>
                               <select
                                 value={newSkinType}
                                 onChange={(e) => setNewSkinType(e.target.value)}
@@ -668,7 +668,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                             {/* Rating Stars Selection */}
                             <div className="space-y-1">
-                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block mb-1">Your Rating</label>
+                              <label className="text-[10px] uppercase tracking-widest font-semibold text-muted block mb-1">Your Rating</label>
                               <div className="flex items-center space-x-1 text-lg">
                                 {Array.from({ length: 5 }).map((_, idx) => {
                                   const starVal = idx + 1;
@@ -688,7 +688,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                             {/* Comment */}
                             <div className="space-y-1">
-                              <label className="text-[9px] uppercase tracking-widest font-semibold text-muted block">Thoughts</label>
+                              <label className="text-[10px] uppercase tracking-widest font-semibold text-muted block">Thoughts</label>
                               <textarea
                                 required
                                 value={newComment}
@@ -702,7 +702,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                             <CurtainButton
                               type="submit"
                               disabled={isSubmittingReview}
-                              className="w-full py-3 text-bg border-accent bg-accent text-[9px] font-bold tracking-widest uppercase rounded-[3px] flex items-center justify-center cursor-pointer"
+                              className="w-full py-3 text-bg border-accent bg-accent text-[10px] font-bold tracking-widest uppercase rounded-[3px] flex items-center justify-center cursor-pointer"
                             >
                               <span>{isSubmittingReview ? "Submitting..." : "Submit Review"}</span>
                             </CurtainButton>

@@ -58,7 +58,7 @@ export default function BackInStockModal({ isOpen, onClose, productName }: BackI
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[9px] uppercase tracking-widest font-bold text-muted block">Your Email Address</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-muted block">Your Email Address</label>
                 <input
                   type="email"
                   required

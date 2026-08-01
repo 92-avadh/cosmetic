@@ -110,7 +110,7 @@ export default function CurrencyModal() {
 
               <div className="relative flex py-3 items-center mb-6">
                 <div className="flex-grow border-t border-line/30"></div>
-                <span className="flex-shrink mx-4 text-[9px] text-muted tracking-widest uppercase font-bold">
+                <span className="flex-shrink mx-4 text-[10px] text-muted tracking-widest uppercase font-bold">
                   Or Select Region
                 </span>
                 <div className="flex-grow border-t border-line/30"></div>

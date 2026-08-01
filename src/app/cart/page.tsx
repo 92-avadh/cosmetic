@@ -74,7 +74,7 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-start">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 w-full sm:w-auto justify-between sm:justify-start">
                       {/* Quantity Selectors */}
                       <div className="flex items-center border border-line/80 rounded-full px-3 py-1 bg-bg/50">
                         <button
@@ -95,7 +95,7 @@ export default function CartPage() {
                       </div>
 
                       {/* Remove Button */}
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-ink">
                           {formatPrice(item.price * item.quantity)}
                         </span>

@@ -333,7 +333,7 @@ export default function AdminDashboardPage() {
           <div className="bg-bg/35 border border-line rounded-xl p-5 space-y-4">
             <h4 className="font-display font-semibold text-[10px] uppercase text-ink tracking-wider text-left">Sales by Category</h4>
             <div className="flex justify-center py-2">
-              <svg width="200" height="200" viewBox="0 0 200 200">
+              <svg width="200" height="200" viewBox="0 0 200 200" className="w-full max-w-[200px] h-auto">
                 <circle cx="100" cy="100" r="80" fill="none" stroke="#EDE9DF" strokeWidth="24" />
                 <circle
                   cx="100" cy="100" r="80" fill="none" stroke="var(--color-accent)" strokeWidth="24"

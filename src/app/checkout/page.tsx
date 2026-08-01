@@ -465,7 +465,7 @@ export default function CheckoutPage() {
                 <form onSubmit={handlePlaceOrder} className="space-y-6">
                   {savedAddresses.length > 0 && (
                     <div className="space-y-3 p-4 bg-bg/50 border border-line/40 rounded-2xl">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">
+                      <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">
                         Select a Saved Address ({savedAddresses.length}/3)
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -502,7 +502,7 @@ export default function CheckoutPage() {
                                 e.stopPropagation();
                                 handleDeleteAddress(addr.id);
                               }}
-                              className="text-[9px] text-accent mt-3 uppercase font-bold tracking-wider hover:underline w-fit select-none"
+                              className="text-[10px] text-accent mt-3 uppercase font-bold tracking-wider hover:underline w-fit select-none"
                             >
                               Delete
                             </button>
@@ -514,7 +514,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">First Name</label>
+                      <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">First Name</label>
                       <input
                         type="text"
                         value={firstName}
@@ -524,7 +524,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Last Name</label>
+                      <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">Last Name</label>
                       <input
                         type="text"
                         value={lastName}
@@ -536,7 +536,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Shipping Address</label>
+                    <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">Shipping Address</label>
                     <input
                       type="text"
                       value={address}
@@ -549,7 +549,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">City</label>
+                      <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">City</label>
                       <input
                         type="text"
                         value={city}
@@ -559,7 +559,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Postal / ZIP Code</label>
+                      <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">Postal / ZIP Code</label>
                       <input
                         type="text"
                         value={zipCode}
@@ -571,7 +571,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
+                    <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">Phone Number</label>
                       <input
                         type="text"
                         value={phone}
@@ -596,7 +596,7 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleSaveAddress}
                       disabled={isSavingAddress || isAddressAlreadySaved}
-                      className="px-4 py-2.5 border border-line rounded-xl text-[9px] font-bold tracking-widest uppercase text-ink hover:text-accent hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 w-max select-none"
+                      className="px-4 py-2.5 border border-line rounded-xl text-[10px] font-bold tracking-widest uppercase text-ink hover:text-accent hover:border-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 w-max select-none"
                     >
                       {isSavingAddress ? "Saving Address..." : isAddressAlreadySaved ? "Address Already Saved" : "Save Address to Profile"}
                     </button>
@@ -663,7 +663,7 @@ export default function CheckoutPage() {
 
                 {/* Promo Code Input Form */}
                 <form onSubmit={handleApplyPromo} className="space-y-2.5 pt-4 border-t border-line/30">
-                  <label className="text-[9px] uppercase tracking-widest font-semibold text-ink/75 block">Promo / Discount Code</label>
+                  <label className="text-[10px] uppercase tracking-widest font-semibold text-ink/75 block">Promo / Discount Code</label>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -685,8 +685,8 @@ export default function CheckoutPage() {
                     <p className="text-[10px] text-accent font-medium mt-1">{promoError}</p>
                   )}
                   {appliedPromo && (
-                    <div className="flex items-center justify-between text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg p-2.5 font-medium mt-1">
-                      <span>Code "{appliedPromo.code}" applied ({appliedPromo.discount * 100}% off)</span>
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg p-2.5 font-medium mt-1">
+                      <span className="min-w-0 break-words">Code "{appliedPromo.code}" applied ({appliedPromo.discount * 100}% off)</span>
                       <button
                         type="button"
                         onClick={() => setAppliedPromo(null)}
