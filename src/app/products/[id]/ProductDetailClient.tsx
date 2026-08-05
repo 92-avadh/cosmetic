@@ -9,9 +9,15 @@ import ProductCard from "@/components/ProductCard";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
 import { getApiErrorMessage } from "@/lib/utils";
-import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight, RotateCcw, ChevronDown } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 import BackInStockModal from "@/components/BackInStockModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/animate-ui/components/radix/dropdown-menu";
 
 interface ProductDetailClientProps {
   product: {
@@ -59,7 +65,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
     try {
       const parsed = typeof product.specifications === "string" ? JSON.parse(product.specifications) : product.specifications;
       if (Array.isArray(parsed)) {
-        parsedSpecifications = parsed.filter((s: any) => s && s.key && s.value);
+        parsedSpecifications = parsed.filter((s: any) => s && s.key && s.value && s.key !== "Target Audience");
       }
     } catch {
       parsedSpecifications = [];
@@ -73,14 +79,6 @@ export default function ProductDetailClient({ product, recommendations }: Produc
           { key: "Brand", value: "BODYBARREL" },
           { key: "Product Type", value: "Premium Body Wash" },
           { key: "Volume", value: getVolumeText(product.id) },
-          {
-            key: "Target Audience",
-            value: product.id.includes("men")
-              ? "Men"
-              : product.id.includes("women")
-              ? "Women"
-              : "Unisex / All Genders",
-          },
           { key: "Skin Type", value: "All Skin Types" },
           { key: "Primary Benefits", value: "Deep Cleansing, Hydration, Long-Lasting Freshness, Lipid Barrier Repair" },
           { key: "Texture", value: "Rich Foaming Gel" },
@@ -595,9 +593,9 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                                 .filter((rev) => selectedSkinFilter === "ALL" || rev.skinType === selectedSkinFilter || (!rev.skinType && selectedSkinFilter === "ALL"))
                                 .map((rev) => (
                                   <div key={rev.id} className="pt-5 first:pt-0 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-ink uppercase tracking-wide min-w-0 break-words">{rev.userName}</span>
+                                    <div className="flex items-center justify-between text-xs">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <span className="font-semibold text-ink uppercase tracking-wide min-w-0 break-words">{rev.userName}</span>
                                         <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-widest">
                                           <ShieldCheck className="w-2.5 h-2.5" /> Verified Buyer
                                         </span>
@@ -650,20 +648,27 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                               />
                             </div>
 
-                            {/* Skin Profile Select */}
+                            {/* Skin Profile Select using Animated DropdownMenu */}
                             <div className="space-y-1">
                               <label className="text-[10px] uppercase tracking-widest font-semibold text-muted block">Your Skin Profile</label>
-                              <select
-                                value={newSkinType}
-                                onChange={(e) => setNewSkinType(e.target.value)}
-                                className="w-full bg-bg/50 border border-line rounded px-3 py-2 text-xs text-ink focus:outline-none focus:border-accent uppercase tracking-wider"
-                              >
-                                <option value="Sensitive Barrier">Sensitive Barrier</option>
-                                <option value="Hyperkeratosis">Hyperkeratosis / Rough</option>
-                                <option value="Barrier Depleted">Barrier Depleted / Dry</option>
-                                <option value="Dry & Damaged">Dry & Damaged</option>
-                                <option value="Normal Derm">Normal Dermis</option>
-                              </select>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="w-full bg-bg/50 border border-line rounded px-3 py-2 text-xs text-ink uppercase tracking-wider flex items-center justify-between hover:border-accent transition-colors cursor-pointer"
+                                  >
+                                    <span>{newSkinType}</span>
+                                    <ChevronDown className="w-3.5 h-3.5 text-muted shrink-0" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-full min-w-[240px]">
+                                  <DropdownMenuItem onClick={() => setNewSkinType("Sensitive Barrier")}>Sensitive Barrier</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => setNewSkinType("Hyperkeratosis")}>Hyperkeratosis / Rough</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => setNewSkinType("Barrier Depleted")}>Barrier Depleted / Dry</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => setNewSkinType("Dry & Damaged")}>Dry & Damaged</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => setNewSkinType("Normal Derm")}>Normal Dermis</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
 
                             {/* Rating Stars Selection */}

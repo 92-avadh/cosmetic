@@ -5,21 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  // 1. Create or ensure default category exists
-  const bodycareCategory = await prisma.category.upsert({
-    where: { slug: "bodycare" },
-    update: {
-      name: "Shower & Body Care",
-    },
-    create: {
-      name: "Shower & Body Care",
-      slug: "bodycare",
-    },
-  });
-
-  console.log(`✓ Category ensured: ${bodycareCategory.name} (${bodycareCategory.slug})`);
-
-  // 2. Define core product catalog matching standard store items
+  // Define core product catalog matching standard store items
   const initialProducts = [
     {
       id: "hydra-foam-cleanser",
@@ -30,7 +16,6 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "With 0.5% Microspherized PDRN, hyaluronic acid, and pure botanical extracts, it lifts sweat, dirt, and impurities while deeply hydrating, leaving your body skin fresh, supple, and reinforced.",
       inventory: 100,
-      categoryId: bodycareCategory.id,
     },
     {
       id: "hydra-nutrition-essence",
@@ -41,7 +26,6 @@ async function main() {
       hoverImage: "/products/cream-texture.png",
       description: "Advanced cellular recovery shower oil formulated with pure salmon-derived PDRN DNA and bio-active amino acids to lock in moisture and restore dry body skin elasticity during your daily shower.",
       inventory: 80,
-      categoryId: bodycareCategory.id,
     },
     {
       id: "men-body-wash",
@@ -50,9 +34,8 @@ async function main() {
       priceUSD: 38.0,
       image: "/products/men-wash.png",
       hoverImage: "/products/texture-gel.png",
-      description: "Advanced lipid barrier recovery body wash formulated specifically for men's thicker skin to cleanse deeply without dryness.",
+      description: "Advanced lipid barrier recovery body wash formulated to cleanse deeply without dryness.",
       inventory: 120,
-      categoryId: bodycareCategory.id,
     },
     {
       id: "women-body-wash",
@@ -61,9 +44,8 @@ async function main() {
       priceUSD: 42.0,
       image: "/products/women-wash.png",
       hoverImage: "/products/texture-gel.png",
-      description: "Premium pH-balanced body wash infused with micro-nutrients to repair and deeply hydrate women's delicate skin.",
+      description: "Premium pH-balanced body wash infused with micro-nutrients to repair and deeply hydrate delicate skin.",
       inventory: 90,
-      categoryId: bodycareCategory.id,
     },
     {
       id: "unisex-body-wash",
@@ -74,7 +56,6 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "A universal body wash designed for all skin types, containing natural marine biotics and amino acids for ultimate skin health.",
       inventory: 150,
-      categoryId: skincareCategory.id,
     },
     {
       id: "exfoliating-body-wash",
@@ -85,11 +66,10 @@ async function main() {
       hoverImage: "/products/texture-gel.png",
       description: "A dual-action exfoliating body wash containing biological fruit enzymes and marine minerals to reveal smooth, hydrated skin.",
       inventory: 200,
-      categoryId: bodycareCategory.id,
     },
   ];
 
-  // 3. Upsert products to prevent duplicates during re-runs
+  // Upsert products to prevent duplicates during re-runs
   for (const product of initialProducts) {
     const upserted = await prisma.product.upsert({
       where: { id: product.id },
@@ -101,14 +81,13 @@ async function main() {
         hoverImage: product.hoverImage,
         description: product.description,
         inventory: product.inventory,
-        categoryId: product.categoryId,
       },
       create: product,
     });
     console.log(`✓ Product upserted: ${upserted.name} (${upserted.id})`);
   }
 
-  // 4. Seed default promo codes
+  // Seed default promo codes
   const defaultPromoCodes = [
     { code: "WELCOME10", discount: 0.10 },
     { code: "FIT20", discount: 0.20 },

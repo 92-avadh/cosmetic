@@ -16,7 +16,7 @@ async function checkAdminAuth() {
   return payload?.role === "ADMIN";
 }
 
-// GET: Fetch products and categories
+// GET: Fetch products
 export const GET = withApiHandler(async (request) => {
   if (!(await checkAdminAuth())) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
@@ -24,18 +24,12 @@ export const GET = withApiHandler(async (request) => {
 
   const { data: products, error: productsError } = await supabase
     .from("Product")
-    .select(`*, Category ( id, name, slug )`)
+    .select("*")
     .order("createdAt", { ascending: false });
 
   if (productsError) throw new Error(productsError.message);
 
-  const { data: categories, error: categoriesError } = await supabase
-    .from("Category")
-    .select("*");
-
-  if (categoriesError) throw new Error(categoriesError.message);
-
-  return { products, categories };
+  return { products, categories: [] };
 });
 
 // POST: Add new product
@@ -57,13 +51,12 @@ export const POST = withApiHandler(async (request) => {
     description,
     specifications,
     inventory,
-    categorySlug,
   } = await productCreateSchema.parseAsync(body);
 
   // Autogenerate SKU if empty
   let productSku = sku ? sku.trim() : "";
   if (!productSku) {
-    productSku = `BB-${(categorySlug || "GEN").slice(0, 4).toUpperCase()}-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    productSku = `BB-PROD-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
   }
 
   // Generate custom slug ID from name
@@ -83,48 +76,6 @@ export const POST = withApiHandler(async (request) => {
     cleanId = `${cleanId}-${Math.round(Math.random() * 1000)}`;
   }
 
-  // Find or create category
-  let categoryId = null;
-  if (categorySlug) {
-    const slug = categorySlug.toLowerCase().trim();
-
-    const { data: existingCategory } = await supabase
-      .from("Category")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (existingCategory) {
-      categoryId = existingCategory.id;
-    } else {
-      const CATEGORY_NAMES: Record<string, string> = {
-        men: "Men's Collection",
-        women: "Women's Collection",
-        unisex: "Unisex / Universal",
-        facial: "Facial Care",
-      };
-      const readableName = CATEGORY_NAMES[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1) + " Collection");
-      const { data: newCategory, error: catError } = await supabase
-        .from("Category")
-        .insert({
-          id: crypto.randomUUID(),
-          name: readableName,
-          slug,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        })
-        .select("id")
-        .maybeSingle();
-      if (catError && !newCategory) {
-        // Fall back to querying created category
-        const { data: fallbackCat } = await supabase.from("Category").select("id").eq("slug", slug).maybeSingle();
-        categoryId = fallbackCat?.id || null;
-      } else {
-        categoryId = newCategory?.id || null;
-      }
-    }
-  }
-
   const insertData: Record<string, any> = {
     id: cleanId,
     sku: productSku,
@@ -135,7 +86,6 @@ export const POST = withApiHandler(async (request) => {
     hoverImage: hoverImage || "/products/texture-gel.png",
     description: description || "Premium body wash formula.",
     inventory,
-    categoryId,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -176,52 +126,12 @@ export const PUT = withApiHandler(async (request) => {
   const body = await request.json();
   const { productUpdateSchema } = await import("@/lib/schemas");
   const validated = await productUpdateSchema.parseAsync(body);
-  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, specifications, inventory, categorySlug } = validated;
+  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, specifications, inventory } = validated;
 
   // Autogenerate SKU if empty
   let productSku = sku ? sku.trim() : "";
   if (!productSku && name) {
-    productSku = `BB-${(categorySlug || "GEN").slice(0, 4).toUpperCase()}-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-  }
-
-  // Find or create category if categorySlug is provided
-  let categoryId = null;
-  if (categorySlug) {
-    const slug = categorySlug.toLowerCase().trim();
-    const { data: existingCategory } = await supabase
-      .from("Category")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (existingCategory) {
-      categoryId = existingCategory.id;
-    } else {
-      const CATEGORY_NAMES: Record<string, string> = {
-        men: "Men's Collection",
-        women: "Women's Collection",
-        unisex: "Unisex / Universal",
-        facial: "Facial Care",
-      };
-      const readableName = CATEGORY_NAMES[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1) + " Collection");
-      const { data: newCategory, error: catError } = await supabase
-        .from("Category")
-        .insert({
-          id: crypto.randomUUID(),
-          name: readableName,
-          slug,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        })
-        .select("id")
-        .maybeSingle();
-      if (catError && !newCategory) {
-        const { data: fallbackCat } = await supabase.from("Category").select("id").eq("slug", slug).maybeSingle();
-        categoryId = fallbackCat?.id || null;
-      } else {
-        categoryId = newCategory?.id || null;
-      }
-    }
+    productSku = `BB-PROD-${name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
   }
 
   const updateData: Record<string, any> = {
@@ -236,7 +146,6 @@ export const PUT = withApiHandler(async (request) => {
   if (hoverImage !== undefined) updateData.hoverImage = hoverImage;
   if (description !== undefined) updateData.description = description;
   if (inventory !== undefined) updateData.inventory = inventory;
-  if (categoryId !== null) updateData.categoryId = categoryId;
   if (specifications !== undefined) updateData.specifications = specifications;
 
   let { data: updatedProduct, error: productError } = await supabase

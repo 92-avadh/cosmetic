@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: "Which product should I choose for my skin type?",
-    a: "Dry & Damaged skin: Aura-Glow or Bio-Fit. Sensitive & Reacting skin: Bio-Fit Unisex (pH 5.4, soothing centella extract). Thick/Oily dermis: Derm-Restore Men's (charcoal-depth cleansing). Uneven Texture: Dermal-Micro Exfoliating Wash (2-3x per week). Visit our Shop page for the full Skin Type Guide.",
+    a: "Dry & Damaged skin: Aura-Glow or Bio-Fit. Sensitive & Reacting skin: Bio-Fit (pH 5.4, soothing centella extract). Deep Cleansing: Derm-Restore (charcoal-depth cleansing). Uneven Texture: Dermal-Micro Exfoliating Wash (2-3x per week). Visit our Shop page for the full Skin Type Guide.",
   },
   {
     q: "Do you ship internationally?",

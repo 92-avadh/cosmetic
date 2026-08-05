@@ -24,7 +24,6 @@ const ProductCardSkeleton = () => (
 );
 
 export default function ShopPage() {
-  const [activeCategory, setActiveCategory] = useState("all");
   const { products, fetchProducts } = useCartStore();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,41 +34,6 @@ export default function ShopPage() {
   }, [fetchProducts]);
 
   const displayProducts = products.length > 0 ? products : PRODUCTS_CATALOG;
-
-  const categories = [
-    { id: "all", label: "All Formulations" },
-    { id: "men", label: "Men's Collection" },
-    { id: "women", label: "Women's Collection" },
-    { id: "unisex", label: "Unisex / Universal" },
-    { id: "facial", label: "Facial Care" },
-  ];
-
-  // Category filtering based on product category, slug, or ID/name keywords
-  const filteredProducts = displayProducts.filter((product) => {
-    if (activeCategory === "all") return true;
-    const catSlug = (
-      product.categorySlug ||
-      product.category?.slug ||
-      product.Category?.slug ||
-      ""
-    ).toLowerCase();
-    const pid = (product.id || "").toLowerCase();
-    const pname = (product.name || "").toLowerCase();
-
-    if (activeCategory === "men") {
-      return catSlug === "men" || pid.includes("men") || pname.includes("men");
-    }
-    if (activeCategory === "women") {
-      return catSlug === "women" || pid.includes("women") || pname.includes("women");
-    }
-    if (activeCategory === "unisex") {
-      return catSlug === "unisex" || pid.includes("unisex") || pname.includes("unisex") || pid.includes("exfoliating");
-    }
-    if (activeCategory === "facial") {
-      return catSlug === "facial" || pid.includes("hydra") || pid.includes("cleanser") || pid.includes("essence");
-    }
-    return catSlug === activeCategory;
-  });
 
   const faqs = [
     {
@@ -95,24 +59,7 @@ export default function ShopPage() {
       <Nav />
       <main className="bg-bg text-ink min-h-screen pt-32 pb-24 font-sans">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          {/* Filtering Tabs */}
-          <div className="flex flex-wrap items-center gap-2 mb-12 border-b border-line pb-6">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`button px-6 py-2.5 text-xs font-semibold tracking-widest uppercase transition-colors duration-200 border rounded-full ${
-                  activeCategory === cat.id
-                    ? "bg-ink text-bg border-ink"
-                    : "bg-transparent text-ink/75 border-line hover:border-ink hover:text-ink"
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Main Products Grid with Split Layout matching screenshot */}
+          {/* Main Products Grid with Split Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8">
             {/* Left Sidebar Content */}
             <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 h-fit">
@@ -138,23 +85,17 @@ export default function ShopPage() {
                   <ProductCardSkeleton />
                   <ProductCardSkeleton />
                 </div>
-              ) : filteredProducts.length > 0 ? (
+              ) : displayProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  {filteredProducts.map((product) => (
+                  {displayProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-24 bg-card-bg border border-line rounded-2xl">
                   <span className="text-sm text-muted uppercase tracking-widest block mb-4">
-                    No products found in this category
+                    No products available
                   </span>
-                  <CurtainButton
-                    onClick={() => setActiveCategory("all")}
-                    className="px-8 py-3 text-ink border-ink bg-transparent text-xs font-semibold tracking-widest uppercase border"
-                  >
-                    Show All Products
-                  </CurtainButton>
                 </div>
               )}
             </div>

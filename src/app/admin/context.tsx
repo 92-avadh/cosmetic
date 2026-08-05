@@ -15,9 +15,6 @@ export interface Product {
   description?: string;
   specifications?: string;
   inventory: number;
-  categoryId?: string;
-  category?: { name: string };
-  Category?: { id: string; name: string; slug: string } | null;
 }
 
 export interface OrderItem {
@@ -105,7 +102,7 @@ interface AdminContextType {
     description: string;
     image: string;
     hoverImage: string;
-    categorySlug: string;
+    specifications?: string;
   }) => Promise<void>;
   handleUpdateProduct: (productData: {
     id: string;
@@ -117,7 +114,7 @@ interface AdminContextType {
     description: string;
     image: string;
     hoverImage: string;
-    categorySlug: string;
+    specifications?: string;
   }) => Promise<void>;
   handleDeleteProduct: (id: string, name: string) => Promise<void>;
   
@@ -355,7 +352,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     description: string;
     image: string;
     hoverImage: string;
-    categorySlug: string;
+    specifications?: string;
   }) => {
     if (!user?.email) return;
     setIsActionLoading(true);
@@ -394,7 +391,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     description: string;
     image: string;
     hoverImage: string;
-    categorySlug: string;
+    specifications?: string;
   }) => {
     if (!user?.email) return;
     setIsActionLoading(true);

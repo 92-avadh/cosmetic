@@ -12,7 +12,7 @@ export default function UsPageClient() {
     },
     {
       title: "Advanced Body Regimens",
-      desc: "Every product is tailored for specific skin needs—engineered with targeted bio-actives for Men's thicker dermis, Women's delicate barriers, and Unisex applications."
+      desc: "Every product is tailored for specific skin needs—engineered with targeted bio-actives for all skin types and delicate barriers."
     },
     {
       title: "Clean Bio-Actives",

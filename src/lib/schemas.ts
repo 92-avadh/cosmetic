@@ -140,7 +140,6 @@ export const productCreateSchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   specifications: z.string().max(10000).optional().nullable(),
   inventory: z.number().int().nonnegative().default(0),
-  categorySlug: z.string().max(100).optional().nullable(),
 });
 
 export const productUpdateSchema = z.object({
@@ -154,7 +153,6 @@ export const productUpdateSchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   specifications: z.string().max(10000).optional().nullable(),
   inventory: z.number().int().nonnegative().optional(),
-  categorySlug: z.string().max(100).optional().nullable(),
 });
 
 export const orderUpdateSchema = z.object({

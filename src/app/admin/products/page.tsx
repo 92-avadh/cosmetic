@@ -50,7 +50,6 @@ export default function AdminProductsPage() {
   const [newProductPrice, setNewProductPrice] = useState("");
   const [newProductInventory, setNewProductInventory] = useState("0");
   const [newProductDescription, setNewProductDescription] = useState("");
-  const [newProductCategory, setNewProductCategory] = useState("men");
   const [newProductImage, setNewProductImage] = useState("");
   const [newProductHoverImage, setNewProductHoverImage] = useState("");
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
@@ -60,7 +59,6 @@ export default function AdminProductsPage() {
     { key: "Brand", value: "BODYBARREL" },
     { key: "Product Type", value: "" },
     { key: "Volume", value: "" },
-    { key: "Target Audience", value: "" },
     { key: "Skin Type", value: "" },
     { key: "Primary Benefits", value: "" },
     { key: "Texture", value: "" },
@@ -263,7 +261,6 @@ export default function AdminProductsPage() {
         specifications: specsJson,
         image: newProductImage,
         hoverImage: newProductHoverImage,
-        categorySlug: newProductCategory,
       };
 
       if (editingProduct) {
@@ -283,7 +280,6 @@ export default function AdminProductsPage() {
       setNewProductPrice("");
       setNewProductInventory("0");
       setNewProductDescription("");
-      setNewProductCategory("men");
       setNewProductImages([]);
       setUploadedFileMetadata([]);
       setSpecsList(STANDARD_PRESETS);
@@ -377,33 +373,6 @@ export default function AdminProductsPage() {
                 onChange={(e) => setNewProductSku(e.target.value)}
                 className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
               />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product Category</label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs uppercase tracking-wider h-10 justify-between items-center cursor-pointer">
-                    <span>
-                      {newProductCategory === "men"
-                        ? "Men's Collection"
-                        : newProductCategory === "women"
-                        ? "Women's Collection"
-                        : newProductCategory === "unisex"
-                        ? "Unisex / Universal"
-                        : newProductCategory === "facial"
-                        ? "Facial Care"
-                        : newProductCategory}
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full">
-                  <DropdownMenuItem onClick={() => setNewProductCategory("men")}>Men&apos;s Collection</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setNewProductCategory("women")}>Women&apos;s Collection</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setNewProductCategory("unisex")}>Unisex / Universal</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setNewProductCategory("facial")}>Facial Care</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
 
             {/* File Uploader */}
@@ -642,7 +611,6 @@ export default function AdminProductsPage() {
                   setNewProductDescription("");
                   setNewProductImages([]);
                   setUploadedFileMetadata([]);
-                  setNewProductCategory("men");
                   setSpecsList(STANDARD_PRESETS);
                 }}
                 className="px-6 py-3.5 text-ink border border-line bg-transparent text-[10px] font-bold tracking-widest uppercase cursor-pointer"
@@ -710,12 +678,11 @@ export default function AdminProductsPage() {
                       const imgs = prod.image ? prod.image.split(",") : [];
                       setNewProductImages(imgs);
                       setUploadedFileMetadata([]);
-                      setNewProductCategory(prod.Category?.slug || "men");
                       try {
                         if (prod.specifications) {
                           const parsed = typeof prod.specifications === "string" ? JSON.parse(prod.specifications) : prod.specifications;
                           if (Array.isArray(parsed) && parsed.length > 0) {
-                            setSpecsList(parsed);
+                            setSpecsList(parsed.filter((s: any) => s && s.key !== "Target Audience"));
                           } else {
                             setSpecsList(STANDARD_PRESETS);
                           }
