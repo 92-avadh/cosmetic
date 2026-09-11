@@ -119,7 +119,11 @@ export default function CongratsAnimation({ isVisible, onClose, freeSampleNames 
                   🎉 Congratulations!
                 </h2>
                 <p className="text-sm text-muted leading-relaxed">
-                  You've been rewarded with <span className="font-bold text-emerald-600">2 FREE 15ml samples</span>!
+                  {freeSampleNames.length > 0 ? (
+                    <>You've been rewarded with <span className="font-bold text-emerald-600">FREE 15ml samples</span>!</>
+                  ) : (
+                    <>Your order has been placed successfully! Thank you for shopping with us.</>
+                  )}
                 </p>
               </motion.div>
 

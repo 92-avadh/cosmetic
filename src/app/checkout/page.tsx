@@ -424,11 +424,9 @@ export default function CheckoutPage() {
 
             clearCart();
             setOrderCompleted(true);
-            // Show congrats animation if free samples were awarded
-            if (verifyData.freeSamples && verifyData.freeSamples.length > 0) {
-              setFreeSampleNames(verifyData.freeSamples);
-              setTimeout(() => setShowCongrats(true), 800);
-            }
+            // Always show congrats animation after purchase
+            setFreeSampleNames(verifyData.freeSamples || []);
+            setTimeout(() => setShowCongrats(true), 800);
           } catch (verifyErr: any) {
             setFormError(getNaturalErrorMessage(verifyErr.message || ""));
           } finally {

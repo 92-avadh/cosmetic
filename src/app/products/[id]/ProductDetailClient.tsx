@@ -503,6 +503,25 @@ export default function ProductDetailClient({ product, recommendations }: Produc
                 </div>
               </div>
 
+              {/* Free Samples Banner */}
+              {product.freeSamples && product.freeSamples.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3"
+                >
+                  <span className="text-lg">🎁</span>
+                  <div className="space-y-1 text-xs">
+                    <span className="font-bold text-emerald-700 uppercase tracking-wider block text-[10px]">
+                      Includes FREE 15ml Samples
+                    </span>
+                    <p className="text-[11px] text-emerald-600 leading-relaxed">
+                      Get 2 complimentary 15ml samples with this purchase. A perfect way to explore more of our collection!
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Product Sourcing Description (below actions) */}
               <div className="pt-6 border-t border-line/45 space-y-3">
                 <h3 className="font-display font-semibold text-xs sm:text-sm uppercase tracking-widest text-ink flex items-center gap-2">
