@@ -51,6 +51,8 @@ export const POST = withApiHandler(async (request) => {
     description,
     specifications,
     inventory,
+    badge,
+    freeSamples,
   } = await productCreateSchema.parseAsync(body);
 
   // Autogenerate SKU if empty
@@ -86,6 +88,8 @@ export const POST = withApiHandler(async (request) => {
     hoverImage: hoverImage || "/products/texture-gel.png",
     description: description || "Premium body wash formula.",
     inventory,
+    badge: badge || "",
+    freeSamples: freeSamples || "",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -126,7 +130,7 @@ export const PUT = withApiHandler(async (request) => {
   const body = await request.json();
   const { productUpdateSchema } = await import("@/lib/schemas");
   const validated = await productUpdateSchema.parseAsync(body);
-  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, specifications, inventory } = validated;
+  const { id, name, subtitle, priceUSD, image, sku, hoverImage, description, specifications, inventory, badge, freeSamples } = validated;
 
   // Autogenerate SKU if empty
   let productSku = sku ? sku.trim() : "";
@@ -147,6 +151,8 @@ export const PUT = withApiHandler(async (request) => {
   if (description !== undefined) updateData.description = description;
   if (inventory !== undefined) updateData.inventory = inventory;
   if (specifications !== undefined) updateData.specifications = specifications;
+  if (badge !== undefined) updateData.badge = badge;
+  if (freeSamples !== undefined) updateData.freeSamples = freeSamples;
 
   let { data: updatedProduct, error: productError } = await supabase
     .from("Product")

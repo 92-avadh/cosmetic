@@ -1,0 +1,20 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Every 3-4 days at 10:00 UTC (Sun & Thu) — Supabase pauses after 7 days inactive
+    - cron: '0 10 * * 0,4'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit keep-alive endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.APP_URL }}/api/keep-alive")
+          echo "Status: $response"
+          if [ "$response" != "200" ]; then
+            echo "Keep-alive ping returned non-200 status"
+            exit 1
+          fi

@@ -55,6 +55,8 @@ export default function AdminProductsPage() {
   const [newProductImages, setNewProductImages] = useState<string[]>([]);
   const [uploadedFileMetadata, setUploadedFileMetadata] = useState<{ name: string; size: number }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [newProductBadge, setNewProductBadge] = useState("");
+  const [newProductFreeSamples, setNewProductFreeSamples] = useState<string[]>([]);
   const STANDARD_PRESETS = [
     { key: "Brand", value: "BODYBARREL" },
     { key: "Product Type", value: "" },
@@ -261,6 +263,8 @@ export default function AdminProductsPage() {
         specifications: specsJson,
         image: newProductImage,
         hoverImage: newProductHoverImage,
+        badge: newProductBadge,
+        freeSamples: newProductFreeSamples.join(","),
       };
 
       if (editingProduct) {
@@ -283,6 +287,8 @@ export default function AdminProductsPage() {
       setNewProductImages([]);
       setUploadedFileMetadata([]);
       setSpecsList(STANDARD_PRESETS);
+      setNewProductBadge("");
+      setNewProductFreeSamples([]);
     } catch {
       // toast is already displayed inside context helpers
     }
@@ -404,6 +410,46 @@ export default function AdminProductsPage() {
                   <span className="font-semibold text-ink block">Requirements:</span>
                   <span>JPEG, PNG, GIF, WEBP. Max size: 1 MB per image.</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Badge & Free Samples Section */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Product Badge</label>
+              <select
+                value={newProductBadge}
+                onChange={(e) => setNewProductBadge(e.target.value)}
+                className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
+              >
+                <option value="">None</option>
+                <option value="DIWALI">🪔 Diwali Offer</option>
+                <option value="DISCOUNT">🏷️ Discount</option>
+                <option value="FREE">🎁 Free</option>
+                <option value="BUNDLE">📦 Bundle Deal</option>
+                <option value="SAMPLE">🧪 Sample</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Free 15ml Samples (Select products)</label>
+              <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto border border-line rounded-xl p-2">
+                {products.filter(p => p.id !== editingProduct?.id).map(p => (
+                  <label key={p.id} className="flex items-center gap-1 text-[9px] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newProductFreeSamples.includes(p.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setNewProductFreeSamples([...newProductFreeSamples, p.id]);
+                        } else {
+                          setNewProductFreeSamples(newProductFreeSamples.filter(id => id !== p.id));
+                        }
+                      }}
+                    />
+                    <span className="truncate max-w-[100px]">{p.name}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </div>
@@ -678,6 +724,8 @@ export default function AdminProductsPage() {
                       const imgs = prod.image ? prod.image.split(",") : [];
                       setNewProductImages(imgs);
                       setUploadedFileMetadata([]);
+                      setNewProductBadge(prod.badge || "");
+                      setNewProductFreeSamples(prod.freeSamples ? prod.freeSamples.split(",").filter(Boolean) : []);
                       try {
                         if (prod.specifications) {
                           const parsed = typeof prod.specifications === "string" ? JSON.parse(prod.specifications) : prod.specifications;

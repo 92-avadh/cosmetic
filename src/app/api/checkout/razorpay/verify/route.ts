@@ -113,7 +113,7 @@ export const POST = withApiHandler(async (request: Request) => {
 
     if (updateError) throw new Error(`Failed to update order: ${updateError.message}`);
 
-    // 6. Deduct product stock
+    // 6. Deduct product stock & collect free samples
     const { data: items, error: itemsGetError } = await supabase
       .from("OrderItem")
       .select("productId, quantity, pricePaid")
@@ -121,10 +121,12 @@ export const POST = withApiHandler(async (request: Request) => {
 
     if (itemsGetError || !items) throw new Error("Failed to load order items");
 
+    const collectedFreeSamples: string[] = [];
+
     for (const item of items) {
       const { data: prod } = await supabase
         .from("Product")
-        .select("inventory")
+        .select("inventory, name, freeSamples")
         .eq("id", item.productId)
         .single();
 
@@ -136,8 +138,26 @@ export const POST = withApiHandler(async (request: Request) => {
             updatedAt: new Date().toISOString()
           })
           .eq("id", item.productId);
+
+        // Collect free sample names from products
+        if (prod.freeSamples) {
+          const sampleIds = prod.freeSamples.split(",").filter(Boolean);
+          for (const sampleId of sampleIds) {
+            const { data: sampleProd } = await supabase
+              .from("Product")
+              .select("name")
+              .eq("id", sampleId)
+              .single();
+            if (sampleProd) {
+              collectedFreeSamples.push(sampleProd.name);
+            }
+          }
+        }
       }
     }
+
+    // Return free sample info so client can show animation
+    const freeSamplesData = collectedFreeSamples.length > 0 ? collectedFreeSamples : null;
 
     // 7. Clear user's shopping cart in the database
     const { data: user } = await supabase
@@ -255,7 +275,7 @@ export const POST = withApiHandler(async (request: Request) => {
       details: { orderId, razorpay_payment_id }
     });
 
-    return { success: true, orderId };
+    return { success: true, orderId, freeSamples: freeSamplesData };
   } catch (error: any) {
     await logAudit({
       action: "RAZORPAY_PAYMENT_VERIFIED",

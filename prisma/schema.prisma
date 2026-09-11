@@ -33,6 +33,8 @@ model Product {
   description String?     @default("Premium cellular skincare formula.")
   inventory   Int         @default(0)
   specifications String?
+  badge       String?     @default("") // DIWALI, DISCOUNT, FREE, BUNDLE, SAMPLE, or empty
+  freeSamples String?     @default("") // comma-separated product IDs included as free 15ml samples
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   

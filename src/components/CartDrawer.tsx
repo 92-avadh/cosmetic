@@ -224,8 +224,10 @@ export default function CartDrawer() {
                       )}`;
 
                       return (
-                        <div
+                        <motion.div
                           key={product.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
                           className="flex items-center space-x-3 p-2 bg-card-bg/60 border border-line/30 rounded relative"
                         >
                           <div className="relative w-12 h-14 shrink-0 overflow-hidden border border-line/20 rounded-[2px]">
@@ -267,7 +269,7 @@ export default function CartDrawer() {
                               Add
                             </button>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>

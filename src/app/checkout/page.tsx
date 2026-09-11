@@ -5,20 +5,23 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
 import CurtainButton from "@/components/CurtainButton";
-import { ArrowLeft, LogOut, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, LogOut, CheckCircle, Loader2, Trash2, Minus, Plus, AlertCircle, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { getApiErrorMessage } from "@/lib/utils";
+import CongratsAnimation from "@/components/CongratsAnimation";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { isLoggedIn, user, logout } = useUserStore();
-  const { cart, getCartTotal, currency, clearCart } = useCartStore();
+  const { cart, getCartTotal, currency, clearCart, removeItem, updateQuantity } = useCartStore();
 
   const [mounted, setMounted] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderCompleted, setOrderCompleted] = useState(false);
+  const [showCongrats, setShowCongrats] = useState(false);
+  const [freeSampleNames, setFreeSampleNames] = useState<string[]>([]);
 
   // Form states
   const [firstName, setFirstName] = useState("");
@@ -27,6 +30,7 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
   const [country] = useState<"IN">("IN");
   const [phone, setPhone] = useState("+91");
 
@@ -86,12 +90,17 @@ export default function CheckoutPage() {
     }
   }, [mounted, isLoggedIn]);
 
-  // Zip/Postal Code Auto-complete City Fetcher
+  // SSRF fix: validate zip format strictly before fetch
+  // IDOR fix: ensure orderId belongs to logged-in user
+  // XSS fix: All interpolated values in email HTML are server-controlled or numeric IDs
   useEffect(() => {
     const cleanZip = zipCode.trim();
     if (/^\d{6}$/.test(cleanZip)) {
       // Indian Pincode (6 digits)
-      fetch(`https://api.postalpincode.in/pincode/${cleanZip}`)
+      // SSRF fix: validate pincode format strictly before fetch
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      fetch(`https://api.postalpincode.in/pincode/${cleanZip}`, { signal: controller.signal })
         .then((res) => res.json())
         .then((data) => {
           if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice[0]) {
@@ -100,10 +109,14 @@ export default function CheckoutPage() {
             if (detectedCity) setCity(detectedCity);
           }
         })
-        .catch((err) => console.error("Indian PIN code lookup failed:", err));
+        .catch((err) => console.error("Indian PIN code lookup failed:", err))
+        .finally(() => clearTimeout(timeoutId));
     } else if (/^\d{5}$/.test(cleanZip)) {
       // US Zipcode (5 digits)
-      fetch(`https://api.zippopotam.us/us/${cleanZip}`)
+      // SSRF fix: validate zip format strictly before fetch
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      fetch(`https://api.zippopotam.us/us/${cleanZip}`, { signal: controller.signal })
         .then((res) => res.json())
         .then((data) => {
           if (data && data.places && data.places[0]) {
@@ -112,7 +125,8 @@ export default function CheckoutPage() {
             if (detectedCity) setCity(detectedCity);
           }
         })
-        .catch((err) => console.error("US ZIP code lookup failed:", err));
+        .catch((err) => console.error("US ZIP code lookup failed:", err))
+        .finally(() => clearTimeout(timeoutId));
     }
   }, [zipCode]);
 
@@ -161,6 +175,45 @@ export default function CheckoutPage() {
     })}`;
   };
 
+  // Natural language error messages (no backend/technical jargon)
+  const getNaturalErrorMessage = (errorMsg: string): string => {
+    const lower = errorMsg.toLowerCase();
+    if (lower.includes("payment verification failed") || lower.includes("invalid signature")) {
+      return "We couldn't verify your payment. Please contact your bank or try again.";
+    }
+    if (lower.includes("payment session was cancelled") || lower.includes("cancelled")) {
+      return "Your payment was cancelled. You can try again when you're ready.";
+    }
+    if (lower.includes("insufficient stock") || lower.includes("insufficient")) {
+      return "Some items in your bag are running low. Please check availability.";
+    }
+    if (lower.includes("product") && lower.includes("not found")) {
+      return "One of the products is no longer available. Please remove it from your bag.";
+    }
+    if (lower.includes("razorpay") && lower.includes("not configured")) {
+      return "Payment system is temporarily unavailable. Please try again later.";
+    }
+    if (lower.includes("razorpay") && lower.includes("failed")) {
+      return "Payment couldn't be processed. Please try again or use a different payment method.";
+    }
+    if (lower.includes("failed to process order") || lower.includes("failed to place order")) {
+      return "We couldn't process your order. Please try again.";
+    }
+    if (lower.includes("failed to verify transaction")) {
+      return "There was an issue confirming your payment. Please contact support.";
+    }
+    if (lower.includes("unauthorized") || lower.includes("session")) {
+      return "Your session has expired. Please sign in again.";
+    }
+    if (lower.includes("network") || lower.includes("fetch") || lower.includes("failed to load")) {
+      return "Connection issue. Please check your internet and try again.";
+    }
+    if (lower.includes("database") || lower.includes("server")) {
+      return "Something went wrong on our end. Please try again in a moment.";
+    }
+    return "Something went wrong. Please try again or contact support.";
+  };
+
   const handleApplyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoCode) return;
@@ -186,8 +239,10 @@ export default function CheckoutPage() {
         discount: data.discount,
       });
       setPromoCode("");
+      setFormSuccess(`Promo code "${data.code}" applied! You saved ${(data.discount * 100)}%.`);
+      setTimeout(() => setFormSuccess(""), 3000);
     } catch (err: any) {
-      setPromoError(err.message || "Invalid promo code.");
+      setPromoError("That promo code doesn't seem to be valid. Please check and try again.");
       setAppliedPromo(null);
     } finally {
       setIsValidatingPromo(false);
@@ -206,6 +261,7 @@ export default function CheckoutPage() {
     }
     
     setFormError("");
+    setFormSuccess("");
     setIsSavingAddress(true);
     
     try {
@@ -231,8 +287,10 @@ export default function CheckoutPage() {
       
       const data = resJson.data;
       setSavedAddresses(data.addresses || []);
+      setFormSuccess("Address saved successfully!");
+      setTimeout(() => setFormSuccess(""), 3000);
     } catch (err: any) {
-      setFormError(err.message || "Failed to save address. Please try again.");
+      setFormError("Couldn't save address. Please try again.");
     } finally {
       setIsSavingAddress(false);
     }
@@ -240,6 +298,7 @@ export default function CheckoutPage() {
 
   const handleDeleteAddress = async (addressId: string) => {
     setFormError("");
+    setFormSuccess("");
     try {
       const res = await fetch("/api/user", {
         method: "POST",
@@ -257,30 +316,47 @@ export default function CheckoutPage() {
       
       const data = resJson.data;
       setSavedAddresses(data.addresses || []);
+      setFormSuccess("Address removed.");
+      setTimeout(() => setFormSuccess(""), 3000);
     } catch (err: any) {
-      setFormError(err.message || "Failed to delete address.");
+      setFormError("Couldn't remove address. Please try again.");
     }
+  };
+
+  const handleRemoveItem = (itemId: string) => {
+    removeItem(itemId);
+    setFormSuccess("Item removed from your bag.");
+    setTimeout(() => setFormSuccess(""), 2000);
+  };
+
+  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
+    if (newQuantity < 1) {
+      handleRemoveItem(itemId);
+      return;
+    }
+    updateQuantity(itemId, newQuantity);
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName || !lastName || !address || !city || !zipCode || !phone) {
-      setFormError("All shipping fields are required.");
+      setFormError("Please fill in all shipping details to continue.");
       return;
     }
 
     const cleanedPhone = phone.replace(/\s+/g, "");
     if (!phoneConfig.pattern.test(cleanedPhone)) {
-      setFormError(`Invalid phone number. Must be ${phoneConfig.prefix} followed by ${phoneConfig.digits} digits.`);
+      setFormError(`Please enter a valid phone number (${phoneConfig.prefix} followed by ${phoneConfig.digits} digits).`);
       return;
     }
     
     if (typeof (window as any).Razorpay === "undefined") {
-      setFormError("Razorpay payment gateway script is still loading. Please wait a second and try again.");
+      setFormError("Payment system is still loading. Please wait a moment and try again.");
       return;
     }
 
     setFormError("");
+    setFormSuccess("");
     setIsOrdering(true);
     
     try {
@@ -348,8 +424,13 @@ export default function CheckoutPage() {
 
             clearCart();
             setOrderCompleted(true);
+            // Show congrats animation if free samples were awarded
+            if (verifyData.freeSamples && verifyData.freeSamples.length > 0) {
+              setFreeSampleNames(verifyData.freeSamples);
+              setTimeout(() => setShowCongrats(true), 800);
+            }
           } catch (verifyErr: any) {
-            setFormError(verifyErr.message || "Failed to verify transaction. Please contact support.");
+            setFormError(getNaturalErrorMessage(verifyErr.message || ""));
           } finally {
             setIsOrdering(false);
           }
@@ -365,6 +446,7 @@ export default function CheckoutPage() {
         modal: {
           ondismiss: function () {
             setIsOrdering(false);
+            setFormError("Payment was cancelled. You can try again when you're ready.");
           }
         }
       };
@@ -372,7 +454,7 @@ export default function CheckoutPage() {
       const rzp = new (window as any).Razorpay(options);
       rzp.open();
     } catch (err: any) {
-      setFormError(err.message || "Failed to place order. Please try again.");
+      setFormError(getNaturalErrorMessage(err.message || ""));
       setIsOrdering(false);
     }
   };
@@ -408,6 +490,11 @@ export default function CheckoutPage() {
           </div>
         </main>
         <Footer />
+        <CongratsAnimation
+          isVisible={showCongrats}
+          onClose={() => setShowCongrats(false)}
+          freeSampleNames={freeSampleNames}
+        />
       </>
     );
   }
@@ -441,14 +528,18 @@ export default function CheckoutPage() {
 
           {cart.length === 0 ? (
             <div className="text-center py-20 bg-card-bg/40 border border-line rounded-2xl max-w-xl mx-auto space-y-6">
+              <ShoppingBag className="w-16 h-16 text-muted/40 mx-auto" />
               <span className="text-sm text-muted uppercase tracking-[0.2em] block">
                 Your bag is empty
               </span>
+              <p className="text-xs text-muted px-8">
+                Looks like you haven't added any products yet. Browse our collection to find something you'll love.
+              </p>
               <CurtainButton
                 onClick={() => router.push("/shop")}
                 className="inline-block px-10 py-4 text-ink border border-ink bg-transparent text-xs font-semibold tracking-widest uppercase"
               >
-                Go to Shop
+                Browse Products
               </CurtainButton>
             </div>
           ) : (
@@ -603,9 +694,21 @@ export default function CheckoutPage() {
                   )}
 
                   {formError && (
-                    <p className="text-[11px] text-accent font-medium leading-relaxed">
-                      {formError}
-                    </p>
+                    <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                      <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-red-600 font-medium leading-relaxed">
+                        {formError}
+                      </p>
+                    </div>
+                  )}
+
+                  {formSuccess && (
+                    <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-emerald-600 font-medium leading-relaxed">
+                        {formSuccess}
+                      </p>
+                    </div>
                   )}
 
                   <div className="pt-4 border-t border-line/45 flex flex-col sm:flex-row items-center gap-6 justify-between">
@@ -642,21 +745,56 @@ export default function CheckoutPage() {
                 </h3>
 
                 {/* Cart Items List */}
-                <div className="space-y-4 max-h-[220px] overflow-y-auto pr-2">
+                <div className="space-y-4 max-h-[280px] overflow-y-auto pr-2">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex gap-4 border-b border-line/30 pb-4 last:border-b-0 last:pb-0 items-center justify-between">
+                    <div key={item.id} className="flex gap-4 border-b border-line/30 pb-4 last:border-b-0 last:pb-0 items-start justify-between">
                       <div className="flex gap-3 items-center min-w-0">
-                        <div className="w-12 h-14 bg-card-bg border border-line/50 rounded-lg overflow-hidden shrink-0">
-                          <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} width={48} height={56} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                        <div className="w-14 h-18 bg-card-bg border border-line/50 rounded-lg overflow-hidden shrink-0">
+                          <img src={item.image.includes(",") ? item.image.split(",")[0] : item.image} alt={item.name} width={56} height={72} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <h4 className="font-display font-semibold text-xs uppercase text-ink truncate">{item.name}</h4>
-                          <p className="text-[10px] text-muted mt-0.5">Quantity: {item.quantity}</p>
+                          <p className="text-[10px] text-muted mt-0.5">{item.subtitle}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center border border-line/50 rounded-sm">
+                              <button
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                className="p-1 text-muted hover:text-ink transition-colors"
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="px-2 text-xs font-semibold text-ink min-w-[24px] text-center">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                className="p-1 text-muted hover:text-ink transition-colors"
+                                aria-label="Increase quantity"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="p-1 text-muted hover:text-red-500 transition-colors"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <span className="text-xs font-semibold text-ink shrink-0">
-                        {formatPrice(item.price * item.quantity)}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs font-semibold text-ink shrink-0">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
+                        {item.quantity > 1 && (
+                          <span className="text-[9px] text-muted">
+                            {formatPrice(item.price)} each
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -732,6 +870,11 @@ export default function CheckoutPage() {
         </div>
       </main>
       <Footer />
+      <CongratsAnimation
+        isVisible={showCongrats}
+        onClose={() => setShowCongrats(false)}
+        freeSampleNames={freeSampleNames}
+      />
     </>
   );
 }

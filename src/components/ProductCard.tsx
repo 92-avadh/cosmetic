@@ -17,7 +17,17 @@ interface ProductCardProps {
   priceUSD: number;
   image: string;
   hoverImage: string;
+  badge?: string;
+  freeSamples?: string;
 }
+
+const BADGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  DIWALI: { label: "🪔 DIWALI OFFER", color: "#fff", bg: "#b91c1c" },
+  DISCOUNT: { label: "🏷️ DISCOUNT", color: "#fff", bg: "#ea580c" },
+  FREE: { label: "🎁 FREE", color: "#fff", bg: "#16a34a" },
+  BUNDLE: { label: "📦 BUNDLE", color: "#fff", bg: "#7c3aed" },
+  SAMPLE: { label: "🧪 SAMPLE", color: "#fff", bg: "#0891b2" },
+};
 
 export default function ProductCard({
   id,
@@ -26,6 +36,8 @@ export default function ProductCard({
   priceUSD,
   image,
   hoverImage,
+  badge,
+  freeSamples,
 }: ProductCardProps) {
   const router = useRouter();
   const { isLoggedIn } = useUserStore();
@@ -105,6 +117,20 @@ export default function ProductCard({
           BODYBARREL
         </div>
 
+        {/* Promotional Badge */}
+        {badge && BADGE_CONFIG[badge] && (
+          <div
+            className="absolute top-3 right-12 px-2 py-0.5 text-[8px] tracking-[0.15em] font-bold uppercase z-10 select-none rounded-[2px] animate-pulse cursor-help group"
+            style={{ backgroundColor: BADGE_CONFIG[badge].bg, color: BADGE_CONFIG[badge].color }}
+            title={badge === "DIWALI" ? "Special Diwali offer - Limited time!" : badge === "DISCOUNT" ? "Discounted price" : badge === "FREE" ? "Free gift included" : badge === "BUNDLE" ? "Bundle deal - Save more!" : "Free sample included"}
+          >
+            {BADGE_CONFIG[badge].label}
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-ink text-bg text-[8px] font-medium uppercase tracking-wider rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              {badge === "DIWALI" ? "🪔 Special Diwali offer - Limited time!" : badge === "DISCOUNT" ? "🏷️ Discounted price" : badge === "FREE" ? "🎁 Free gift included" : badge === "BUNDLE" ? "📦 Bundle deal - Save more!" : "🧪 Free sample included"}
+            </span>
+          </div>
+        )}
+
         {/* Wishlist Heart Toggle */}
         <button
           onClick={handleWishlistToggle}
@@ -112,20 +138,20 @@ export default function ProductCard({
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <AnimatePresence mode="wait">
-            <motion.div
-              key={wishlisted ? "filled" : "empty"}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-            >
-              <Heart
-                className={`w-3.5 h-3.5 transition-colors duration-200 ${
-                  wishlisted ? "fill-red-500 text-red-500" : "fill-none text-ink/60"
-                }`}
-              />
-            </motion.div>
-          </AnimatePresence>
+              <motion.div
+                key={wishlisted ? "filled" : "empty"}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              >
+                <Heart
+                  className={`w-3.5 h-3.5 transition-colors duration-200 ${
+                    wishlisted ? "fill-red-500 text-red-500" : "fill-none text-ink/60"
+                  }`}
+                />
+              </motion.div>
+            </AnimatePresence>
         </button>
 
         {/* Base Image */}
@@ -187,6 +213,11 @@ export default function ProductCard({
           </h3>
           <span className="text-sm font-semibold text-ink/80">{priceString}</span>
         </div>
+        {freeSamples && freeSamples.length > 0 && (
+          <span className="text-[9px] text-emerald-600 font-semibold uppercase tracking-wider">
+            + Includes 2 Free 15ml Samples
+          </span>
+        )}
       </div>
     </Link>
   );

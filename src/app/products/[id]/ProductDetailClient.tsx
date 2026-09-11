@@ -10,6 +10,7 @@ import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartS
 import { useUserStore } from "@/store/useUserStore";
 import { getApiErrorMessage } from "@/lib/utils";
 import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight, RotateCcw, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
 import CurtainButton from "@/components/CurtainButton";
 import BackInStockModal from "@/components/BackInStockModal";
 import {
@@ -18,6 +19,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/animate-ui/components/radix/dropdown-menu";
+
+const BADGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  DIWALI: { label: "🪔 DIWALI OFFER", color: "#fff", bg: "#b91c1c" },
+  DISCOUNT: { label: "🏷️ DISCOUNT", color: "#fff", bg: "#ea580c" },
+  FREE: { label: "🎁 FREE", color: "#fff", bg: "#16a34a" },
+  BUNDLE: { label: "📦 BUNDLE", color: "#fff", bg: "#7c3aed" },
+  SAMPLE: { label: "🧪 SAMPLE", color: "#fff", bg: "#0891b2" },
+};
 
 interface ProductDetailClientProps {
   product: {
@@ -30,6 +39,8 @@ interface ProductDetailClientProps {
     description?: string | null;
     specifications?: string | null;
     inventory: number;
+    badge?: string;
+    freeSamples?: string;
   };
   recommendations: any[];
 }
@@ -282,7 +293,7 @@ export default function ProductDetailClient({ product, recommendations }: Produc
   return (
     <>
       <Nav />
-      <main className="bg-bg text-ink min-h-screen pt-32 pb-24 font-sans">
+      <main className="bg-bg text-ink min-h-screen pt-32 pb-24 font-sans pb-32 md:pb-24">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-8">
@@ -406,6 +417,17 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                 <div className="pt-2">
                   <span className="text-2xl font-semibold text-ink">{priceString}</span>
+                  {product.badge && BADGE_CONFIG[product.badge] && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                      className="ml-3 inline-block px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[2px]"
+                      style={{ backgroundColor: BADGE_CONFIG[product.badge].bg, color: BADGE_CONFIG[product.badge].color }}
+                    >
+                      {BADGE_CONFIG[product.badge].label}
+                    </motion.span>
+                  )}
                 </div>
               </div>
 
@@ -743,6 +765,29 @@ export default function ProductDetailClient({ product, recommendations }: Produc
         </div>
       </main>
       <Footer />
+      {/* Mobile Sticky Add to Bag Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-bg/95 backdrop-blur-md border-t border-line p-4 safe-area-bottom">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-wider text-muted">{product.name}</span>
+            <span className="text-lg font-semibold text-ink">{priceString}</span>
+          </div>
+          <div className="flex gap-2">
+            <CurtainButton
+              onClick={handleAdd}
+              className="flex-1 text-ink border border-ink bg-transparent text-[11px] font-semibold py-3 px-4 rounded-[3px] uppercase tracking-[0.2em] flex items-center justify-center"
+            >
+              ADD TO BAG
+            </CurtainButton>
+            <CurtainButton
+              onClick={handleBuyNow}
+              className="flex-1 text-[#2d1c14] border border-[#2d1c14] bg-accent text-[11px] font-semibold py-3 px-4 rounded-[3px] uppercase tracking-[0.2em] flex items-center justify-center"
+            >
+              BUY NOW
+            </CurtainButton>
+          </div>
+        </div>
+      </div>
       <BackInStockModal
         isOpen={showBackInStockModal}
         onClose={() => setShowBackInStockModal(false)}

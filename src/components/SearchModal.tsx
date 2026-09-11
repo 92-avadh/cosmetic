@@ -233,7 +233,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         {/* Footer command prompt hint */}
         <div className="px-6 py-2.5 bg-card-bg/70 border-t border-line/45 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[10px] uppercase tracking-widest text-muted">
           <span>Press <kbd className="px-1.5 py-0.5 bg-bg border border-line rounded font-mono text-[10px] text-ink">ESC</kbd> to close</span>
-          <span>CELLULAR SEARCH ENGINE</span>
         </div>
       </div>
     </div>
