@@ -14,6 +14,7 @@ export default function CurrencyModal() {
     if (typeof window === "undefined") return;
 
     // Geolocation detection simulation based on navigator configurations
+    // Default to INR (Indian brand) - only switch if explicitly detected otherwise
     const userLang = navigator.language.toLowerCase();
     let detectedCur: Currency = "INR";
     let detectedCountryName = "India";
@@ -22,8 +23,8 @@ export default function CurrencyModal() {
       detectedCur = "KRW";
       detectedCountryName = "South Korea";
     } else if (
-      userLang.includes("us") ||
-      userLang.includes("en-us")
+      userLang.includes("en-us") ||
+      userLang.includes("us")
     ) {
       detectedCur = "USD";
       detectedCountryName = "United States";
@@ -45,8 +46,13 @@ export default function CurrencyModal() {
     // Read localStorage cache
     const cachedCurrency = localStorage.getItem("bodybarrel-currency-cached");
     if (!cachedCurrency) {
-      // First visit: trigger modal open
-      setCurrencyModalOpen(true);
+      // First visit: set detected currency as default (INR for most users)
+      setCurrency(detectedCur);
+      localStorage.setItem("bodybarrel-currency-cached", detectedCur);
+      // Only show modal for non-INR users to confirm
+      if (detectedCur !== "INR") {
+        setCurrencyModalOpen(true);
+      }
     } else {
       setCurrency(cachedCurrency as Currency);
     }
