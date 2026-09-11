@@ -181,7 +181,9 @@ export const POST = withApiHandler(async (request: Request) => {
       }
     }
 
-    // 8. Compile item names for the invoice email
+    // 8. Compile item names for the invoice email (convert to INR)
+    const CURRENCY_RATE = 83.5;
+    const CURRENCY_SYMBOL = "₹";
     const emailItems = [];
     for (const item of items) {
       const { data: prod } = await supabase
@@ -194,7 +196,7 @@ export const POST = withApiHandler(async (request: Request) => {
         name: prod?.name || "Premium Product",
         subtitle: prod?.subtitle || "",
         quantity: item.quantity,
-        price: item.pricePaid
+        priceINR: Math.round(item.pricePaid * CURRENCY_RATE),
       });
     }
 
@@ -207,13 +209,13 @@ export const POST = withApiHandler(async (request: Request) => {
           <span style="font-size: 11px; color: #888;">${item.subtitle || ""}</span>
         </td>
         <td style="padding: 12px 0; font-size: 13px; color: #333; text-align: center;">${item.quantity}</td>
-        <td style="padding: 12px 0; font-size: 13px; color: #333; text-align: right;">$${(
-            item.price * item.quantity
-          ).toFixed(2)}</td>
+        <td style="padding: 12px 0; font-size: 13px; color: #333; text-align: right;">${CURRENCY_SYMBOL}${(item.priceINR * item.quantity).toLocaleString("en-IN")}</td>
       </tr>
     `
       )
       .join("");
+
+    const totalINR = Math.round(order.totalUSD * CURRENCY_RATE);
 
     const orderEmailHtml = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; border: 1px solid #eaeaea; border-radius: 16px; background-color: #ffffff;">
@@ -223,7 +225,7 @@ export const POST = withApiHandler(async (request: Request) => {
         </div>
 
         <p style="font-size: 13px; color: #666; line-height: 1.6;">Hello,</p>
-        <p style="font-size: 13px; color: #666; line-height: 1.6;">Thank you for your purchase. received your order payment. Below is your billing summary.</p>
+        <p style="font-size: 13px; color: #666; line-height: 1.6;">Thank you for your purchase. We received your payment. Below is your billing summary.</p>
         
         <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eaeaea; margin: 25px 0; font-size: 12px; line-height: 1.6; color: #444;">
           <strong style="display: block; font-size: 13px; color: #111; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #eaeaea; padding-bottom: 5px;">Order Details</strong>
@@ -249,7 +251,7 @@ export const POST = withApiHandler(async (request: Request) => {
 
         <div style="border-top: 2px solid #111; padding-top: 15px; text-align: right; margin-top: 20px;">
           <span style="font-size: 12px; text-transform: uppercase; color: #666; tracking: 0.1em;">Order Total Paid:</span>
-          <strong style="font-size: 18px; color: #111; margin-left: 10px;">$${order.totalUSD.toFixed(2)} USD</strong>
+          <strong style="font-size: 18px; color: #111; margin-left: 10px;">${CURRENCY_SYMBOL}${totalINR.toLocaleString("en-IN")} INR</strong>
         </div>
 
         <p style="font-size: 13px; color: #666; line-height: 1.6; margin-top: 35px;">We will notify you once your package is dispatched with tracking information.</p>
