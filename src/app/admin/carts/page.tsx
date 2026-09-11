@@ -2,11 +2,11 @@
 
 import { useAdminContext } from "../context";
 import { Clock, Mail } from "lucide-react";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 
 export default function AdminCartsPage() {
   const { abandonedCarts, handleSimulateRecoveryEmail } = useAdminContext();
-  const { currency } = useCartStore();
+  // Currency fixed to INR
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -67,10 +67,10 @@ export default function AdminCartsPage() {
                       <div className="flex gap-3 sm:gap-8 items-baseline shrink-0">
                         <span>Qty: {item.quantity}</span>
                         <span className="font-bold text-ink">
-                          {CURRENCY_SYMBOLS[currency]}
-                          {(item.priceUSD * item.quantity * CURRENCY_RATES[currency]).toLocaleString(undefined, {
-                            minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                            maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                          {CURRENCY_SYMBOL}
+                          {(item.priceUSD * item.quantity * CURRENCY_RATE).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           })}
                         </span>
                       </div>
@@ -82,10 +82,10 @@ export default function AdminCartsPage() {
               <div className="border-t border-line/30 pt-3 flex justify-between items-baseline">
                 <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Cart Cargo Value</span>
                 <span className="text-sm font-bold text-accent">
-                  {CURRENCY_SYMBOLS[currency]}
-                  {(cart.totalUSD * CURRENCY_RATES[currency]).toLocaleString(undefined, {
-                    minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                    maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                  {CURRENCY_SYMBOL}
+                  {(cart.totalUSD * CURRENCY_RATE).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   })}
                 </span>
               </div>

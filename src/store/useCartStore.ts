@@ -10,32 +10,16 @@ export interface CartItem {
   subtitle?: string;
 }
 
-export type Currency = "USD" | "EUR" | "KRW" | "INR";
-
-export const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: "$",
-  EUR: "€",
-  KRW: "₩",
-  INR: "₹",
-};
-
-export const CURRENCY_RATES: Record<Currency, number> = {
-  USD: 1,
-  EUR: 0.92,
-  KRW: 1350,
-  INR: 83.5,
-};
+// Fixed INR currency for Indian brand
+const CURRENCY_SYMBOL = "₹";
+const CURRENCY_RATE = 83.5; // USD to INR
 
 interface CartState {
   cart: CartItem[];
   isCartOpen: boolean;
-  currency: Currency;
-  isCurrencyModalOpen: boolean;
   products: any[];
   hasFetchedCart: boolean;
   setCartOpen: (open: boolean) => void;
-  setCurrencyModalOpen: (open: boolean) => void;
-  setCurrency: (currency: Currency) => void;
   addItem: (item: Omit<CartItem, "quantity">) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -52,16 +36,10 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       cart: [],
       isCartOpen: false,
-      currency: "INR",
-      isCurrencyModalOpen: false,
       products: [],
       hasFetchedCart: false,
       
       setCartOpen: (open) => set({ isCartOpen: open }),
-      
-      setCurrencyModalOpen: (open) => set({ isCurrencyModalOpen: open }),
-      
-      setCurrency: (currency) => set({ currency }),
       
       addItem: (item) => set((state) => {
         const existingIndex = state.cart.findIndex((i) => i.id === item.id);
@@ -79,7 +57,7 @@ export const useCartStore = create<CartState>()(
       
       updateQuantity: (id, quantity) => set((state) => ({
         cart: state.cart
-          .map((item) => (item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item)),
+          .map(item => (item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item)),
       })),
       
       clearCart: () => set({ cart: [], hasFetchedCart: false }),
@@ -93,9 +71,9 @@ export const useCartStore = create<CartState>()(
       })),
       
       getCartTotal: () => {
-        const { cart, currency } = get();
+        const { cart } = get();
         const sumUSD = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        return sumUSD * CURRENCY_RATES[currency];
+        return sumUSD * CURRENCY_RATE;
       },
 
       fetchProducts: async () => {
@@ -116,9 +94,9 @@ export const useCartStore = create<CartState>()(
       name: "bodybarrel-cart-storage",
       partialize: (state) => ({
         cart: state.cart,
-        currency: state.currency,
       }),
     }
   )
 );
 
+export { CURRENCY_SYMBOL, CURRENCY_RATE };

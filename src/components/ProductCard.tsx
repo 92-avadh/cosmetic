@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useUserStore } from "@/store/useUserStore";
 import { Plus, Heart } from "lucide-react";
@@ -43,7 +43,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const router = useRouter();
   const { isLoggedIn } = useUserStore();
-  const { addItem, currency } = useCartStore();
+  const { addItem } = useCartStore();
   const { toggleItem, isWishlisted } = useWishlistStore();
   const [isHovered, setIsHovered] = useState(false);
   const wishlisted = isWishlisted(id);
@@ -53,21 +53,15 @@ export default function ProductCard({
 
   const displayPrice = salePriceUSD && salePriceUSD > 0 ? salePriceUSD : priceUSD;
   const hasSale = salePriceUSD && salePriceUSD > 0 && salePriceUSD < priceUSD;
-  const convertedPrice = displayPrice * CURRENCY_RATES[currency];
-  const convertedOriginalPrice = priceUSD * CURRENCY_RATES[currency];
-  const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
+  const convertedPrice = displayPrice * CURRENCY_RATE;
+  const convertedOriginalPrice = priceUSD * CURRENCY_RATE;
+  const priceString = `${CURRENCY_SYMBOL}${convertedPrice.toLocaleString(
     undefined,
-    {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
-    }
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 }
   )}`;
-  const originalPriceString = `${CURRENCY_SYMBOLS[currency]}${convertedOriginalPrice.toLocaleString(
+  const originalPriceString = `${CURRENCY_SYMBOL}${convertedOriginalPrice.toLocaleString(
     undefined,
-    {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
-    }
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 }
   )}`;
 
   const handleQuickAdd = (e: React.MouseEvent) => {

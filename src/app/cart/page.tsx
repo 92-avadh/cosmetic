@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
@@ -14,7 +14,7 @@ import CurtainButton from "@/components/CurtainButton";
 export default function CartPage() {
   const router = useRouter();
   const { isLoggedIn } = useUserStore();
-  const { cart, updateQuantity, removeItem, getCartTotal, currency } = useCartStore();
+  const { cart, updateQuantity, removeItem, getCartTotal} = useCartStore();
 
   const handleCheckoutRedirect = () => {
     if (isLoggedIn) {
@@ -24,8 +24,8 @@ export default function CartPage() {
     }
   };
 
-  const symbol = CURRENCY_SYMBOLS[currency];
-  const rate = CURRENCY_RATES[currency];
+  const symbol = CURRENCY_SYMBOL;
+  const rate = CURRENCY_RATE;
 
   const subtotal = getCartTotal();
   const shipping = subtotal > 150 * rate ? 0 : 15 * rate;
@@ -35,8 +35,8 @@ export default function CartPage() {
   const formatPrice = (priceUSD: number) => {
     const converted = priceUSD * rate;
     return `${symbol}${converted.toLocaleString(undefined, {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     })}`;
   };
 

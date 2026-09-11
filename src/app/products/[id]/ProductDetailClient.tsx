@@ -6,7 +6,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
 import { getApiErrorMessage } from "@/lib/utils";
 import { Plus, Minus, ArrowLeft, ShieldCheck, ChevronLeft, ChevronRight, RotateCcw, ChevronDown } from "lucide-react";
@@ -48,7 +48,7 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product, recommendations }: ProductDetailClientProps) {
   const router = useRouter();
-  const { addItem, currency } = useCartStore();
+  const { addItem} = useCartStore();
 
   const images = [
     ...(product.image ? product.image.split(",") : []),
@@ -208,20 +208,20 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
   const displayPrice = product.salePriceUSD && product.salePriceUSD > 0 ? product.salePriceUSD : product.priceUSD;
   const hasSale = product.salePriceUSD && product.salePriceUSD > 0 && product.salePriceUSD < product.priceUSD;
-  const convertedPrice = displayPrice * CURRENCY_RATES[currency];
-  const convertedOriginalPrice = product.priceUSD * CURRENCY_RATES[currency];
-  const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
+  const convertedPrice = displayPrice * CURRENCY_RATE;
+  const convertedOriginalPrice = product.priceUSD * CURRENCY_RATE;
+  const priceString = `${CURRENCY_SYMBOL}${convertedPrice.toLocaleString(
     undefined,
     {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }
   )}`;
-  const originalPriceString = `${CURRENCY_SYMBOLS[currency]}${convertedOriginalPrice.toLocaleString(
+  const originalPriceString = `${CURRENCY_SYMBOL}${convertedOriginalPrice.toLocaleString(
     undefined,
     {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }
   )}`;
 

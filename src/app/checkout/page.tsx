@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import CurtainButton from "@/components/CurtainButton";
 import { ArrowLeft, LogOut, CheckCircle, Loader2, Trash2, Minus, Plus, AlertCircle, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -15,7 +15,7 @@ import CongratsAnimation from "@/components/CongratsAnimation";
 export default function CheckoutPage() {
   const router = useRouter();
   const { isLoggedIn, user, logout } = useUserStore();
-  const { cart, getCartTotal, currency, clearCart, removeItem, updateQuantity } = useCartStore();
+  const { cart, getCartTotal, clearCart, removeItem, updateQuantity } = useCartStore();
 
   const [mounted, setMounted] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
@@ -158,8 +158,8 @@ export default function CheckoutPage() {
     );
   }
 
-  const symbol = CURRENCY_SYMBOLS[currency];
-  const rate = CURRENCY_RATES[currency];
+  const symbol = CURRENCY_SYMBOL;
+  const rate = CURRENCY_RATE;
   const subtotal = getCartTotal();
   const discountAmount = appliedPromo ? subtotal * appliedPromo.discount : 0;
   const discountedSubtotal = subtotal - discountAmount;
@@ -170,8 +170,8 @@ export default function CheckoutPage() {
   const formatPrice = (priceUSD: number) => {
     const converted = priceUSD * rate;
     return `${symbol}${converted.toLocaleString(undefined, {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     })}`;
   };
 
@@ -366,7 +366,6 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email: user?.email,
           promoCode: appliedPromo?.code || null,
-          currency,
           items: cart.map((item) => ({
             id: item.id,
             name: item.name,

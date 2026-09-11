@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import { X, Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PRODUCTS_CATALOG } from "./ProductRow";
@@ -17,10 +17,11 @@ export default function CartDrawer() {
     setCartOpen,
     removeItem,
     updateQuantity,
-    currency,
     addItem,
     products,
   } = useCartStore();
+  const symbol = CURRENCY_SYMBOL;
+  const rate = CURRENCY_RATE;
 
   const router = useRouter();
   const { isLoggedIn } = useUserStore();
@@ -55,13 +56,13 @@ export default function CartDrawer() {
 
   // Calculate totals
   const subtotalUSD = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const convertedSubtotal = subtotalUSD * CURRENCY_RATES[currency];
+  const convertedSubtotal = subtotalUSD * CURRENCY_RATE;
   
-  const formattedSubtotal = `${CURRENCY_SYMBOLS[currency]}${convertedSubtotal.toLocaleString(
+  const formattedSubtotal = `${CURRENCY_SYMBOL}${convertedSubtotal.toLocaleString(
     undefined,
     {
-      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }
   )}`;
 
@@ -129,12 +130,12 @@ export default function CartDrawer() {
               ) : (
                 <div className="space-y-6">
                   {cart.map((item) => {
-                    const price = item.price * CURRENCY_RATES[currency] * item.quantity;
-                    const priceStr = `${CURRENCY_SYMBOLS[currency]}${price.toLocaleString(
+                    const price = item.price * CURRENCY_RATE * item.quantity;
+                    const priceStr = `${CURRENCY_SYMBOL}${price.toLocaleString(
                       undefined,
                       {
-                        minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                        maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       }
                     )}`;
 
@@ -214,12 +215,12 @@ export default function CartDrawer() {
                   </h4>
                   <div className="grid grid-cols-2 gap-4">
                     {upsellProducts.map((product) => {
-                      const price = product.priceUSD * CURRENCY_RATES[currency];
-                      const priceStr = `${CURRENCY_SYMBOLS[currency]}${price.toLocaleString(
+                      const price = product.priceUSD * CURRENCY_RATE;
+                      const priceStr = `${CURRENCY_SYMBOL}${price.toLocaleString(
                         undefined,
                         {
-                          minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                          maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
                         }
                       )}`;
 

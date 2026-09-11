@@ -6,7 +6,7 @@ import { Loader2, Upload, Check } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
 import { Button } from "@/components/ui/button";
 import { getApiErrorMessage } from "@/lib/utils";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ export default function AdminProductsPage() {
     handleDeleteProduct,
   } = useAdminContext();
 
-  const { currency } = useCartStore();
+  // Currency fixed to INR
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -252,9 +252,9 @@ export default function AdminProductsPage() {
 
       // Convert input price in INR (₹) to base USD price for database storage
       const inputPriceINR = parseFloat(newProductPrice);
-      const priceUSD = inputPriceINR / CURRENCY_RATES["INR"];
+      const priceUSD = inputPriceINR / CURRENCY_RATE;
       const inputSalePriceINR = newProductSalePrice ? parseFloat(newProductSalePrice) : 0;
-      const salePriceUSD = inputSalePriceINR > 0 ? inputSalePriceINR / CURRENCY_RATES["INR"] : 0;
+      const salePriceUSD = inputSalePriceINR > 0 ? inputSalePriceINR / CURRENCY_RATE : 0;
 
       const payload = {
         sku: newProductSku,
@@ -719,10 +719,10 @@ export default function AdminProductsPage() {
                 <div className="border-t border-line/30 pt-2 flex items-center justify-between text-[9px] uppercase font-semibold">
                   <span className="text-ink/80">Stock: <span className="font-bold text-ink">{prod.inventory} units</span></span>
                   <span className="text-accent font-bold">
-                    {CURRENCY_SYMBOLS[currency]}
-                    {(prod.priceUSD * CURRENCY_RATES[currency]).toLocaleString(undefined, {
-                      minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                    {CURRENCY_SYMBOL}
+                    {(prod.priceUSD * CURRENCY_RATE).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </span>
                 </div>
@@ -733,7 +733,7 @@ export default function AdminProductsPage() {
                       setNewProductSku(prod.sku || "");
                       setNewProductName(prod.name);
                       setNewProductSubtitle(prod.subtitle);
-                      const priceInINR = Math.round(prod.priceUSD * CURRENCY_RATES["INR"]);
+                      const priceInINR = Math.round(prod.priceUSD * CURRENCY_RATE);
                       setNewProductPrice(String(priceInINR));
                       setNewProductInventory(String(prod.inventory));
                       setNewProductDescription(prod.description || "");

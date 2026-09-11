@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, ShoppingBag, ArrowRight, Tag, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
 
 interface SearchModalProps {
@@ -17,13 +17,13 @@ const POPULAR_TAGS = ["PDRN", "Ceramide", "Exfoliating", "Sensitive Barrier", "H
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const router = useRouter();
   const { isLoggedIn } = useUserStore();
-  const { products, currency, addItem, setCartOpen } = useCartStore();
+  const { products, addItem, setCartOpen } = useCartStore();
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const symbol = CURRENCY_SYMBOLS[currency] || "$";
-  const rate = CURRENCY_RATES[currency] || 1;
+  const symbol = CURRENCY_SYMBOL || "$";
+  const rate = CURRENCY_RATE || 1;
 
   useEffect(() => {
     const stored = localStorage.getItem("bodybarrel-recent-searches");
@@ -157,7 +157,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             {p.subtitle}
                           </p>
                           <span className="font-display font-bold text-xs text-ink mt-1 block">
-                            {symbol}{price.toFixed(currency === "KRW" ? 0 : 2)}
+                            {symbol}{price.toFixed(2)}
                           </span>
                         </div>
                         <button

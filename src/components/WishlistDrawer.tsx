@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useWishlistStore } from "@/store/useWishlistStore";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
 import { X, Trash2, Heart, ShoppingBag } from "lucide-react";
@@ -16,7 +16,7 @@ export default function WishlistDrawer() {
     removeItem,
   } = useWishlistStore();
 
-  const { addItem, currency, setCartOpen } = useCartStore();
+  const { addItem, setCartOpen } = useCartStore();
   const { isLoggedIn } = useUserStore();
   const router = useRouter();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -118,12 +118,12 @@ export default function WishlistDrawer() {
               ) : (
                 <div className="space-y-6">
                   {wishlistItems.map((item) => {
-                    const price = item.priceUSD * CURRENCY_RATES[currency];
-                    const priceStr = `${CURRENCY_SYMBOLS[currency]}${price.toLocaleString(
+                    const price = item.priceUSD * CURRENCY_RATE;
+                    const priceStr = `${CURRENCY_SYMBOL}${price.toLocaleString(
                       undefined,
                       {
-                        minimumFractionDigits: currency === "KRW" ? 0 : 2,
-                        maximumFractionDigits: currency === "KRW" ? 0 : 2,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
                       }
                     )}`;
 

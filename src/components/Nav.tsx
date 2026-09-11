@@ -123,7 +123,7 @@ export default function Nav() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
   
-  const { cart, setCartOpen, currency } = useCartStore();
+  const { cart, setCartOpen} = useCartStore();
   const { items: wishlistItems, setWishlistOpen } = useWishlistStore();
   const cartItemsCount = cart.reduce((total, item) => total + item.quantity, 0);
   const wishlistItemsCount = wishlistItems.length;

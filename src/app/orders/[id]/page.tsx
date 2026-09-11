@@ -6,7 +6,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import CurtainButton from "@/components/CurtainButton";
 import { ArrowLeft, Clock, MapPin, Package, ShieldCheck, Mail, HelpCircle, CheckCircle, Truck, Printer, Download, FileText } from "lucide-react";
-import { useCartStore, CURRENCY_SYMBOLS, CURRENCY_RATES } from "@/store/useCartStore";
+import { useCartStore, CURRENCY_SYMBOL, CURRENCY_RATE } from "@/store/useCartStore";
 import {
   AlertDialog,
   AlertDialogPopup,
@@ -24,7 +24,7 @@ export default function OrderTrackingPage() {
   const router = useRouter();
   const orderId = params.id as string;
 
-  const { currency } = useCartStore();
+  // Currency fixed to INR
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -130,8 +130,8 @@ export default function OrderTrackingPage() {
   }
 
   // Currency calculations
-  const rate = CURRENCY_RATES[currency] || 1;
-  const symbol = CURRENCY_SYMBOLS[currency] || "$";
+  const rate = CURRENCY_RATE || 1;
+  const symbol = CURRENCY_SYMBOL || "$";
   const displayTotal = order.totalUSD * rate;
   const displaySubtotal = (order.totalUSD - (order.discountUSD || 0)) * rate;
 
