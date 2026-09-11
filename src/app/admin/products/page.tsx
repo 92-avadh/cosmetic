@@ -48,6 +48,7 @@ export default function AdminProductsPage() {
   const [newProductName, setNewProductName] = useState("");
   const [newProductSubtitle, setNewProductSubtitle] = useState("");
   const [newProductPrice, setNewProductPrice] = useState("");
+  const [newProductSalePrice, setNewProductSalePrice] = useState("");
   const [newProductInventory, setNewProductInventory] = useState("0");
   const [newProductDescription, setNewProductDescription] = useState("");
   const [newProductImage, setNewProductImage] = useState("");
@@ -252,12 +253,15 @@ export default function AdminProductsPage() {
       // Convert input price in INR (₹) to base USD price for database storage
       const inputPriceINR = parseFloat(newProductPrice);
       const priceUSD = inputPriceINR / CURRENCY_RATES["INR"];
+      const inputSalePriceINR = newProductSalePrice ? parseFloat(newProductSalePrice) : 0;
+      const salePriceUSD = inputSalePriceINR > 0 ? inputSalePriceINR / CURRENCY_RATES["INR"] : 0;
 
       const payload = {
         sku: newProductSku,
         name: newProductName,
         subtitle: newProductSubtitle,
         priceUSD,
+        salePriceUSD,
         inventory: parseInt(newProductInventory),
         description: newProductDescription,
         specifications: specsJson,
@@ -355,6 +359,18 @@ export default function AdminProductsPage() {
                 value={newProductPrice}
                 onChange={(e) => setNewProductPrice(e.target.value)}
                 placeholder="1000"
+                className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[8px] uppercase tracking-widest font-bold text-ink block">Sale Price (INR ₹) — Optional</label>
+              <input
+                type="number"
+                step="0.01"
+                value={newProductSalePrice}
+                onChange={(e) => setNewProductSalePrice(e.target.value)}
+                placeholder="Leave empty for no sale"
                 className="w-full bg-bg border border-line rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"
               />
             </div>

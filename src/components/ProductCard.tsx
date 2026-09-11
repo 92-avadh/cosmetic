@@ -15,6 +15,7 @@ interface ProductCardProps {
   name: string;
   subtitle: string;
   priceUSD: number;
+  salePriceUSD?: number;
   image: string;
   hoverImage: string;
   badge?: string;
@@ -34,6 +35,7 @@ export default function ProductCard({
   name,
   subtitle,
   priceUSD,
+  salePriceUSD,
   image,
   hoverImage,
   badge,
@@ -49,8 +51,18 @@ export default function ProductCard({
   const primaryImage = image.includes(",") ? image.split(",")[0] : image;
   const hoverImageToShow = hoverImage || (image.includes(",") ? image.split(",")[1] : primaryImage);
 
-  const convertedPrice = priceUSD * CURRENCY_RATES[currency];
+  const displayPrice = salePriceUSD && salePriceUSD > 0 ? salePriceUSD : priceUSD;
+  const hasSale = salePriceUSD && salePriceUSD > 0 && salePriceUSD < priceUSD;
+  const convertedPrice = displayPrice * CURRENCY_RATES[currency];
+  const convertedOriginalPrice = priceUSD * CURRENCY_RATES[currency];
   const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: currency === "KRW" ? 0 : 2,
+      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+    }
+  )}`;
+  const originalPriceString = `${CURRENCY_SYMBOLS[currency]}${convertedOriginalPrice.toLocaleString(
     undefined,
     {
       minimumFractionDigits: currency === "KRW" ? 0 : 2,
@@ -207,11 +219,16 @@ export default function ProductCard({
         <span className="text-[11px] uppercase tracking-[0.15em] text-muted font-medium">
           {subtitle}
         </span>
-        <div className="flex items-baseline justify-between">
+        <div className="flex items-baseline gap-2">
           <h3 className="font-display font-semibold text-sm md:text-base tracking-wide uppercase text-ink">
             {name}
           </h3>
-          <span className="text-sm font-semibold text-ink/80">{priceString}</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm font-semibold text-ink/80">{priceString}</span>
+            {hasSale && (
+              <span className="text-xs font-medium text-muted line-through">{originalPriceString}</span>
+            )}
+          </div>
         </div>
         {freeSamples && freeSamples.length > 0 && (
           <span className="text-[9px] text-emerald-600 font-semibold uppercase tracking-wider">

@@ -28,6 +28,7 @@ model Product {
   name        String
   subtitle    String
   priceUSD    Float
+  salePriceUSD Float?     @default(0) // Special sale price (0 = no sale)
   image       String
   hoverImage  String?
   description String?     @default("Premium cellular skincare formula.")

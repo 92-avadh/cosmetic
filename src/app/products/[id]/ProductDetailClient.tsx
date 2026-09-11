@@ -34,6 +34,7 @@ interface ProductDetailClientProps {
     name: string;
     subtitle: string;
     priceUSD: number;
+    salePriceUSD?: number;
     image: string;
     hoverImage?: string | null;
     description?: string | null;
@@ -205,8 +206,18 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
   const volumeText = getVolumeText(product.id);
 
-  const convertedPrice = product.priceUSD * CURRENCY_RATES[currency];
+  const displayPrice = product.salePriceUSD && product.salePriceUSD > 0 ? product.salePriceUSD : product.priceUSD;
+  const hasSale = product.salePriceUSD && product.salePriceUSD > 0 && product.salePriceUSD < product.priceUSD;
+  const convertedPrice = displayPrice * CURRENCY_RATES[currency];
+  const convertedOriginalPrice = product.priceUSD * CURRENCY_RATES[currency];
   const priceString = `${CURRENCY_SYMBOLS[currency]}${convertedPrice.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: currency === "KRW" ? 0 : 2,
+      maximumFractionDigits: currency === "KRW" ? 0 : 2,
+    }
+  )}`;
+  const originalPriceString = `${CURRENCY_SYMBOLS[currency]}${convertedOriginalPrice.toLocaleString(
     undefined,
     {
       minimumFractionDigits: currency === "KRW" ? 0 : 2,
@@ -417,6 +428,9 @@ export default function ProductDetailClient({ product, recommendations }: Produc
 
                 <div className="pt-2">
                   <span className="text-2xl font-semibold text-ink">{priceString}</span>
+                  {hasSale && (
+                    <span className="ml-2 text-lg font-medium text-muted line-through">{originalPriceString}</span>
+                  )}
                   {product.badge && BADGE_CONFIG[product.badge] && (
                     <motion.span
                       initial={{ scale: 0 }}
