@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import { ArrowLeft, ArrowRight, ShieldCheck, Mail, KeyRound, Loader2 } from "lucide-react";
 import CurtainButton from "@/components/CurtainButton";
-import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { getApiErrorMessage } from "@/lib/utils";
@@ -17,7 +16,7 @@ function LoginForm() {
   const redirect = searchParams.get("redirect") || "/account";
 
   const { isLoggedIn, login } = useUserStore();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +25,7 @@ function LoginForm() {
   const [timer, setTimer] = useState(0);
   const [resendCount, setResendCount] = useState(0);
 
-  // Timer countdown logic
+  // Timer countdown logic (30s cooldown)
   useEffect(() => {
     if (step !== "otp" || timer <= 0) return;
 
@@ -53,11 +52,6 @@ function LoginForm() {
     }
 
     setError(null);
-    // Immediately advance to OTP verification step so user is not blocked
-    setStep("otp");
-    setTimer(30);
-    setResendCount(0);
-    setMessage("Sending security code... Please check your email inbox.");
     setIsLoading(true);
 
     try {
@@ -73,7 +67,11 @@ function LoginForm() {
         throw new Error(getApiErrorMessage(resJson, "Failed to send verification code."));
       }
 
-      setMessage("Security code sent. Please check your email inbox.");
+      // Advance to OTP verification step
+      setStep("otp");
+      setTimer(30);
+      setResendCount(0);
+      setMessage(`A 6-digit verification code has been sent from connect@bodybarrel.com to ${cleanEmail}. It expires in 10 minutes.`);
     } catch (err: any) {
       setError(err.message || "Failed to initiate login request.");
     } finally {
@@ -82,7 +80,7 @@ function LoginForm() {
   };
 
   const handleResendOtp = async () => {
-    if (resendCount >= 2 || timer > 0 || isLoading) return;
+    if (resendCount >= 3 || timer > 0 || isLoading) return;
 
     const cleanEmail = email.trim().toLowerCase();
     setIsLoading(true);
@@ -104,9 +102,9 @@ function LoginForm() {
 
       setResendCount((prev) => prev + 1);
       setTimer(30);
-      setMessage(`New security code sent. Please check your email inbox. (Resend ${resendCount + 1}/2)`);
+      setMessage(`A 6-digit verification code has been sent from connect@bodybarrel.com to ${cleanEmail}. It expires in 10 minutes.`);
     } catch (err: any) {
-      setError(err.message || "Failed to resend code.");
+      setError(err.message || "Failed to resend verification code.");
     } finally {
       setIsLoading(false);
     }
@@ -134,16 +132,11 @@ function LoginForm() {
       const resJson = await res.json();
 
       if (!res.ok) {
-        throw new Error(getApiErrorMessage(resJson, "Invalid verification code."));
+        throw new Error(getApiErrorMessage(resJson, "Invalid or expired verification code."));
       }
 
-      // Successful login
-      if (resJson.sessionToken) {
-        // ponytail: Edge runtime fallback — session should be set via httpOnly cookie server-side.
-        // If this path executes, cookies() failed which means the server config needs fixing.
-        console.error("Session token returned in response body — this should not happen in production. Ensure cookies() works.");
-      }
-      login(email, resJson.user?.role);
+      // Successful verification
+      login(cleanEmail, resJson.user?.role);
       router.push(redirect);
     } catch (err: any) {
       setError(err.message || "Failed to verify security code.");
@@ -159,8 +152,13 @@ function LoginForm() {
 
       <div className="text-center mb-8">
         <h2 className="font-display font-semibold text-2xl uppercase tracking-tight text-ink">
-          Sign In
+          {step === "email" ? "Sign In" : "Security Verification"}
         </h2>
+        <p className="text-[11px] text-muted tracking-wide mt-1.5">
+          {step === "email"
+            ? "Enter your email to receive a 6-digit secure login code"
+            : "Enter the 6-digit code sent to your email"}
+        </p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -248,6 +246,9 @@ function LoginForm() {
                     className="w-full bg-transparent border-b border-line py-3.5 pl-8 pr-2 text-xs tracking-[0.3em] font-semibold text-ink placeholder:text-muted/65 placeholder:tracking-normal focus:outline-none focus:border-accent transition-colors duration-300 disabled:opacity-50"
                   />
                 </div>
+                <p className="text-[10px] text-muted tracking-wide">
+                  Code expires in 10 minutes &bull; Check your spam folder if not received
+                </p>
               </div>
 
               {message && !error && (
@@ -265,20 +266,20 @@ function LoginForm() {
               <div className="space-y-3">
                 <CurtainButton
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || otp.length !== 6}
                   className="w-full text-ink border border-ink bg-transparent text-[10px] font-semibold py-4.5 tracking-[0.2em] uppercase flex items-center justify-center space-x-2 disabled:opacity-55 disabled:cursor-not-allowed group cursor-pointer"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <span>Confirm & Login</span>
+                      <span>Confirm &amp; Sign In</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}
                 </CurtainButton>
 
-                {resendCount < 2 ? (
+                {resendCount < 3 ? (
                   <CurtainButton
                     type="button"
                     disabled={timer > 0 || isLoading}
@@ -288,14 +289,12 @@ function LoginForm() {
                     {timer > 0 ? (
                       <span>Resend Code in {timer}s</span>
                     ) : (
-                      <>
-                        <span>Resend Code ({2 - resendCount} left)</span>
-                      </>
+                      <span>Resend Code ({3 - resendCount} left)</span>
                     )}
                   </CurtainButton>
                 ) : (
                   <div className="text-[10px] uppercase tracking-wider font-semibold text-muted text-center py-2.5">
-                    Resend limit reached
+                    Resend limit reached &bull; Please wait a few minutes
                   </div>
                 )}
 
@@ -322,7 +321,7 @@ function LoginForm() {
 
       <div className="mt-8 pt-6 border-t border-line/50 flex items-center justify-center gap-2.5 text-[9px] text-muted uppercase tracking-widest">
         <ShieldCheck className="w-4 h-4 text-emerald-600" />
-        <span>Secure Secure SSL Session</span>
+        <span>Secure Encrypted Session</span>
       </div>
     </div>
   );

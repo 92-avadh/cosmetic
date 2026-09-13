@@ -141,14 +141,13 @@ export default function Footer() {
           </div>
 
           <div>
-            Developed &amp; Managed by{" "}
             <a
               href="https://portfolio-avadh.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-accent transition-colors"
             >
-              AD
+              Developed &amp; Managed by AD
             </a>
           </div>
         </div>

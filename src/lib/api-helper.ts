@@ -104,9 +104,9 @@ export function withApiHandler(
 
       // 1. CSRF Protection for mutation requests (POST, PUT, DELETE, PATCH)
       if (["POST", "PUT", "DELETE", "PATCH"].includes(method)) {
-        const isWebhook = path.startsWith("/api/webhooks");
+        const isExempt = path.startsWith("/api/webhooks") || path === "/api/test-email";
         
-        if (!isWebhook) {
+        if (!isExempt) {
           const origin = headers.get("origin");
           const referer = headers.get("referer");
           // Use the URL's own hostname as the canonical host to avoid proxy/port mismatches on CF Workers
