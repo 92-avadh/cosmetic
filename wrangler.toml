@@ -7,3 +7,13 @@ compatibility_flags = [ "nodejs_compat" ]
 # Environment variables — set these via `wrangler secret put <KEY>` or in Cloudflare Dashboard.
 # Required: SUPABASE_URL, SUPABASE_ANON_KEY
 # Optional: SESSION_SECRET, GMAIL_USER, GMAIL_APP_PASSWORD, RAZORPAY_API_KEY, RAZORPAY_SECRET, STRIPE_SECRET_KEY
+
+[vars]
+SUPABASE_URL = "https://gjlwnohlruwdfbjvrfas.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqbHdub2hscnV3ZGZianZyZmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzI0MTUsImV4cCI6MjA5ODkwODQxNX0.obUZe_oorjj6RviQSsGHj5Hv_DFG76a6ZrEWpN4JVBk"
+SMTP_HOST = "smtpout.secureserver.net"
+SMTP_PORT = "465"
+SMTP_SECURE = "true"
+SMTP_USER = "connect@bodybarrel.com"
+RAZORPAY_API_KEY = "rzp_test_TcIR3cSdD5MiIh"
+ADMIN_EMAIL = "dhameliyaavadh592@gmail.com"
