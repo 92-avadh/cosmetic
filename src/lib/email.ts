@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
 import { getSafeRequestContext } from "./cloudflare";
+import { getEnv } from "./env";
 
 export interface SmtpConfig {
   host: string;
@@ -15,15 +16,17 @@ export interface SmtpConfig {
  * Safe for both Node.js runtime and Cloudflare context.
  */
 export function getSmtpConfig(customHost?: string): SmtpConfig {
+  const env = getEnv();
   const context = getSafeRequestContext();
   const cfEnv = (context?.env || {}) as Record<string, string | undefined>;
 
-  const host = customHost || cfEnv.SMTP_HOST || process.env.SMTP_HOST || "smtp.titan.email";
-  const port = Number(cfEnv.SMTP_PORT || process.env.SMTP_PORT || 465);
+  const host = customHost || cfEnv.SMTP_HOST || env.SMTP_HOST || process.env.SMTP_HOST || "smtpout.secureserver.net";
+  const port = Number(cfEnv.SMTP_PORT || env.SMTP_PORT || process.env.SMTP_PORT || 465);
   // Titan / GoDaddy Email on port 465 requires secure: true (SSL/TLS)
-  const secure = (cfEnv.SMTP_SECURE || process.env.SMTP_SECURE) !== "false";
-  const user = cfEnv.SMTP_USER || process.env.SMTP_USER || "connect@bodybarrel.com";
-  const pass = cfEnv.SMTP_PASS || process.env.SMTP_PASS;
+  const secure = (cfEnv.SMTP_SECURE || env.SMTP_SECURE || process.env.SMTP_SECURE) !== "false";
+  const user = cfEnv.SMTP_USER || env.SMTP_USER || process.env.SMTP_USER || "connect@bodybarrel.com";
+  const rawPass = cfEnv.SMTP_PASS || env.SMTP_PASS || process.env.SMTP_PASS;
+  const pass = rawPass ? rawPass.replace(/^["']|["']$/g, "").trim() : undefined;
 
   return { host, port, secure, user, pass };
 }
@@ -136,8 +139,8 @@ export async function verifySmtpConnection(): Promise<{ success: boolean; messag
       message: `SMTP server connection verified successfully (${config.host}:465)`,
     };
   } catch (error: unknown) {
-    // If primary host fails, try GoDaddy alternate hostname
-    const alternateHost = config.host.includes("titan") ? "smtpout.secureserver.net" : "smtp.titan.email";
+    // If primary host fails, try alternate hostname
+    const alternateHost = config.host.includes("secureserver") ? "smtp.titan.email" : "smtpout.secureserver.net";
     try {
       const fallbackTransporter = createMailTransporter(alternateHost);
       await fallbackTransporter.verify();
@@ -167,13 +170,8 @@ export async function sendEmail({
   const config = getSmtpConfig();
 
   if (!config.pass || config.pass === "MY_PASSWORD") {
-    console.warn("\n┌────────────────────────────────────────────────────────┐");
-    console.warn("│ ⚠️ [MOCK EMAIL] TITAN SMTP CREDENTIALS NOT CONFIGURED  │");
-    console.warn("├────────────────────────────────────────────────────────┤");
-    console.warn(`│ To:      ${to.padEnd(46)} │`);
-    console.warn(`│ Subject: ${subject.padEnd(46)} │`);
-    console.warn("└────────────────────────────────────────────────────────┘\n");
-    return { success: true, mocked: true };
+    console.error("[SMTP ERROR] SMTP_PASS credentials are missing or unconfigured.");
+    throw mapSmtpError(new Error("SMTP authentication failed: SMTP credentials are not configured"));
   }
 
   // 1. Try configured host
@@ -188,8 +186,8 @@ export async function sendEmail({
 
     return { success: true, messageId: info.messageId };
   } catch (primaryErr: unknown) {
-    // 2. Try GoDaddy / Titan alternate host fallback
-    const alternateHost = config.host.includes("titan") ? "smtpout.secureserver.net" : "smtp.titan.email";
+    // 2. Try alternate host fallback
+    const alternateHost = config.host.includes("secureserver") ? "smtp.titan.email" : "smtpout.secureserver.net";
     try {
       const fallbackTransporter = createMailTransporter(alternateHost);
       const info = await fallbackTransporter.sendMail({

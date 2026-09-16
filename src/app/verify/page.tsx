@@ -23,7 +23,7 @@ function VerifyForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(
-    initialEmail ? `A 6-digit verification code has been sent from connect@bodybarrel.com to ${initialEmail}. It expires in 10 minutes.` : null
+    initialEmail ? `A 6-digit verification code has been sent to ${initialEmail}. It expires in 10 minutes.` : null
   );
   const [timer, setTimer] = useState(30);
   const [resendCount, setResendCount] = useState(0);
@@ -67,7 +67,7 @@ function VerifyForm() {
 
       setResendCount((prev) => prev + 1);
       setTimer(30);
-      setMessage(`A 6-digit verification code has been sent from connect@bodybarrel.com to ${cleanEmail}. It expires in 10 minutes.`);
+      setMessage(`A 6-digit verification code has been sent to ${cleanEmail}. It expires in 10 minutes.`);
     } catch (err: any) {
       setError(err.message || "Failed to resend code.");
     } finally {
@@ -125,7 +125,7 @@ function VerifyForm() {
           Verify Your Email
         </h2>
         <p className="text-[11px] text-muted tracking-wide mt-1.5">
-          Enter the 6-digit code sent to your email from connect@bodybarrel.com
+          Enter the 6-digit code sent to your email
         </p>
       </div>
 

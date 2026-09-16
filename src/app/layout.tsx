@@ -3,7 +3,7 @@ import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScroll";
 import CartSync from "@/components/CartSync";
 import CartDrawer from "@/components/CartDrawer";
-
+import ToastContainer from "@/components/ToastContainer";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bodybarrel.com";
 
@@ -57,6 +57,7 @@ export default function RootLayout({
         <SmoothScrollProvider>
           <CartSync />
           <CartDrawer />
+          <ToastContainer />
 
           {children}
         </SmoothScrollProvider>

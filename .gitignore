@@ -45,3 +45,4 @@ next-env.d.ts
 # graphify and agents tool directories
 /graphify-out
 /.agents
+.firecrawl/

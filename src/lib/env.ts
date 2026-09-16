@@ -31,19 +31,19 @@ export function getEnv(): Env {
   const cfEnv = (context?.env || {}) as Record<string, unknown>;
 
   const rawEnv = {
-    SUPABASE_URL: cfEnv.SUPABASE_URL || process.env.SUPABASE_URL || "https://gjlwnohlruwdfbjvrfas.supabase.co",
-    SUPABASE_ANON_KEY: cfEnv.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqbHdub2hscnV3ZGZianZyZmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzI0MTUsImV4cCI6MjA5ODkwODQxNX0.obUZe_oorjj6RviQSsGHj5Hv_DFG76a6ZrEWpN4JVBk",
-    SESSION_SECRET: cfEnv.SESSION_SECRET || process.env.SESSION_SECRET || "bb-prod-session-secret-change-me-in-production-32chars-min",
+    SUPABASE_URL: cfEnv.SUPABASE_URL || process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: cfEnv.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY,
+    SESSION_SECRET: cfEnv.SESSION_SECRET || process.env.SESSION_SECRET,
     ADMIN_EMAIL: cfEnv.ADMIN_EMAIL || process.env.ADMIN_EMAIL || "dhameliyaavadh592@gmail.com",
-    GMAIL_USER: cfEnv.GMAIL_USER || process.env.GMAIL_USER || "dhameliyaavadh592@gmail.com",
-    GMAIL_APP_PASSWORD: cfEnv.GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD || "pbnsljmrszqgtkkv",
+    GMAIL_USER: cfEnv.GMAIL_USER || process.env.GMAIL_USER,
+    GMAIL_APP_PASSWORD: cfEnv.GMAIL_APP_PASSWORD || process.env.GMAIL_APP_PASSWORD,
     SMTP_HOST: cfEnv.SMTP_HOST || process.env.SMTP_HOST || "smtpout.secureserver.net",
     SMTP_PORT: cfEnv.SMTP_PORT || process.env.SMTP_PORT || "465",
     SMTP_SECURE: cfEnv.SMTP_SECURE || process.env.SMTP_SECURE || "true",
     SMTP_USER: cfEnv.SMTP_USER || process.env.SMTP_USER || "connect@bodybarrel.com",
-    SMTP_PASS: cfEnv.SMTP_PASS || process.env.SMTP_PASS || "Bodybarrel@9624",
-    RAZORPAY_API_KEY: cfEnv.RAZORPAY_API_KEY || process.env.RAZORPAY_API_KEY || "rzp_test_TcIR3cSdD5MiIh",
-    RAZORPAY_SECRET: cfEnv.RAZORPAY_SECRET || process.env.RAZORPAY_SECRET || "oEpwuso8bWDWuQ6Gz3qck6Y5",
+    SMTP_PASS: cfEnv.SMTP_PASS || process.env.SMTP_PASS,
+    RAZORPAY_API_KEY: cfEnv.RAZORPAY_API_KEY || process.env.RAZORPAY_API_KEY,
+    RAZORPAY_SECRET: cfEnv.RAZORPAY_SECRET || process.env.RAZORPAY_SECRET,
     STRIPE_SECRET_KEY: cfEnv.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY,
     DATABASE_URL: cfEnv.DATABASE_URL || process.env.DATABASE_URL,
     DIRECT_URL: cfEnv.DIRECT_URL || process.env.DIRECT_URL,
@@ -55,9 +55,9 @@ export function getEnv(): Env {
     console.warn("⚠️ Environment validation warning:", JSON.stringify(parsed.error.format(), null, 2));
     _env = {
       ...rawEnv,
-      SUPABASE_URL: (rawEnv.SUPABASE_URL as string) || "https://gjlwnohlruwdfbjvrfas.supabase.co",
-      SUPABASE_ANON_KEY: (rawEnv.SUPABASE_ANON_KEY as string) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqbHdub2hscnV3ZGZianZyZmFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMzI0MTUsImV4cCI6MjA5ODkwODQxNX0.obUZe_oorjj6RviQSsGHj5Hv_DFG76a6ZrEWpN4JVBk",
-      SESSION_SECRET: (rawEnv.SESSION_SECRET as string) || "bb-prod-session-secret-change-me-in-production-32chars-min",
+      SUPABASE_URL: (rawEnv.SUPABASE_URL as string) || "",
+      SUPABASE_ANON_KEY: (rawEnv.SUPABASE_ANON_KEY as string) || "",
+      SESSION_SECRET: (rawEnv.SESSION_SECRET as string) || "bb-default-development-session-secret-min-32-chars",
     } as unknown as Env;
     return _env;
   }

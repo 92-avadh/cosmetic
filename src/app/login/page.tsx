@@ -71,7 +71,7 @@ function LoginForm() {
       setStep("otp");
       setTimer(30);
       setResendCount(0);
-      setMessage(`A 6-digit verification code has been sent from connect@bodybarrel.com to ${cleanEmail}. It expires in 10 minutes.`);
+      setMessage(`A 6-digit verification code has been sent to ${cleanEmail}. It expires in 10 minutes.`);
     } catch (err: any) {
       setError(err.message || "Failed to initiate login request.");
     } finally {
@@ -102,7 +102,7 @@ function LoginForm() {
 
       setResendCount((prev) => prev + 1);
       setTimer(30);
-      setMessage(`A 6-digit verification code has been sent from connect@bodybarrel.com to ${cleanEmail}. It expires in 10 minutes.`);
+      setMessage(`A 6-digit verification code has been sent to ${cleanEmail}. It expires in 10 minutes.`);
     } catch (err: any) {
       setError(err.message || "Failed to resend verification code.");
     } finally {
